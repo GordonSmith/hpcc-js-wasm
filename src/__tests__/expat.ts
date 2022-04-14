@@ -41,6 +41,7 @@ describe("expat", function () {
         const v = await expatVersion();
         expect(v).to.be.a.string;
         expect(v).to.not.be.empty;
+        console.log("expat version:", v);
     });
 
     it("simple", function () {

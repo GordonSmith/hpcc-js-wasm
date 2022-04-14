@@ -1,0 +1,13 @@
+interface Buffer
+{
+  void Buffer();
+  VoidPtr data();
+  long length();
+};
+
+interface Zlib
+{
+  [Const] DOMString version();
+  [Value] Buffer compressString([Const] DOMString str);
+  [Const] DOMString decompressString([Ref] Buffer buff);
+};

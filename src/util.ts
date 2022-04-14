@@ -6,7 +6,7 @@ function getGlobal() {
 }
 
 const globalNS: any = getGlobal();
-  
+
 let _wasmFolder: string | undefined = globalNS.__hpcc_wasmFolder || undefined;
 export function wasmFolder(_?: string): string | undefined {
     if (!arguments.length) return _wasmFolder;
@@ -29,16 +29,11 @@ function trimStart(str: string, charToRemove: string) {
     return str;
 }
 
-export function loadWasm(_wasmLib: any, wf?: string, wasmBinary?: Uint8Array): Promise<any> {
-    const wasmLib = _wasmLib.default || _wasmLib;
-    //  Prevent double load ---
-    if (!wasmLib.__hpcc_promise) {
-        wasmLib.__hpcc_promise = wasmLib({
-                wasmBinary,
-                locateFile: (path: string, prefix: string) => {
-                    return `${trimEnd(wf || wasmFolder() || prefix || ".", "/")}/${trimStart(path, "/")}`;
-                }
-        });
-    }
-    return wasmLib.__hpcc_promise;
+export function loadWasm<T extends EmscriptenModule = EmscriptenModule>(wasmLib: (obj: any) => Promise<T>, wf?: string, wasmBinary?: Uint8Array) {
+    return wasmLib({
+        wasmBinary,
+        locateFile: (path: string, prefix: string) => {
+            return `${trimEnd(wf || wasmFolder() || prefix || ".", "/")}/${trimStart(path, "/")}`;
+        }
+    });
 }

@@ -4,7 +4,8 @@
 
 This repository contains a collection of useful c++ libraries compiled to WASM for (re)use in Node JS, Web Browsers and JavaScript Libraries:
 * [graphviz](https://www.graphviz.org/) - v3.0.0
-* [expat](https://libexpat.github.io/) - v2.4.6
+* [expat](https://libexpat.github.io/) - v2.4.8
+* [zlib](https://www.zlib.net/) - v1.2.12
 
 Built with:
 * [emsdk](https://github.com/emscripten-core/emsdk) - v3.1.6

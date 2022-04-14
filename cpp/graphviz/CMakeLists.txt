@@ -1,4 +1,4 @@
-PROJECT(graphlayout)
+PROJECT(graphviz)
 
 SET(GRAPHVIZ_LIB_DIR "${GRAPHVIZ_DIR}/lib")
 SET(GRAPHVIZ_PLUGIN_DIR "${GRAPHVIZ_DIR}/plugin")

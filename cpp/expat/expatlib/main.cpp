@@ -1,6 +1,6 @@
-#include "../config.h"
 #include "stack_parser.h"
 
+#include <expat_config.h>
 #include <string>
 
 class CExpat : public CExpatImpl<CExpat>

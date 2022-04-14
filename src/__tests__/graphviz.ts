@@ -9,6 +9,7 @@ describe("graphviz", function () {
         const v = await graphvizVersion();
         expect(v).to.be.a.string;
         expect(v).to.not.be.empty;
+        console.log("graphviz version:", v);
     });
 
     it("circo", function () {

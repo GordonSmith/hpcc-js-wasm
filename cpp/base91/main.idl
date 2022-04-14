@@ -1,0 +1,4 @@
+interface base91
+{
+  [Const] DOMString xxx();
+};

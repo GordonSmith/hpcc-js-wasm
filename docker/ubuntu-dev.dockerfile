@@ -8,7 +8,7 @@ RUN apt-get upgrade -y
 # Install pre-requisites (keep synced with README.md)
 ## NodeJS
 RUN apt-get install -y curl
-RUN curl --silent --location https://deb.nodesource.com/setup_14.x | bash -
+RUN curl --silent --location https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get install -y nodejs
 RUN apt-get install -y build-essential
 
@@ -23,7 +23,6 @@ WORKDIR /usr/src/app
 COPY ./scripts/* ./scripts/
 RUN ./scripts/cpp-install-emsdk.sh
 RUN ./scripts/cpp-install-graphviz.sh
-RUN ./scripts/cpp-install-expat.sh
 
 COPY . .
 

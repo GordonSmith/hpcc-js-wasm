@@ -49,5 +49,5 @@ target_link_libraries(gvc
   pack
   pathplan
   xdot
-  expat
+  expat::expat
 )

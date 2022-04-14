@@ -1,6 +1,10 @@
 // @ts-ignore
-import * as graphvizlib from "../build/graphviz/graphvizlib/graphvizlib";
+import graphvizlib from "../build/graphviz/graphvizlib/graphvizlib";
 import { loadWasm } from "./util";
+
+interface GraphvizModule extends EmscriptenModule {
+    Graphviz: any;
+}
 
 export type Format = "svg" | "dot" | "json" | "dot_json" | "xdot_json" | "plain" | "plain-ext";
 export type Engine = "circo" | "dot" | "fdp" | "sfdp" | "neato" | "osage" | "patchwork" | "twopi";
@@ -48,7 +52,7 @@ function createFiles(graphviz: any, _ext?: Ext) {
 }
 
 export function graphvizVersion(wasmFolder?: string, wasmBinary?: Uint8Array) {
-    return loadWasm(graphvizlib, wasmFolder, wasmBinary).then(module => {
+    return loadWasm<GraphvizModule>(graphvizlib, wasmFolder, wasmBinary).then(module => {
         return module.Graphviz.prototype.version();
     });
 }
@@ -56,7 +60,7 @@ export function graphvizVersion(wasmFolder?: string, wasmBinary?: Uint8Array) {
 export const graphviz = {
     layout(dotSource: string, outputFormat: Format = "svg", layoutEngine: Engine = "dot", ext?: Ext): Promise<string> {
         if (!dotSource) return Promise.resolve("");
-        return loadWasm(graphvizlib, ext?.wasmFolder, ext?.wasmBinary).then(module => {
+        return loadWasm<GraphvizModule>(graphvizlib, ext?.wasmFolder, ext?.wasmBinary).then(module => {
             const graphViz = new module.Graphviz(ext?.yInvert !== undefined ? ext?.yInvert : false, ext?.nop !== undefined ? ext?.nop : 0);
             createFiles(graphViz, ext);
             const retVal = graphViz.layout(dotSource, outputFormat, layoutEngine);
