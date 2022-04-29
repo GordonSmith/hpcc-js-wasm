@@ -1,5 +1,5 @@
 // @ts-ignore
-import zliblib from "../build/zlib/zlib";
+import zliblib from "../build/src-cpp/zlib/zlib";
 import { loadWasm } from "./util";
 
 interface IBuffer {

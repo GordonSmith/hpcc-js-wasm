@@ -1,5 +1,5 @@
 // @ts-ignore
-import graphvizlib from "../build/graphviz/graphvizlib/graphvizlib";
+import graphvizlib from "../build/src-cpp/graphviz/graphvizlib/graphvizlib";
 import { loadWasm } from "./util";
 
 interface GraphvizModule extends EmscriptenModule {

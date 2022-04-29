@@ -43,9 +43,9 @@ const nodeTpl = (input, cjsOutput, esOutput) => ({
     plugins: [
         alias({
             entries: [
-                { find: "../build/graphviz/graphvizlib/graphvizlib", replacement: "../build/graphviz/graphvizlib/graphvizlib.node" },
-                { find: "../build/expat/expatlib/expatlib", replacement: "../build/expat/expatlib/expatlib.node" },
-                { find: "../build/zlib/zlib", replacement: "../build/zlib/zlib.node" }
+                { find: "../build/src-cpp/graphviz/graphvizlib/graphvizlib", replacement: "../build/src-cpp/graphviz/graphvizlib/graphvizlib.node" },
+                { find: "../build/src-cpp/expat/expatlib/expatlib", replacement: "../build/src-cpp/expat/expatlib/expatlib.node" },
+                { find: "../build/src-cpp/zlib/zlib", replacement: "../build/src-cpp/zlib/zlib.node" }
             ]
         }),
         replace({

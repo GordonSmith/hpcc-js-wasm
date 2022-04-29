@@ -1,6 +1,8 @@
-PROJECT(expatlib)
+PROJECT(zlib)
 
-SET(EM_FLAGS "${EM_COMMON_FLAGS} -s EXPORT_NAME='${CMAKE_PROJECT_NAME}' -s EXPORTED_FUNCTIONS=\"['_malloc']\" --post-js ${CMAKE_CURRENT_BINARY_DIR}/main_glue.js")
+ADD_SUBDIRECTORY(zliblib)
+
+SET(EM_FLAGS "${EM_COMMON_FLAGS} -s EXPORT_NAME='${PROJECT_NAME}' --post-js ${CMAKE_CURRENT_BINARY_DIR}/main_glue.js")
 
 #  Generate Glue from IDL file  ---
 ADD_CUSTOM_COMMAND(
@@ -11,33 +13,33 @@ ADD_CUSTOM_COMMAND(
 SET_PROPERTY(SOURCE main.cpp APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/main_glue.cpp)
 #  ---  ---  ---
 
+SET(SRCS
+    main.cpp
+)
+
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${EXPAT_INCLUDE_DIR}
+    zliblib
 )
 
-ADD_EXECUTABLE(expatlib
-    main.cpp
+ADD_EXECUTABLE(zlib ${SRCS})
+
+SET_TARGET_PROPERTIES(zlib PROPERTIES LINK_FLAGS "-s ENVIRONMENT=web ${EM_FLAGS}")
+
+TARGET_LINK_LIBRARIES(zlib 
+    zliblib
 )
 
-SET_TARGET_PROPERTIES(expatlib PROPERTIES LINK_FLAGS "-s ENVIRONMENT=web ${EM_FLAGS}")
+ADD_EXECUTABLE(zlib.node ${SRCS})
 
-TARGET_LINK_LIBRARIES(expatlib
-    expat::expat
-)
+SET_TARGET_PROPERTIES(zlib.node PROPERTIES LINK_FLAGS "-s ENVIRONMENT=node ${EM_FLAGS}")
 
-ADD_EXECUTABLE(expatlib.node
-    main.cpp
-)
-
-SET_TARGET_PROPERTIES(expatlib.node PROPERTIES LINK_FLAGS "-s ENVIRONMENT=node ${EM_FLAGS}")
-
-TARGET_LINK_LIBRARIES(expatlib.node
-    expat::expat
+TARGET_LINK_LIBRARIES(zlib.node
+    zliblib
 )
 
 INSTALL(FILES 
-    ${CMAKE_CURRENT_BINARY_DIR}/expatlib.wasm
+    ${CMAKE_CURRENT_BINARY_DIR}/zlib.wasm
     DESTINATION dist
     COMPONENT runtime
 )

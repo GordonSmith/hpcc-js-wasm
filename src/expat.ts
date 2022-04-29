@@ -1,5 +1,5 @@
 // @ts-ignore
-import expatlib from "../build/expat/expatlib/expatlib";
+import expatlib from "../build/src-cpp/expat/expatlib/expatlib";
 import { loadWasm } from "./util";
 
 interface ExpatModule extends EmscriptenModule {

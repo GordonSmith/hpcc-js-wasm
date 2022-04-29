@@ -1,6 +1,6 @@
 PROJECT(graphvizlib)
 
-SET(EM_FLAGS "${EM_COMMON_FLAGS} -s EXPORT_NAME='${CMAKE_PROJECT_NAME}' --post-js ${CMAKE_CURRENT_BINARY_DIR}/main_glue.js")
+SET(EM_FLAGS "${EM_COMMON_FLAGS} -s EXPORT_NAME='${PROJECT_NAME}' --post-js ${CMAKE_CURRENT_BINARY_DIR}/main_glue.js")
 
 #  Generate Glue from IDL file  ---
 ADD_CUSTOM_COMMAND(
