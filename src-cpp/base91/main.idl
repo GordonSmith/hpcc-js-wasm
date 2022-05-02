@@ -1,5 +1,0 @@
-interface base91
-{
-  void base91();
-  [Const] DOMString xxx();
-};

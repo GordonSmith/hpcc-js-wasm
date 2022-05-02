@@ -1,11 +1,11 @@
-function getGlobal() {
-    if (typeof self !== "undefined") { return self; }
-    if (typeof window !== "undefined") { return window; }
-    if (typeof global !== "undefined") { return global; }
-    throw new Error("unable to locate global object");
-}
+// function getGlobal() {
+//     if (typeof self !== "undefined") { return self; }
+//     if (typeof window !== "undefined") { return window; }
+//     if (typeof global !== "undefined") { return global; }
+//     throw new Error("unable to locate global object");
+// }
 
-const globalNS: any = getGlobal();
+const globalNS: any = globalThis;
 
 let _wasmFolder: string | undefined = globalNS.__hpcc_wasmFolder || undefined;
 export function wasmFolder(_?: string): string | undefined {
