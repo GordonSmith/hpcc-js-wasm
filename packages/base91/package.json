@@ -1,0 +1,55 @@
+{
+    "name": "@hpcc-js/base91",
+    "version": "2.0.0",
+    "description": "base91 wasm library",
+    "keywords": [
+        "base91"
+    ],
+    "main": "dist/index.node.js",
+    "module": "dist/index.es6",
+    "module-node": "dist/index.node.es6",
+    "browser": "dist/index.js",
+    "unpkg": "dist/index.min.js",
+    "jsdelivr": "dist/index.min.js",
+    "types": "types/index.d.ts",
+    "files": [
+        "dist/*",
+        "types/*",
+        "types-3.4/*",
+        "src/*"
+    ],
+    "scripts": {
+        "clean": "rimraf lib* types dist *.tsbuildinfo build",
+        "compile-es6": "tsc --module es6 --outDir ./lib-es6",
+        "compile-es6-watch": "npm run compile-es6 -- -w",
+        "bundle": "rollup -c",
+        "bundle-watch": "npm run bundle -- -w",
+        "minimize": "terser dist/index.js -c -m --source-map \"content='dist/index.js.map',url='index.min.js.map'\" -o dist/index.min.js",
+        "gen-legacy-types": "downlevel-dts ./types ./types-3.4",
+        "build": "run-s compile-cpp compile-es6 bundle minimize",
+        "watch": "run-p compile-es6-watch bundle-watch",
+        "lint": "eslint ./src",
+        "lint-fix": "npm run lint -- --fix",
+        "test-karma": "karma start --single-run --browsers ChromeHeadless karma.conf.js",
+        "test-node": "npx mocha ./lib-test/index.node.js --reporter spec",
+        "test": "run-p test-karma test-node",
+        "update": "npx npm-check-updates -u -t minor"
+    },
+    "dependencies": {
+        "yargs": "17.4.1"
+    },
+    "devDependencies": {
+        "@types/emscripten": "1.39.6"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/hpcc-systems/hpcc-js-wasm.git"
+    },
+    "author": "Gordon Smith <gordonjsmith@gmail.com>",
+    "contributors": [],
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/hpcc-systems/hpcc-js-wasm/issues"
+    },
+    "homepage": "https://github.com/hpcc-systems/hpcc-js-wasm#readme"
+}

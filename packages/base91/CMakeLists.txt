@@ -1,0 +1,41 @@
+PROJECT(Base91Module)
+
+find_package(unofficial-base91 CONFIG REQUIRED)
+
+SET(EM_FLAGS "${EM_COMMON_FLAGS} -lembind -s EXPORT_NAME='${PROJECT_NAME}'")
+
+INCLUDE_DIRECTORIES(
+    UtilModule
+    ${VCPKG_INCLUDE_DIR}
+)
+
+SET(SRCS
+    src-cpp/main.cpp
+)
+
+SET(LIBS
+    UtilModule  
+    unofficial::base91::base91
+)
+
+ADD_EXECUTABLE(base91 ${SRCS})
+
+SET_TARGET_PROPERTIES(base91 PROPERTIES LINK_FLAGS "-s ENVIRONMENT=web,worker ${EM_FLAGS}")
+
+TARGET_LINK_LIBRARIES(base91
+    ${LIBS}
+)
+
+ADD_EXECUTABLE(base91.node ${SRCS})
+
+SET_TARGET_PROPERTIES(base91.node PROPERTIES LINK_FLAGS "-s ENVIRONMENT=node ${EM_FLAGS}")
+
+TARGET_LINK_LIBRARIES(base91.node PRIVATE
+    ${LIBS}
+)
+
+INSTALL(FILES 
+    ${CMAKE_CURRENT_BINARY_DIR}/base91.wasm
+    DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/dist
+    COMPONENT runtime
+)
