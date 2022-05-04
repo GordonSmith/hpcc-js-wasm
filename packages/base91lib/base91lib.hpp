@@ -22,6 +22,6 @@ public:
     std::string encode(const std::vector<uint8_t> &data);
     std::vector<uint8_t> decode(const std::string &str);
 
-    void stream_b91enc_p(std::stringstream &in, std::stringstream &out);
-    void stream_b91dec(std::stringstream &in, std::stringstream &out);
+    void stream_encode(std::istream &in, std::stringstream &out);
+    void stream_decode(std::stringstream &in, std::ostream &out);
 };
