@@ -1,0 +1,32 @@
+PROJECT(TestModule)
+
+find_package(unofficial-base91 CONFIG REQUIRED)
+
+SET(EM_FLAGS "${EM_COMMON_FLAGS} -s EXPORTED_FUNCTIONS=_encode,_decode -s EXPORT_NAME='${PROJECT_NAME}'")
+
+INCLUDE_DIRECTORIES(
+    ${VCPKG_INCLUDE_DIR}
+)
+
+SET(SRCS
+    src-cpp/main.cpp
+)
+
+SET(LIBS
+    unofficial::base91::base91
+)
+
+ADD_EXECUTABLE(TestModule ${SRCS})
+
+SET_TARGET_PROPERTIES(TestModule PROPERTIES LINK_FLAGS "-s ENVIRONMENT=web,worker ${EM_FLAGS}")
+
+TARGET_LINK_LIBRARIES(TestModule
+    ${LIBS}
+)
+
+INSTALL(FILES 
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.wasm
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.js
+    DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../dist
+    COMPONENT runtime
+)

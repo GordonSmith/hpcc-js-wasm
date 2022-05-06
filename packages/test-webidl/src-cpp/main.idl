@@ -1,0 +1,4 @@
+interface TestModuleIDL
+{
+   [Const] static DOMString encode(VoidPtr data, unsigned long size);
+};

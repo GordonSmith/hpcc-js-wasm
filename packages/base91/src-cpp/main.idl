@@ -1,0 +1,5 @@
+interface main
+{
+   [Const] static DOMString encode2(VoidPtr data, unsigned long size);
+   [Const] static DOMString decode2(DOMString str, unsigned long strSize, VoidPtr data, unsigned long size);
+};

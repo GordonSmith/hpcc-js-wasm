@@ -12,6 +12,7 @@ private:
     size_t encbuf_size;
     char *decbuf;
     size_t decbuf_size;
+
     char *obuf;
     size_t llen;
 

@@ -23,6 +23,17 @@
             "name": "test-browser",
             "type": "pwa-msedge",
             "request": "launch",
+            "url": "file://localhost:8000/test.html",
+            "webRoot": "${workspaceRoot}",
+            "sourceMapPathOverrides": {
+                "webpack:///./*": "${workspaceRoot}/*",
+                "webpack:///*": "/*"
+            }
+        },
+        {
+            "name": "test-http-browser",
+            "type": "pwa-msedge",
+            "request": "launch",
             "url": "http://localhost:8000/test.html",
             "webRoot": "${workspaceRoot}",
             "sourceMapPathOverrides": {

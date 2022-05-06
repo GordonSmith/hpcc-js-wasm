@@ -1,9 +1,38 @@
-// function getGlobal() {
-//     if (typeof self !== "undefined") { return self; }
-//     if (typeof window !== "undefined") { return window; }
-//     if (typeof global !== "undefined") { return global; }
-//     throw new Error("unable to locate global object");
-// }
+const read_ = (url: string | URL) => {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, false);
+    xhr.send(null);
+    return xhr.responseText;
+};
+
+const nodeRead = (url?: string) => {
+    var fs = require('fs');
+    return fs.readFileSync(url ?? __dirname + '/base91.wasm');
+};
+
+const readBinary = (url: string | URL) => {
+    //  --- ENVIRONMENT_IS_WORKER  ---
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, false);
+    xhr.responseType = 'arraybuffer';
+    xhr.send(null);
+    return new Uint8Array(/** @type{!ArrayBuffer} */(xhr.response));
+};
+
+const readAsync = (url: string | URL, onload: (arg0: any) => void, onerror: (this: XMLHttpRequest, ev?: ProgressEvent<EventTarget>) => any) => {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'arraybuffer';
+    xhr.onload = () => {
+        if (xhr.status == 200 || (xhr.status == 0 && xhr.response)) { // file URLs can return 0
+            onload(xhr.response);
+            return;
+        }
+        onerror.apply(xhr);
+    };
+    xhr.onerror = onerror;
+    xhr.send(null);
+};
 
 const globalNS: any = globalThis;
 
@@ -29,11 +58,21 @@ function trimStart(str: string, charToRemove: string) {
     return str;
 }
 
+let g_wasm: Uint8Array | undefined;
+
 export function loadWasm<T extends EmscriptenModule = EmscriptenModule>(wasmLib: (obj: any) => Promise<T>, wf?: string, wasmBinary?: Uint8Array) {
-    return wasmLib({
-        wasmBinary,
-        locateFile: (path: string, prefix: string) => {
-            return `${trimEnd(wf || wasmFolder() || prefix || ".", "/")}/${trimStart(path, "/")}`;
+    if (!g_wasm) {
+        if (wasmBinary) {
+            g_wasm = wasmBinary;
+        } else if (wf) {
+            g_wasm = nodeRead(__dirname + "/../dist/base91.wasm");
         }
+    }
+    return wasmLib({
+        wasm: g_wasm,
+        // locateFile: (path: string, prefix: string) => {
+        //     return `${trimEnd(wf || wasmFolder() || prefix || ".", "/")
+        //         } /${trimStart(path, "/")}`;
+        // }
     });
 }

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 project(base91 LANGUAGES C CXX)
 
-add_library(base91
+add_library(base91 
     base91.h
     base91.c
 )

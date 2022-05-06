@@ -8,6 +8,7 @@ SET(SRCS
 )
 
 INCLUDE_DIRECTORIES(
+    UtilModule
     ${VCPKG_INCLUDE_DIR}
 )
 
@@ -15,7 +16,8 @@ ADD_LIBRARY(base91lib
     ${SRCS}
 )
 
-TARGET_LINK_LIBRARIES(base91lib PRIVATE 
+TARGET_LINK_LIBRARIES(base91lib PRIVATE
+    UtilModule
     unofficial::base91::base91
 )
 
