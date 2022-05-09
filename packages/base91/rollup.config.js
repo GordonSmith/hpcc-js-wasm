@@ -61,8 +61,8 @@ const nodeTpl = (input, cjsOutput, esOutput) => ({
 
 export default [
     browserTpl("lib-es6/index", pkg.browser, pkg.module),
-    nodeTpl("lib-es6/index", pkg.main, pkg["module-node"]),
+    // nodeTpl("lib-es6/index", pkg.main, pkg["module-node"]),
 
     browserTpl("lib-es6/index.spec", "lib-test/index.js", "lib-test/index.es6"),
-    nodeTpl("lib-es6/index.spec", "lib-test/index.node.js", "lib-test/index.node.es6")
+    // nodeTpl("lib-es6/index.spec", "lib-test/index.node.js", "lib-test/index.node.es6")
 ];

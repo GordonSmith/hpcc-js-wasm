@@ -4,8 +4,12 @@
 #include <iostream>
 #include <sstream>
 
-struct main
+struct hpccjs
 {
+    void *malloc(size_t size)
+    {
+        return ::malloc(size);
+    }
 
     std::string encode(std::vector<uint8_t> data)
     {
@@ -66,17 +70,17 @@ struct main
         return retVal.c_str();
     }
 
-    void decode2(const char *str, size_t strSize, uint8_t *buff, size_t size)
+    void decode2(const char *str, size_t strSize, void *buff, size_t size)
     {
         struct basE91 b91;
         basE91_init(&b91);
 
         size_t s = basE91_decode(&b91, str, strSize, buff);
-        basE91_decode_end(&b91, buff + s); /* empty bit queue */
+        basE91_decode_end(&b91, (uint8_t *)buff + s); /* empty bit queue */
     }
 };
 
 // #include <emscripten.h>
 
 //  Include JS Glue  ---
-#include "main_glue.cpp"
+#include <main_glue.cpp>

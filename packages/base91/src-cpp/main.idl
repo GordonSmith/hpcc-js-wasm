@@ -1,5 +1,6 @@
-interface main
+interface hpccjs
 {
+   static VoidPtr malloc(unsigned long size);
    [Const] static DOMString encode2(VoidPtr data, unsigned long size);
-   [Const] static DOMString decode2(DOMString str, unsigned long strSize, VoidPtr data, unsigned long size);
+   static void decode2(DOMString str, unsigned long strSize, VoidPtr data, unsigned long size);
 };

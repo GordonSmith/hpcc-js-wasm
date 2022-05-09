@@ -2,7 +2,7 @@ PROJECT(Base91Module)
 
 find_package(unofficial-base91 CONFIG REQUIRED)
 
-SET(EM_FLAGS "${EM_COMMON_FLAGS} -s EXPORT_NAME='${PROJECT_NAME}' --post-js ${CMAKE_CURRENT_BINARY_DIR}/main_glue.js")
+SET(EM_FLAGS "${EM_COMMON_FLAGS} -s INCOMING_MODULE_JS_API=\"[]\" -s EXPORTED_FUNCTIONS=\"['_malloc']\" -s EXPORT_NAME='${PROJECT_NAME}' --pre-js ${CMAKE_CURRENT_SOURCE_DIR}/src/pre.js --post-js ${CMAKE_CURRENT_BINARY_DIR}/main_glue.js")
 
 #  Generate Glue from IDL file  ---
 ADD_CUSTOM_COMMAND(

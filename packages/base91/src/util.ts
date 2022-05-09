@@ -60,19 +60,22 @@ function trimStart(str: string, charToRemove: string) {
 
 let g_wasm: Uint8Array | undefined;
 
-export function loadWasm<T extends EmscriptenModule = EmscriptenModule>(wasmLib: (obj: any) => Promise<T>, wf?: string, wasmBinary?: Uint8Array) {
+export async function loadWasm<T extends EmscriptenModule = EmscriptenModule>(wasmLib: (obj: any) => Promise<T>, wf?: string, wasmBinary?: Uint8Array) {
     if (!g_wasm) {
         if (wasmBinary) {
             g_wasm = wasmBinary;
-        } else if (wf) {
+        } else {
             g_wasm = nodeRead(__dirname + "/../dist/base91.wasm");
         }
     }
-    return wasmLib({
+    const Module = {
         wasm: g_wasm,
         // locateFile: (path: string, prefix: string) => {
         //     return `${trimEnd(wf || wasmFolder() || prefix || ".", "/")
         //         } /${trimStart(path, "/")}`;
         // }
+    };
+    return wasmLib(Module).then(module => {
+        return module;
     });
 }
