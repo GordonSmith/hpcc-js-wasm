@@ -51,13 +51,22 @@ async function nodeFetch(wasmUrl: string): Promise<ArrayBuffer> {
     return fs.readFile(wasmUrl, undefined);
 }
 
+const g_wasmCache = {} as { [key: string]: Promise<any> };
+
 export async function loadWasm(_wasmLib: any, filename: string, wf?: string, wasmBinary?: ArrayBuffer): Promise<any> {
+    if (!g_wasmCache[filename]) {
+        g_wasmCache[filename] = _loadWasm(_wasmLib, filename, wf, wasmBinary);
+    }
+    return g_wasmCache[filename];
+}
+
+export async function _loadWasm(_wasmLib: any, filename: string, wf?: string, wasmBinary?: ArrayBuffer): Promise<any> {
     const wasmLib = _wasmLib.default || _wasmLib;
     const wasmUrl = `${trimEnd(wf || wasmFolder() || scriptDir || ".", "/")}/${trimStart(`${filename}.wasm`, "/")}`;
     if (!wasmBinary) {
         wasmBinary = await ((typeof process == 'object' && typeof require == 'function') ? nodeFetch(wasmUrl) : browserFetch(wasmUrl));
     }
-    return wasmLib({
+    return await wasmLib({
         "wasm": wasmBinary
     });
 }

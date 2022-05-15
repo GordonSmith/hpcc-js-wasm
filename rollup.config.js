@@ -4,6 +4,14 @@ import nodeResolve from "@rollup/plugin-node-resolve";
 import sourcemaps from "rollup-plugin-sourcemaps";
 import replace from "@rollup/plugin-replace";
 
+const initRuntime = "initRuntime(asm);"
+const initRuntimePatched = `\
+initRuntime(asm) ;\
+var _malloc=_malloc,_free=_free;\
+Module['_malloc']=_malloc;\
+Module['_free']=_free;\
+`;
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require("./package.json");
 const browserTpl = (input, umdOutput, esOutput) => ({
@@ -20,6 +28,13 @@ const browserTpl = (input, umdOutput, esOutput) => ({
     }],
     plugins: [
         alias({}),
+        replace({
+            preventAssignment: true,
+            delimiters: ['', ''],
+            values: {
+                [initRuntime]: initRuntimePatched
+            }
+        }),
         nodeResolve({
             preferBuiltins: true
         }),
@@ -27,6 +42,7 @@ const browserTpl = (input, umdOutput, esOutput) => ({
         sourcemaps()
     ]
 });
+
 const nodeTpl = (input, cjsOutput, esOutput) => ({
     input: input,
     external: ["fs", "crypto", "path"],
@@ -49,6 +65,7 @@ const nodeTpl = (input, cjsOutput, esOutput) => ({
         }),
         replace({
             preventAssignment: true,
+
             ".node.wasm": ".wasm"
         }),
         nodeResolve({

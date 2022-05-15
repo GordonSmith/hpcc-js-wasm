@@ -1,6 +1,14 @@
 PROJECT(graphvizlib)
 
-SET(EM_FLAGS "-s WASM=1 -s INVOKE_RUN=0 -s ALLOW_MEMORY_GROWTH=1 -s EXPORT_NAME='${CMAKE_PROJECT_NAME}' -s EXPORTED_FUNCTIONS=\"['_malloc', '_free']\" --post-js ${CMAKE_CURRENT_BINARY_DIR}/main_glue.js --pre-js ${CMAKE_CURRENT_SOURCE_DIR}/pre.js --post-js ${CMAKE_CURRENT_SOURCE_DIR}/post.js")
+# See:  https://github.com/emscripten-core/emscripten/blob/main/src/settings.js
+SET(EM_FLAGS 
+    ${EM_FLAGS}
+    "-s EXPORT_NAME='${CMAKE_PROJECT_NAME}'"
+    "-s EXPORTED_FUNCTIONS=\"[]\""
+    "-s EXPORTED_RUNTIME_METHODS=\"[]\""
+    "--post-js ${CMAKE_CURRENT_BINARY_DIR}/main_glue.js"
+)
+STRING(REPLACE ";" " " LINK_FLAGS "${EM_FLAGS}")
 
 #  Generate Glue from IDL file  ---
 ADD_CUSTOM_COMMAND(
@@ -9,8 +17,6 @@ ADD_CUSTOM_COMMAND(
     COMMAND python3 ${CMAKE_BINARY_DIR}/../emsdk/upstream/emscripten/tools/webidl_binder.py ${CMAKE_CURRENT_SOURCE_DIR}/main.idl ${CMAKE_CURRENT_BINARY_DIR}/main_glue
 )
 SET_PROPERTY(SOURCE main.cpp APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/main_glue.cpp)
-SET_PROPERTY(SOURCE main.cpp APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/pre.js)
-SET_PROPERTY(SOURCE main.cpp APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/post.js)
 #  ---  ---  ---
 
 SET(SRCS
@@ -32,7 +38,8 @@ ADD_EXECUTABLE(graphvizlib
     ${SRCS}
 )
 
-SET_TARGET_PROPERTIES(graphvizlib PROPERTIES LINK_FLAGS "-s ENVIRONMENT=web,worker,node -s FILESYSTEM=1 -s MINIMAL_RUNTIME -s MODULARIZE=1 -s EXPORT_ES6=1 -s USE_ES6_IMPORT_META=0 ${EM_FLAGS}")
+message("EM_FLAGS:  ${EM_FLAGS}")
+SET_TARGET_PROPERTIES(graphvizlib PROPERTIES LINK_FLAGS ${LINK_FLAGS})
 
 TARGET_LINK_LIBRARIES(graphvizlib
     gvplugin_core
@@ -42,6 +49,7 @@ TARGET_LINK_LIBRARIES(graphvizlib
     label
     ortho
     pack
+    expat::expat
 )
 
 INSTALL(FILES 

@@ -140,6 +140,21 @@ describe("graphvizSync", function () {
         expect(svg).to.be.a("string");
         expect(svg).to.not.be.empty;
     });
+    this.timeout(5000);
+    it("ortho", function () {
+        let success;
+        try {
+            const svg = gvSync.dot(ortho, "svg");
+            success = true;
+        } catch (e: any) {
+            success = false;
+            expect(typeof e.message).to.equal("string");
+            expect(e.message).to.not.be.empty;
+            console.error(e.message);
+        }
+        expect(success).to.be.true;
+    });
+
 });
 
 describe("bad dot", function () {
@@ -180,18 +195,6 @@ describe("bad dot", function () {
             expect(e.message).to.not.be.empty;
         }
         expect(success).to.be.false;
-    });
-    it("ortho", function () {
-        let success;
-        try {
-            const svg = gvSync.dot(ortho, "svg");
-            success = true;
-        } catch (e: any) {
-            success = false;
-            expect(typeof e.message).to.equal("string");
-            expect(e.message).to.not.be.empty;
-        }
-        expect(success).to.be.true;
     });
 });
 
