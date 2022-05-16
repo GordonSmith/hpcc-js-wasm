@@ -43,7 +43,7 @@
     "install-vcpkg": "run-script-os",
     "install-vcpkg:linux": "./scripts/cpp-install-vcpkg.sh",
     "install-vcpkg:win32": "wsl -e ./scripts/cpp-install-vcpkg.sh",
-    "install-build-deps": "run-s install-emsdk install-graphviz install-vcpkg",
+    "install-build-deps": "run-p install-emsdk install-graphviz install-vcpkg",
     "uninstall-build-deps": "rimraf ./emsdk ./src-graphviz ./src-vcpkg",
     "clean": "rimraf coverage build dist lib* types *.tsbuildinfo",
     "compile-es6": "tsc --module es6 --outDir ./lib-es6",
