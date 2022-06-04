@@ -46,9 +46,9 @@ const char *Graphviz::layout(const char *src, const char *format, const char *en
     lastErrorStr[0] = '\0';
 
     GVC_t *context = gvContext();
-    gvAddLibrary(context, &gvplugin_core_LTX_library);
     gvAddLibrary(context, &gvplugin_dot_layout_LTX_library);
     gvAddLibrary(context, &gvplugin_neato_layout_LTX_library);
+    gvAddLibrary(context, &gvplugin_core_LTX_library);
 
     agseterr(AGERR);
     agseterrf(vizErrorf);

@@ -23,27 +23,53 @@ option(use_sanitizers  "enables using address and undefined behavior sanitizer" 
 option(use_coverage    "enables analyzing code coverage" OFF)
 option(with_cxx_api    "enables building the C++ API" OFF)
 option(with_cxx_tests  "enables building the C++ tests" OFF)
+option(use_win_pre_inst_libs "enables building using pre-installed Windows libraries" ON)
 
-if (with_digcola)
-    add_definitions(-DDIGCOLA)
-endif (with_digcola)
+if(with_digcola)
+  add_definitions(-DDIGCOLA)
+endif()
 
-if (with_ipsepcola)
-    add_definitions(-DIPSEPCOLA)
-endif (with_ipsepcola)
+if(with_ipsepcola)
+  add_definitions(-DIPSEPCOLA)
+endif()
 
-if (with_ortho)
-    add_definitions(-DORTHO)
-endif (with_ortho)
+if(with_ortho)
+  add_definitions(-DORTHO)
+endif()
 
-if (with_sfdp)
-    add_definitions(-DSFDP)
-endif (with_sfdp)
+if(with_sfdp)
+  add_definitions(-DSFDP)
+endif()
 
-if (with_smyrna)
-    # TODO include dependency checks
-    add_definitions(-DSMYRNA)
-endif (with_smyrna)
+# ===================== Append local CMake module directory ====================
+list(APPEND CMAKE_MODULE_PATH "${GRAPHVIZ_DIR}/cmake")
+
+# find_package(ANN)
+
+# find_package(CAIRO)
+
+if(with_expat)
+  find_package(EXPAT)
+endif()
+
+# find_package(GD)
+
+if(enable_ltdl)
+  find_package(LTDL)
+  if(LTDL_FOUND)
+    add_definitions(-DENABLE_LTDL)
+  endif()
+endif()
+
+# find_package(PANGOCAIRO)
+
+if(with_zlib)
+  find_package(ZLIB)
+endif()
+
+# if(UNIX)
+#   find_library(MATH_LIB m)
+# endif()
 
 ADD_SUBDIRECTORY(lib)
 ADD_SUBDIRECTORY(plugin)

@@ -1,14 +1,41 @@
 import { expect } from "chai";
 import { wasmFolder } from "../util";
-import { graphviz, graphvizSync, GraphvizSync, graphvizVersion } from "../graphviz";
+import { Engine, Format, graphviz, graphvizSync, GraphvizSync, graphvizVersion } from "../graphviz";
 import { badDot, dot } from "./dot001";
 import { ortho } from "./dot002";
+
+export const formats: Format[] = ["dot", "plain"];//, "dot_json", "dot"];//["svg", "dot", "json", "dot_json", "xdot_json", "plain", "plain-ext"];
+export const engines: Engine[] = ["circo"];//["circo", "dot", "fdp", "sfdp", "neato", "osage", "patchwork", "twopi"];
+
+// for (const format of formats) {
+//     for (const engine of engines) {
+//         graphviz.layout(dot, format, engine).then(result => {
+//         }).catch(e => {
+//             console.error(e.message);
+//         });
+//     }
+// }
 
 describe("graphviz", function () {
     it("version", async function () {
         const v = await graphvizVersion();
         expect(v).to.be.a.string;
         expect(v).to.not.be.empty;
+    });
+
+    describe.only("all combos", function () {
+        for (const engine of engines) {
+            for (const format of formats) {
+                it(`${engine}-${format}`, function () {
+                    return graphviz.layout(dot, format, engine).then(result => {
+                        expect(result).to.be.a("string");
+                        expect(result).to.not.be.empty;
+                    }).catch(e => {
+                        expect(true).to.be.false;
+                    });
+                });
+            }
+        }
     });
 
     it("circo", function () {

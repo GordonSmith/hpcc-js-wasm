@@ -41,15 +41,11 @@ ADD_EXECUTABLE(graphvizlib
 message("EM_FLAGS:  ${EM_FLAGS}")
 SET_TARGET_PROPERTIES(graphvizlib PROPERTIES LINK_FLAGS ${LINK_FLAGS})
 
-TARGET_LINK_LIBRARIES(graphvizlib
+TARGET_LINK_LIBRARIES(graphvizlib PRIVATE
     gvplugin_core
     gvplugin_dot_layout
     gvplugin_neato_layout
-    common
-    label
     ortho
-    pack
-    expat::expat
 )
 
 INSTALL(FILES 

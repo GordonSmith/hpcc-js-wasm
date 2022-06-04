@@ -1,4 +1,3 @@
-
 add_library(dotgen STATIC
   # Header files
   ${GRAPHVIZ_LIB_DIR}/dotgen/aspect.h
@@ -32,4 +31,8 @@ target_include_directories(dotgen PRIVATE
   ${GRAPHVIZ_LIB_DIR}/gvc
   ${GRAPHVIZ_LIB_DIR}/pack
   ${GRAPHVIZ_LIB_DIR}/pathplan
+)
+
+target_link_libraries(dotgen PRIVATE
+  cgraph
 )

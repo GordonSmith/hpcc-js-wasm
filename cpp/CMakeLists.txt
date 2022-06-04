@@ -17,7 +17,7 @@ SET(EM_FLAGS
     "-s MINIMAL_RUNTIME=2"
     "-s MODULARIZE=1" 
     "-s EXPORT_ES6=1"
-    "-s IGNORE_CLOSURE_COMPILER_ERRORS=1"
+    "-s IGNORE_CLOSURE_COMPILER_ERRORS=0"
     "-s USE_ES6_IMPORT_META=0"
     "--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/src/pre.js"
     "--post-js ${CMAKE_CURRENT_SOURCE_DIR}/src/post.js"
