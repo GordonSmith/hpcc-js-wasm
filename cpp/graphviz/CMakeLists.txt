@@ -1,5 +1,8 @@
 PROJECT(graphlayout)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=bad-function-cast")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror=bad-function-cast")
+
 find_package(expat CONFIG REQUIRED)
 
 SET(GRAPHVIZ_LIB_DIR "${GRAPHVIZ_DIR}/lib")

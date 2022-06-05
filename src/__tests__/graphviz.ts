@@ -4,8 +4,8 @@ import { Engine, Format, graphviz, graphvizSync, GraphvizSync, graphvizVersion }
 import { badDot, dot } from "./dot001";
 import { ortho } from "./dot002";
 
-export const formats: Format[] = ["dot", "plain"];//, "dot_json", "dot"];//["svg", "dot", "json", "dot_json", "xdot_json", "plain", "plain-ext"];
-export const engines: Engine[] = ["circo"];//["circo", "dot", "fdp", "sfdp", "neato", "osage", "patchwork", "twopi"];
+export const formats: Format[] = ["svg", "dot", "json", "dot_json", "xdot_json", "plain", "plain-ext"];
+export const engines: Engine[] = ["circo", "dot", "fdp", "sfdp", "neato", "osage", "patchwork", "twopi"];
 
 // for (const format of formats) {
 //     for (const engine of engines) {
