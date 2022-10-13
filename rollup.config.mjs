@@ -1,9 +1,10 @@
 import commonjs from "@rollup/plugin-commonjs";
 import nodeResolve from "@rollup/plugin-node-resolve";
-import sourcemaps from "rollup-plugin-sourcemaps";
 import replace from "@rollup/plugin-replace";
-
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 const pkg = require("./package.json");
+
 const browserTpl = (input, umdOutput, esOutput) => ({
     input: input,
     output: [{
@@ -12,7 +13,7 @@ const browserTpl = (input, umdOutput, esOutput) => ({
         sourcemap: true,
         name: pkg.name
     }, {
-        file: esOutput + ".js",
+        file: esOutput,
         format: "es",
         sourcemap: true
     }],
@@ -20,12 +21,11 @@ const browserTpl = (input, umdOutput, esOutput) => ({
         nodeResolve({
             preferBuiltins: true
         }),
-        commonjs({}),
-        sourcemaps()
+        commonjs({})
     ]
 });
 
-const nodeTpl = (input, cjsOutput, esOutput) => ({
+const nodeTpl = (input, cjsOutput) => ({
     input: input,
     external: ["fs", "crypto", "path"],
     output: [{
@@ -33,10 +33,6 @@ const nodeTpl = (input, cjsOutput, esOutput) => ({
         format: "cjs",
         sourcemap: true,
         name: pkg.name
-    }, {
-        file: esOutput + ".js",
-        format: "es",
-        sourcemap: true
     }],
     plugins: [
         replace({
@@ -52,18 +48,17 @@ const nodeTpl = (input, cjsOutput, esOutput) => ({
         nodeResolve({
             preferBuiltins: true
         }),
-        commonjs({}),
-        sourcemaps()
+        commonjs({})
     ]
 });
 
 export default [
     browserTpl("lib-es6/index", pkg.browser, pkg.module),
-    nodeTpl("lib-es6/index", pkg.browser.split("index").join("index.node"), pkg.module.split("index").join("index.node")),
+    nodeTpl("lib-es6/index", pkg["main-node"]),
 
-    browserTpl("lib-es6/graphviz", "dist/graphviz.js", "dist/graphviz.es6"),
-    browserTpl("lib-es6/expat", "dist/expat.js", "dist/expat.es6"),
+    browserTpl("lib-es6/graphviz", "dist/graphviz.js", "dist/graphviz.mjs"),
+    browserTpl("lib-es6/expat", "dist/expat.js", "dist/expat.mjs"),
 
-    browserTpl("lib-es6/__tests__/index", "dist/test.js", "dist/test.es6"),
-    nodeTpl("lib-es6/__tests__/index", "dist/test.node.js", "dist/test.node.es6"),
+    browserTpl("lib-es6/__tests__/index", "dist/test.js", "dist/test.mjs"),
+    nodeTpl("lib-es6/__tests__/index", "dist/test.cjs"),
 ];

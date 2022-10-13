@@ -15,19 +15,9 @@
     "patchwork",
     "xml"
   ],
-  "exports": {
-    ".": {
-      "types": "./types/index.d.ts",
-      "node": {
-        "import": "./dist/index.node.es6.js",
-        "require": "./dist/index.node.js"
-      },
-      "default": "./dist/index.es6.js"
-    }
-  },
-  "main": "dist/index.node.js",
-  "module": "dist/index.es6",
-  "module-node": "dist/index.node.es6",
+  "main": "dist/index.js",
+  "main-node": "dist/index.cjs",
+  "module": "dist/index.mjs",
   "browser": "dist/index.js",
   "unpkg": "dist/index.min.js",
   "jsdelivr": "dist/index.min.js",
@@ -62,7 +52,7 @@
     "compile-cpp": "run-script-os",
     "compile-cpp:linux": "./scripts/cpp-build.sh",
     "compile-cpp:win32": "wsl -e ./scripts/cpp-build.sh",
-    "bundle": "rollup -c",
+    "bundle": "rollup -c ./rollup.config.mjs",
     "bundle-watch": "npm run bundle -- -w",
     "minimize": "terser dist/index.js -c -m --source-map -o dist/index.min.js",
     "build": "run-s compile-cpp compile-es6 bundle minimize",
@@ -75,33 +65,33 @@
     "lint": "eslint src/**/*.ts",
     "lint-fix": "npm run lint -- --fix",
     "test-cli": "node ./bin/cli.js -v",
-    "test-bundle": "npx -y esbuild --bundle ./dist/index.js --bundle ./dist/index.es6.js --outdir=tmp",
-    "test-bundle-node": "npx -y esbuild --bundle --platform=node --bundle ./dist/index.node.js ./dist/index.node.es6.js --outdir=tmp",
+    "test-bundle-umd": "npx -y esbuild --bundle ./dist/index.js --outdir=tmp",
+    "test-bundle-mjs": "npx -y esbuild --bundle ./dist/index.mjs --outdir=tmp",
+    "test-bundle-cjs": "npx -y esbuild --bundle  --platform=node ./dist/index.cjs --outdir=tmp",
     "test-chrome": "karma start --single-run --browsers ChromeHeadless karma.conf.js",
     "test-firefox": "karma start --single-run --browsers Firefox karma.conf.js",
-    "test-node": "node ./bin/cli.js -v && mocha ./dist/test.node.js --reporter spec",
-    "test": "run-s test-bundle test-bundle-node test-chrome test-node",
+    "test-node": "node ./bin/cli.js -v && mocha ./dist/test.cjs --reporter spec",
+    "test": "run-s test-bundle-umd test-bundle-mjs test-bundle-cjs test-chrome test-node",
     "tag": "run-s standard-version git-push",
     "purge-jsdelivr": "node ./utils/purge-jsdelivr.js",
     "update-major": "npx npm-check-updates -u",
     "update": "npx npm-check-updates -u -t minor"
   },
   "dependencies": {
-    "yargs": "17.5.1"
+    "yargs": "17.6.0"
   },
   "devDependencies": {
-    "@rollup/plugin-alias": "3.1.9",
-    "@rollup/plugin-commonjs": "22.0.2",
-    "@rollup/plugin-node-resolve": "13.3.0",
-    "@rollup/plugin-replace": "4.0.0",
+    "@rollup/plugin-commonjs": "23.0.0",
+    "@rollup/plugin-node-resolve": "15.0.0",
+    "@rollup/plugin-replace": "5.0.0",
     "@types/chai": "4.3.3",
-    "@types/mocha": "9.1.1",
+    "@types/mocha": "10.0.0",
     "@types/emscripten": "1.39.6",
-    "@typescript-eslint/eslint-plugin": "5.36.2",
-    "@typescript-eslint/parser": "5.36.2",
+    "@typescript-eslint/eslint-plugin": "5.40.0",
+    "@typescript-eslint/parser": "5.40.0",
     "chai": "4.3.6",
-    "eslint": "8.23.0",
-    "karma": "6.4.0",
+    "eslint": "8.25.0",
+    "karma": "6.4.1",
     "karma-chai": "0.1.0",
     "karma-chrome-launcher": "3.1.1",
     "karma-firefox-launcher": "^2.1.2",
@@ -111,13 +101,12 @@
     "mocha": "10.0.0",
     "npm-run-all": "4.1.5",
     "rimraf": "3.0.2",
-    "rollup": "2.79.0",
-    "rollup-plugin-sourcemaps": "0.6.3",
+    "rollup": "3.0.1",
     "run-script-os": "1.1.6",
     "standard-version": "9.5.0",
-    "terser": "5.15.0",
+    "terser": "5.15.1",
     "tslib": "2.4.0",
-    "typescript": "4.8.2"
+    "typescript": "4.8.4"
   },
   "repository": {
     "type": "git",

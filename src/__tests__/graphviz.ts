@@ -281,6 +281,7 @@ describe("bad dot", function () {
         await graphviz.dot(badDot, "svg").then(svg => {
             expect(true).to.be.false;
         }).catch(e => {
+            console.log(e.message);
             expect(typeof e.message).to.equal("string");
             expect(e.message).to.contain("syntax error in line");
         });
@@ -291,11 +292,11 @@ describe("bad dot", function () {
         await graphviz.dot(badDot, "svg").then(svg => {
             expect(true).to.be.false;
         }).catch(e => {
+            console.log(e.message);
             expect(typeof e.message).to.equal("string");
             expect(e.message).to.contain("syntax error in line");
         });
     });
-
     let gvSync: GraphvizSync;
     it("create", function () {
         return graphvizSync().then(gv => {
