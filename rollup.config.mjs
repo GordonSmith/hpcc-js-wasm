@@ -6,7 +6,7 @@ const require = createRequire(import.meta.url);
 const pkg = require("./package.json");
 
 const browserTpl = (input, umdOutput, esOutput) => ({
-    input: input,
+    input,
     output: [{
         file: umdOutput,
         format: "umd",
@@ -26,7 +26,7 @@ const browserTpl = (input, umdOutput, esOutput) => ({
 });
 
 const nodeTpl = (input, cjsOutput) => ({
-    input: input,
+    input,
     external: ["fs", "crypto", "path"],
     output: [{
         file: cjsOutput,

@@ -31,7 +31,6 @@ function trimStart(str: string, charToRemove: string) {
 
 let scriptDir = typeof document !== 'undefined' && document.currentScript ? (document.currentScript as any).src :
     typeof __filename !== 'undefined' ? __filename :
-        typeof document !== 'undefined' && document.currentScript ? (document.currentScript as any).src :
             "";
 scriptDir = scriptDir.substr(0, scriptDir.replace(/[?#].*/, "").lastIndexOf('/') + 1);
 
