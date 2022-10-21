@@ -1,3 +1,5 @@
+// import fetch from "node-fetch";
+
 function getGlobal() {
     if (typeof self !== "undefined") { return self; }
     if (typeof window !== "undefined") { return window; }
@@ -31,11 +33,12 @@ function trimStart(str: string, charToRemove: string) {
 
 let scriptDir = typeof document !== 'undefined' && document.currentScript ? (document.currentScript as any).src :
     typeof __filename !== 'undefined' ? __filename :
-            "";
+        "";
 scriptDir = scriptDir.substr(0, scriptDir.replace(/[?#].*/, "").lastIndexOf('/') + 1);
 
-async function browserFetch(wasmUrl: string): Promise<ArrayBuffer> {
-    return fetch(wasmUrl, { credentials: 'same-origin' }).then(response => {
+async function doFetch(wasmUrl: string): Promise<ArrayBuffer> {
+    debugger;
+    return fetch(wasmUrl, { credentials: 'same-origin' } as any).then(response => {
         if (!response.ok) {
             throw "failed to load wasm binary file at '" + wasmUrl + "'";
         }
@@ -46,17 +49,17 @@ async function browserFetch(wasmUrl: string): Promise<ArrayBuffer> {
 }
 
 //  Do not delete:  Rollup uses this function for NodeJS builds  ---
-async function nodeFetch(wasmUrl: string): Promise<ArrayBuffer> {
-    const fs = require("fs/promises");
-    return fs.readFile(wasmUrl, undefined);
-}
+// async function nodeFetch(wasmUrl: string): Promise<ArrayBuffer> {
+//     const fs = require("fs/promises");
+//     return fs.readFile(wasmUrl, undefined);
+// }
 
 const g_wasmCache = {} as { [key: string]: Promise<any> };
 
 async function _loadWasm(_wasmLib: any, wasmUrl: string, wasmBinary?: ArrayBuffer): Promise<any> {
     const wasmLib = _wasmLib.default || _wasmLib;
     if (!wasmBinary) {
-        wasmBinary = await browserFetch(wasmUrl);
+        wasmBinary = await doFetch(wasmUrl);
     }
     return await wasmLib({
         "wasmBinary": wasmBinary

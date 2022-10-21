@@ -45,7 +45,7 @@
         },
         {
             "name": "CLI",
-            "program": "${workspaceFolder}/bin/cli.js",
+            "program": "${workspaceFolder}/bin/cli.cjs",
             "request": "launch",
             "args": [
                 "-K neato",

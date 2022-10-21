@@ -10,12 +10,10 @@ const browserTpl = (input, umdOutput, esOutput) => ({
     output: [{
         file: umdOutput,
         format: "umd",
-        sourcemap: true,
         name: pkg.name
     }, {
         file: esOutput,
-        format: "es",
-        sourcemap: true
+        format: "es"
     }],
     plugins: [
         nodeResolve({
@@ -25,14 +23,20 @@ const browserTpl = (input, umdOutput, esOutput) => ({
     ]
 });
 
-const nodeTpl = (input, cjsOutput) => ({
+const nodeTpl = (input, name = "index") => ({
     input,
-    external: ["fs", "crypto", "path"],
+    //external: ["fs", "crypto", "path"],
     output: [{
-        file: cjsOutput,
+        dir: "dist",
+        entryFileNames: `${name}-node.cjs`,
+        chunkFileNames: `${name}-node-[hash].cjs`,
         format: "cjs",
-        sourcemap: true,
         name: pkg.name
+    }, {
+        dir: "dist",
+        entryFileNames: `${name}-node.mjs`,
+        chunkFileNames: `${name}-node-[hash].mjs`,
+        format: "es"
     }],
     plugins: [
         replace({
@@ -40,9 +44,9 @@ const nodeTpl = (input, cjsOutput) => ({
             include: ["build/**/*.js", "lib-es6/**/*.js"],
             delimiters: ['', ''],
             values: {
-                "graphvizlib/graphvizlib": "graphvizlib/graphvizlib_node",
-                "expatlib/expatlib": "expatlib/expatlib_node",
-                "await browserFetch(wasmUrl)": "await nodeFetch(wasmUrl)"
+                // "graphvizlib/graphvizlib": "graphvizlib/graphvizlib_node",
+                // "expatlib/expatlib": "expatlib/expatlib_node",
+                "// import fetch from": "import fetch from"
             }
         }),
         nodeResolve({
@@ -53,12 +57,9 @@ const nodeTpl = (input, cjsOutput) => ({
 });
 
 export default [
-    browserTpl("lib-es6/index", pkg.browser, pkg.module),
-    nodeTpl("lib-es6/index", pkg["main-node"]),
-
-    browserTpl("lib-es6/graphviz", "dist/graphviz.js", "dist/graphviz.mjs"),
-    browserTpl("lib-es6/expat", "dist/expat.js", "dist/expat.mjs"),
+    browserTpl("lib-es6/index", "dist/index.js", "dist/index.mjs"),
+    nodeTpl("lib-es6/index"),
 
     browserTpl("lib-es6/__tests__/index", "dist/test.js", "dist/test.mjs"),
-    nodeTpl("lib-es6/__tests__/index", "dist/test.cjs"),
+    nodeTpl("lib-es6/__tests__/index", "test"),
 ];
