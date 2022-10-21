@@ -1,8 +1,8 @@
 import { expect } from "chai";
-import { wasmFolder } from "../util";
-import { Engine, Format, graphviz, graphvizSync, GraphvizSync, graphvizVersion } from "../graphviz";
-import { badDot, dot } from "./dot001";
-import { ortho } from "./dot002";
+import { wasmFolder } from "../util.js";
+import { Engine, Format, graphviz, graphvizSync, GraphvizSync, graphvizVersion } from "../graphviz.js";
+import { badDot, dot } from "./dot001.js";
+import { ortho } from "./dot002.js";
 
 export const formats: Format[] = ["svg", "dot", "json", "dot_json", "xdot_json", "plain", "plain-ext"];
 export const engines: Engine[] = ["circo", "dot", "fdp", "sfdp", "neato", "osage", "patchwork", "twopi"];

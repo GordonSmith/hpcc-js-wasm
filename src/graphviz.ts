@@ -1,6 +1,6 @@
 // @ts-ignore
-import * as graphvizlib from "../build/cpp/graphviz/graphvizlib/graphvizlib";
-import { loadWasm } from "./util";
+import * as graphvizlib from "../build/cpp/graphviz/graphvizlib/graphvizlib.js";
+import { loadWasm } from "./util.js";
 
 export type Format = "svg" | "dot" | "json" | "dot_json" | "xdot_json" | "plain" | "plain-ext";
 export type Engine = "circo" | "dot" | "fdp" | "sfdp" | "neato" | "osage" | "patchwork" | "twopi";
@@ -62,7 +62,7 @@ export const graphviz = {
             let retVal;
             try {
                 retVal = graphViz.layout(dotSource, outputFormat, layoutEngine);
-            } catch (e){
+            } catch (e) {
             };
             module.destroy(graphViz);
             if (!retVal) {

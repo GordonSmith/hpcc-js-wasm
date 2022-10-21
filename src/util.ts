@@ -1,15 +1,6 @@
-// import fetch from "node-fetch";
+import { doFetch, scriptDir } from "./fetch-browser.js";
 
-function getGlobal() {
-    if (typeof self !== "undefined") { return self; }
-    if (typeof window !== "undefined") { return window; }
-    if (typeof global !== "undefined") { return global; }
-    throw new Error("unable to locate global object");
-}
-
-const globalNS: any = getGlobal();
-
-let _wasmFolder: string | undefined = globalNS.__hpcc_wasmFolder || undefined;
+let _wasmFolder: string | undefined = (globalThis as any).__hpcc_wasmFolder || undefined;
 export function wasmFolder(_?: string): string | undefined {
     if (!arguments.length) return _wasmFolder;
     const retVal: string | undefined = _wasmFolder;
@@ -29,23 +20,6 @@ function trimStart(str: string, charToRemove: string) {
         str = str.substring(1);
     }
     return str;
-}
-
-let scriptDir = typeof document !== 'undefined' && document.currentScript ? (document.currentScript as any).src :
-    typeof __filename !== 'undefined' ? __filename :
-        "";
-scriptDir = scriptDir.substr(0, scriptDir.replace(/[?#].*/, "").lastIndexOf('/') + 1);
-
-async function doFetch(wasmUrl: string): Promise<ArrayBuffer> {
-    debugger;
-    return fetch(wasmUrl, { credentials: 'same-origin' } as any).then(response => {
-        if (!response.ok) {
-            throw "failed to load wasm binary file at '" + wasmUrl + "'";
-        }
-        return response.arrayBuffer();
-    }).catch(e => {
-        throw e;
-    });
 }
 
 //  Do not delete:  Rollup uses this function for NodeJS builds  ---

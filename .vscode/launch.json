@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "index-esm.html",
+            "type": "msedge",
+            "request": "launch",
+            "url": "http://localhost:8000/index-esm.html",
+            "runtimeArgs": [],
+            "webRoot": "${workspaceRoot}"
+        },
+        {
             "name": "index.html",
             "type": "msedge",
             "request": "launch",
@@ -45,7 +53,7 @@
         },
         {
             "name": "CLI",
-            "program": "${workspaceFolder}/bin/cli.cjs",
+            "program": "${workspaceFolder}/bin/cli.js",
             "request": "launch",
             "args": [
                 "-K neato",

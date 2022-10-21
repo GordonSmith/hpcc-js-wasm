@@ -1,2 +1,2 @@
-export * from "./expat";
-export * from "./graphviz";
+export * from "./expat.js";
+export * from "./graphviz.js";

@@ -1,6 +1,6 @@
 // @ts-ignore
-import * as expatlib from "../build/cpp/expat/expatlib/expatlib";
-import { loadWasm } from "./util";
+import * as expatlib from "../build/cpp/expat/expatlib/expatlib.js";
+import { loadWasm } from "./util.js";
 
 export type Attributes = { [key: string]: string };
 export interface IParser {

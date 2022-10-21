@@ -1,12 +1,10 @@
 #!/usr/bin/env node
-/* eslint-disable no-undef */
-/* eslint-disable @typescript-eslint/no-var-requires */
+import fs from "fs";
+import { exit } from "process";
+import * as gvMod from "../dist/index-node.mjs";
+import yargsFunc from "yargs/yargs";
 
-const fs = require("fs");
-const { exit } = require("process");
-const gvMod = require("../dist/index-node.cjs");
-
-const yargs = require("yargs/yargs")(process.argv.slice(2))
+const yargs = yargsFunc(process.argv.slice(2))
     .usage("Usage: dot-wasm [options] fileOrDot")
     .demandCommand(0, 1)
     .example("dot-wasm -K neato -T xdot ./input.dot", "Execute NEATO layout and outputs XDOT format.")

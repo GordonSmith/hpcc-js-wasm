@@ -1,3 +1,3 @@
-export * from "./expat";
-export * from "./graphviz";
-export { wasmFolder } from "./util";
+export * from "./expat.js";
+export * from "./graphviz.js";
+export { wasmFolder } from "./util.js";
