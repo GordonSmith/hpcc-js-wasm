@@ -4,25 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>GraphViz WASM</title>
-
-    <script>
-        var wasmBinaryFile;
-        switch (window.location.hostname) {
-            case "localhost":
-                document.write('<script type="text/javascript" src="./dist/index-umd.js"><' + '/script>');
-                wasmBinaryFile = "./dist/graphvizlib.wasm";
-                break;
-            default:
-                document.write('<script src="https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/index.min.js"><' + '/script>');
-                wasmBinaryFile = "https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphvizlib.wasm";
-                break;
-        }
-    </script>
-
-    <script>
-        var hpccWasm = window["@hpcc-js/wasm"];
-        // hpccWasm.wasmFolder("build/cpp/graphviz/graphvizlib");
-    </script>
 </head>
 
 <body>
@@ -39,8 +20,9 @@
     <h3>Cached wasmBinary</h3>
     <div id="placeholder4"></div>
     <hr>
-    <script>
-        hpccWasm.expatVersion().then(v => alert(v));
+    <script type="module">
+        import { expatVersion } from "./lib-esm/index.js"
+        expatVersion().then(v => alert(v));
         const dot = `
             digraph G {
                 node [shape=rect];

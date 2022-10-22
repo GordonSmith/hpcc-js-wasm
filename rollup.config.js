@@ -8,23 +8,23 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const pkg = require("./package.json");
 
-const dist = name => name === "index" ? "dist" : "dist-test";
+const dist = name => name === "test" ? "dist-test" : "dist";
 
 const browserTpl = (input, name = "index") => ({
     input,
     output: [{
         dir: dist(name),
-        entryFileNames: `${name}.js`,
-        chunkFileNames: `${name}-[hash].js`,
+        entryFileNames: `${name}-umd.js`,
+        chunkFileNames: `${name}-umd-[hash].js`,
         format: "umd",
         name: pkg.name,
-        sourcemap: true
+        sourcemap: false
     }, {
         dir: dist(name),
-        entryFileNames: `${name}.mjs`,
-        chunkFileNames: `${name}-[hash].mjs`,
+        entryFileNames: `${name}.js`,
+        chunkFileNames: `${name}-[hash].js`,
         format: "es",
-        sourcemap: true
+        sourcemap: false
     }],
     plugins: [
         nodeResolve({
@@ -43,13 +43,13 @@ const nodeTpl = (input, name = "index") => ({
         entryFileNames: `${name}-node.cjs`,
         chunkFileNames: `${name}-node-[hash].cjs`,
         format: "cjs",
-        sourcemap: true
+        sourcemap: false
     }, {
         dir: dist(name),
-        entryFileNames: `${name}-node.mjs`,
-        chunkFileNames: `${name}-node-[hash].mjs`,
+        entryFileNames: `${name}-node.js`,
+        chunkFileNames: `${name}-node-[hash].js`,
         format: "es",
-        sourcemap: true
+        sourcemap: false
     }],
     plugins: [
         replace({
@@ -57,7 +57,7 @@ const nodeTpl = (input, name = "index") => ({
             include: ["build/**/*.js", "lib-esm/**/*.js"],
             delimiters: ['', ''],
             values: {
-                "document": "undefined",
+                // "document": "undefined",
                 "fetch-browser": "fetch-node"
             }
         }),
@@ -71,6 +71,9 @@ const nodeTpl = (input, name = "index") => ({
 
 export default [
     browserTpl("lib-esm/index"),
+    browserTpl("lib-esm/graphviz", "graphviz"),
+    browserTpl("lib-esm/expat", "expat"),
+
     nodeTpl("lib-esm/index"),
 
     browserTpl("lib-esm/__tests__/index", "test"),

@@ -18,20 +18,26 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
+    "types": "./types/index.d.ts",
     "node": {
-      "import": "./dist/index-node.mjs",
+      "import": "./dist/index-node.js",
       "require": "./dist/index-node.cjs"
     },
     "browser": {
-      "import": "./dist/index.mjs",
-      "default": "./dist/index.js"
-    }
+      "import": "./dist/index.js",
+      "default": "./dist/index-umd.js"
+    },
+    "umd": "./dist/index-umd.js",
+    "graphviz": "./dist/graphviz.js",
+    "expat": "./dist/expat.js",
+    "graphviz/umd": "./dist/graphviz-umd.js",
+    "expat/umd": "./dist/expat-umd.js"
   },
   "main": "dist/index-node.cjs",
-  "module": "dist/index-node.mjs",
-  "browser": "dist/index.js",
-  "unpkg": "dist/index.min.js",
-  "jsdelivr": "dist/index.min.js",
+  "module": "dist/index-node.js",
+  "browser": "dist/index-umd.js",
+  "unpkg": "dist/index-umd.min.js",
+  "jsdelivr": "dist/index-umd.min.js",
   "types": "types/index.d.ts",
   "bin": {
     "dot-wasm": "bin/cli.js"
@@ -60,7 +66,7 @@
     "compile-cpp": "run-script-os",
     "compile-cpp:linux": "./scripts/cpp-build.sh",
     "compile-cpp:win32": "wsl -e ./scripts/cpp-build.sh",
-    "bundle": "rollup -c ./rollup.config.mjs",
+    "bundle": "rollup -c ./rollup.config.js",
     "bundle-watch": "npm run bundle -- -w",
     "minimize": "terser dist/index.js -c -m --source-map -o dist/index.min.js",
     "build": "run-s compile-cpp compile bundle minimize",
@@ -74,7 +80,7 @@
     "lint-fix": "npm run lint -- --fix",
     "test-cli": "node ./bin/cli.js -v",
     "test-bundle-umd": "npx -y esbuild --bundle ./dist/index.js --outdir=tmp",
-    "test-bundle-mjs": "npx -y esbuild --bundle ./dist/index.mjs --outdir=tmp",
+    "test-bundle-mjs": "npx -y esbuild --bundle ./dist/index.js --outdir=tmp",
     "test-bundle-cjs": "npx -y esbuild --bundle  --platform=node ./dist/index-node.cjs --outdir=tmp",
     "test-chrome": "karma start --single-run --browsers ChromeHeadless karma.conf.cjs",
     "test-firefox": "karma start --single-run --browsers Firefox karma.conf.cjs",
@@ -90,18 +96,18 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.19.4",
-    "@rollup/plugin-babel": "^6.0.0",
-    "@rollup/plugin-commonjs": "23.0.1",
-    "@rollup/plugin-node-resolve": "15.0.0",
-    "@rollup/plugin-replace": "5.0.0",
-    "@rollup/plugin-typescript": "^9.0.1",
+    "@rollup/plugin-babel": "^6.0.2",
+    "@rollup/plugin-commonjs": "23.0.2",
+    "@rollup/plugin-node-resolve": "15.0.1",
+    "@rollup/plugin-replace": "5.0.1",
+    "@rollup/plugin-typescript": "^9.0.2",
     "@types/chai": "4.3.3",
     "@types/emscripten": "1.39.6",
     "@types/mocha": "10.0.0",
     "@typescript-eslint/eslint-plugin": "5.40.1",
     "@typescript-eslint/parser": "5.40.1",
     "chai": "4.3.6",
-    "eslint": "8.25.0",
+    "eslint": "8.26.0",
     "karma": "6.4.1",
     "karma-chai": "0.1.0",
     "karma-chrome-launcher": "3.1.1",

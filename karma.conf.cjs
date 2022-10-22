@@ -1,7 +1,7 @@
 module.exports = function (config) {
     config.set({
         frameworks: ['mocha', 'chai'],
-        files: ['dist-test/test.js',
+        files: ['dist-test/test-umd.js',
             { pattern: 'dist/*.wasm', watched: false, included: false, served: true },
         ],
         reporters: ['spec'],

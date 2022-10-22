@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from "fs";
 import { exit } from "process";
-import * as gvMod from "../dist/index-node.mjs";
+import * as gvMod from "../dist/index-node.js";
 import yargsFunc from "yargs/yargs";
 
 const yargs = yargsFunc(process.argv.slice(2))
