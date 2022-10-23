@@ -1,8 +1,5 @@
-import replace from "@rollup/plugin-replace";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
-// import typescript from '@rollup/plugin-typescript';
-// import { babel } from '@rollup/plugin-babel';
 import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
@@ -52,15 +49,6 @@ const nodeTpl = (input, name = "index") => ({
         sourcemap: false
     }],
     plugins: [
-        replace({
-            preventAssignment: true,
-            include: ["build/**/*.js", "lib-esm/**/*.js"],
-            delimiters: ['', ''],
-            values: {
-                // "document": "undefined",
-                "fetch-browser": "fetch-node"
-            }
-        }),
         nodeResolve({
             preferBuiltins: true
         }),
@@ -74,7 +62,7 @@ export default [
     browserTpl("lib-esm/graphviz", "graphviz"),
     browserTpl("lib-esm/expat", "expat"),
 
-    nodeTpl("lib-esm/index"),
+    nodeTpl("lib-esm/index-node"),
 
     browserTpl("lib-esm/__tests__/index", "test"),
     nodeTpl("lib-esm/__tests__/index", "test"),

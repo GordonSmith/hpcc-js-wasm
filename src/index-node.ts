@@ -1,5 +1,5 @@
 import { interop } from "./util.js";
-import { doFetch, scriptDir } from "./fetch-browser.js";
+import { doFetch, scriptDir } from "./fetch-node.js";
 interop.doFetch = doFetch;
 interop.scriptDir = scriptDir;
 

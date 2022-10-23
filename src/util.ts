@@ -1,4 +1,11 @@
-import { doFetch, scriptDir } from "./fetch-browser.js";
+export interface Interop {
+    doFetch: (wasmUrl: string) => Promise<ArrayBuffer>,
+    scriptDir: string
+}
+export const interop: Interop = {
+    doFetch: undefined,
+    scriptDir: undefined
+} as any;
 
 let _wasmFolder: string | undefined = (globalThis as any).__hpcc_wasmFolder || undefined;
 export function wasmFolder(_?: string): string | undefined {
@@ -33,7 +40,7 @@ const g_wasmCache = {} as { [key: string]: Promise<any> };
 async function _loadWasm(_wasmLib: any, wasmUrl: string, wasmBinary?: ArrayBuffer): Promise<any> {
     const wasmLib = _wasmLib.default || _wasmLib;
     if (!wasmBinary) {
-        wasmBinary = await doFetch(wasmUrl);
+        wasmBinary = await interop.doFetch(wasmUrl);
     }
     return await wasmLib({
         "wasmBinary": wasmBinary
@@ -41,7 +48,8 @@ async function _loadWasm(_wasmLib: any, wasmUrl: string, wasmBinary?: ArrayBuffe
 }
 
 export async function loadWasm(_wasmLib: any, filename: string, wf?: string, wasmBinary?: ArrayBuffer): Promise<any> {
-    const wasmUrl = `${trimEnd(wf || wasmFolder() || scriptDir || ".", "/")}/${trimStart(`${filename}.wasm`, "/")}`;
+    debugger;
+    const wasmUrl = `${trimEnd(wf || wasmFolder() || interop.scriptDir || ".", "/")}/${trimStart(`${filename}.wasm`, "/")}`;
     if (!g_wasmCache[wasmUrl]) {
         g_wasmCache[wasmUrl] = _loadWasm(_wasmLib, wasmUrl, wasmBinary);
     }
