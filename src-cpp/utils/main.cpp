@@ -56,26 +56,32 @@ public:
     }
 };
 
-int main()
-{
-    return 0;
-}
-
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    void utils_hello(utils_string_t *name, utils_string_t *ret)
+    void utils_encode(utils_string_t *ret)
     {
-        std::string name_str(name->ptr, name->len);
-        std::string ret_str = "Hello, " + name_str + "!";
-        utils_string_dup(ret, ret_str.c_str());
         auto base91 = new CBasE91();
-        base91->encode("Hello, World!", 13, ret->ptr);
-        base91->encode_end(ret->ptr);
-        ret->len = strlen(ret->ptr);
-        delete base91;
+        iterator_row_t row;
+        itr_next(&row);
+
+        while (!row.done)
+        {
+            base91->encode(row.value.ptr, row.value.len, ret->ptr);
+            iterator_row_free(&row);
+            itr_next(&row);
+        }
+
+        // std::string name_str(name->ptr, name->len);
+        // std::string ret_str = "Hello, " + name_str + "!";
+        // utils_string_dup(ret, ret_str.c_str());
+        // auto base91 = new CBasE91();
+        // base91->encode("Hello, World!", 13, ret->ptr);
+        // base91->encode_end(ret->ptr);
+        // ret->len = strlen(ret->ptr);
+        // delete base91;
     }
 
 #ifdef __cplusplus

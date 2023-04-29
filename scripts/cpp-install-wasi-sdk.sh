@@ -10,6 +10,6 @@ then
     rm wasi-sdk-${WASI_VERSION_FULL}-linux.tar.gz
     cargo install --git https://github.com/bytecodealliance/wit-bindgen wit-bindgen-cli
     curl https://wasmtime.dev/install.sh -sSf | bash
-    wget https://github.com/bytecodealliance/preview2-prototyping/releases/download/latest/wasi_snapshot_preview1.command.wasm
-    mv ./wasi_snapshot_preview1.command.wasm ./wasi-sdk-${WASI_VERSION_FULL}/wasi_snapshot_preview1.wasm
+    wget https://github.com/bytecodealliance/preview2-prototyping/releases/download/latest/wasi_snapshot_preview1.reactor.wasm
+    mv ./wasi_snapshot_preview1.reactor.wasm ./wasi-sdk-${WASI_VERSION_FULL}/wasi_snapshot_preview1.wasm
 fi

@@ -1,3 +1,14 @@
+interface iterator {
+  record row {
+    value: string,
+    done: bool,
+  }
+
+  next: func() -> row
+}
+
 default world utils {
-  export hello: func(name: string) -> string
+  import itr: self.iterator
+
+  export encode: func() -> string
 }

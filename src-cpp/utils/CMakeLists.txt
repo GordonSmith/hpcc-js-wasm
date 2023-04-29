@@ -2,7 +2,7 @@ project(utils)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_EXECUTABLE_SUFFIX ".wasm")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions --sysroot=${WASI_SDK_PREFIX}/share/wasi-sysroot")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -mexec-model=reactor --sysroot=${WASI_SDK_PREFIX}/share/wasi-sysroot")
 
 add_custom_command(
     MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/host.wit
