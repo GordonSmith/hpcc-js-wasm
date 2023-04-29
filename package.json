@@ -69,7 +69,7 @@
     "install-wasi-sdk": "run-script-os",
     "install-wasi-sdk:linux": "./scripts/cpp-install-wasi-sdk.sh",
     "install-wasi-sdk:win32": "wsl -e ./scripts/cpp-install-wasi-sdk.sh",
-    "install-build-deps": "run-p install-emsdk install-vcpkg install-wasi-sdk",
+    "install-build-deps": "npm-run-all --parallel install-emsdk install-wasi-sdk --serial install-vcpkg",
     "uninstall-build-deps": "rimraf ./emsdk ./vcpkg ./wasi-sdk-* ./src-expat ./src-vcpkg",
     "clean-build": "rimraf .nyc_output bin build coverage dist* lib* output-* tmp types *.tsbuildinfo",
     "clean-docs": "rimraf docs/.vitepress/dist docs/classes docs/interfaces docs/modules docs/.nojekyll docs/README.md",
