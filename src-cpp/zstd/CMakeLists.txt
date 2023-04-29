@@ -33,7 +33,7 @@ add_executable(zstdlib
     main.cpp
 )
 
-set_target_properties(graphvizlib PROPERTIES COMPILE_FLAGS "${CPP_FLAGS}")
+set_target_properties(zstdlib PROPERTIES COMPILE_FLAGS "${CPP_FLAGS}")
 set_target_properties(zstdlib PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
 
 target_link_libraries(zstdlib

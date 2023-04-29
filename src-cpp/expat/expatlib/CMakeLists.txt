@@ -33,7 +33,7 @@ add_executable(expatlib
     main.cpp
 )
 
-set_target_properties(base91lib PROPERTIES COMPILE_FLAGS "${CPP_FLAGS}")
+set_target_properties(expatlib PROPERTIES COMPILE_FLAGS "${CPP_FLAGS}")
 set_target_properties(expatlib PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
 
 target_link_libraries(expatlib
