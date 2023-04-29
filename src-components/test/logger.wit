@@ -1,0 +1,3 @@
+default world my-logger {
+  export print: func(msg: string)
+}

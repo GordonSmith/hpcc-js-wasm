@@ -123,6 +123,7 @@
     "yargs": "17.7.1"
   },
   "devDependencies": {
+    "@bytecodealliance/componentize-js": "^0.0.5",
     "@bytecodealliance/jco": "0.5.4",
     "@bytecodealliance/preview2-shim": "^0.0.5",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
