@@ -1,0 +1,7 @@
+interface exports {
+  version: func() -> string
+}
+
+world utils-xxx {
+  default export exports
+}
