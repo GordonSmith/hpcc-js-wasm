@@ -33,6 +33,6 @@ add_custom_command(
     TARGET utils POST_BUILD
     COMMAND 
         wasm-tools component new ${CMAKE_CURRENT_BINARY_DIR}/utils.wasm -o ${CMAKE_CURRENT_BINARY_DIR}/utils.component.wasm --adapt ${WASI_SDK_PREFIX}/wasi_snapshot_preview1.wasm && 
-        npx jco transpile ${CMAKE_CURRENT_BINARY_DIR}/utils.component.wasm -o ${CMAKE_CURRENT_BINARY_DIR}/js --map '*=@bytecodealliance/preview2-shim/*'
+        npx jco transpile ${CMAKE_CURRENT_BINARY_DIR}/utils.component.wasm -o ${CMAKE_CURRENT_BINARY_DIR}/js --wasi-shim
 )
 set_property(SOURCE main.cpp APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/utils.c)
