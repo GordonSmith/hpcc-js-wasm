@@ -11,4 +11,6 @@ then
     git checkout $VERSION
     ./bootstrap-vcpkg.sh
     cd ..
+    source ./emsdk/emsdk_env.sh
+    ./vcpkg/vcpkg install --overlay-ports=./vcpkg-overlays --triplet=wasm32-emscripten
 fi

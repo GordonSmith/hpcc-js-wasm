@@ -1,3 +1,4 @@
+/* 
 interface iterator {
   record row {
     value: string,
@@ -6,9 +7,9 @@ interface iterator {
 
   next: func() -> row
 }
-
+*/
 default world utils {
-  import itr: self.iterator
+  // import itr: self.iterator
 
-  export encode: func() -> string
+  export hello: func(name: string) -> string
 }
