@@ -110,6 +110,7 @@
     "test-chrome": "karma start --single-run --browsers ChromiumHeadless karma.conf.cjs",
     "test-firefox": "karma start --single-run --browsers Firefox karma.conf.cjs",
     "test-node": "node ./bin/dot-wasm.js -v && mocha ./dist-test/index.node.cjs --reporter spec && mocha ./dist-test/index.node.js --reporter spec",
+    "test-wit": "node -e \"import('./build/src-cpp/utils/js/utils.component.js').then(m=>console.log(m.hello('aaaa')))\"",
     "test": "run-s test-bundle test-bundle-node test-bundle-umd test-chrome test-node",
     "coverage": "nyc npm run test-node",
     "coverage-report": "nyc report --reporter=lcov",
@@ -122,6 +123,8 @@
     "yargs": "17.7.1"
   },
   "devDependencies": {
+    "@bytecodealliance/jco": "0.5.4",
+    "@bytecodealliance/preview2-shim": "^0.0.5",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
     "@rollup/plugin-commonjs": "24.1.0",
     "@rollup/plugin-node-resolve": "15.0.2",

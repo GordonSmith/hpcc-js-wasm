@@ -1,62 +1,83 @@
 #include "utils.h"
+#include <string>
+#include <base91.hpp>
+
+const char *const version = "0.6.0";
+
+class CBasE91
+{
+protected:
+    basE91 m_basE91;
+
+public:
+    CBasE91()
+    {
+        reset();
+    }
+
+    void *malloc(size_t __size)
+    {
+        return ::malloc(__size);
+    }
+
+    void free(void *__ptr)
+    {
+        ::free(__ptr);
+    }
+
+    const char *version()
+    {
+        return ::version;
+    }
+
+    void reset()
+    {
+        basE91_init(&m_basE91);
+    }
+
+    size_t encode(const void *data, size_t dataLen, void *dataOut)
+    {
+        return basE91_encode(&m_basE91, data, dataLen, dataOut);
+    }
+
+    size_t encode_end(void *dataOut)
+    {
+        return basE91_encode_end(&m_basE91, dataOut);
+    }
+
+    size_t decode(const void *data, size_t dataLen, void *dataOut)
+    {
+        return basE91_decode(&m_basE91, data, dataLen, dataOut);
+    }
+
+    size_t decode_end(void *dataOut)
+    {
+        return basE91_decode_end(&m_basE91, dataOut);
+    }
+};
+
+int main()
+{
+    return 0;
+}
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    void utils_run()
+    void utils_hello(utils_string_t *name, utils_string_t *ret)
     {
-        utils_string_t my_string;
-        utils_string_set(&my_string, "Hello, world!");
-
-        utils_print(&my_string);
+        std::string name_str(name->ptr, name->len);
+        std::string ret_str = "Hello, " + name_str + "!";
+        utils_string_dup(ret, ret_str.c_str());
+        auto base91 = new CBasE91();
+        base91->encode("Hello, World!", 13, ret->ptr);
+        base91->encode_end(ret->ptr);
+        ret->len = strlen(ret->ptr);
+        delete base91;
     }
 
 #ifdef __cplusplus
 }
 #endif
-
-#include <cstdlib>
-#include <iostream>
-#include <string.h>
-
-using namespace std;
-
-unsigned long fib(unsigned long i)
-{
-    if (i <= 1)
-    {
-        return i;
-    }
-    return fib(i - 1) + fib(i - 2);
-}
-
-int main(int argc, char *argv[])
-{
-    cout << "C++ - Fibonacci sequence example" << endl;
-    if (argc <= 1)
-    {
-        unsigned long n;
-        cout << "Enter a non-negative number:" << endl;
-        cin >> n;
-        cout << "Fibonacci sequence number at index " << n << " is " << fib(n)
-             << endl;
-    }
-    else
-    {
-        for (unsigned int i = 1; i < argc; i++)
-        {
-            errno = 0;
-            unsigned long n = strtoul(argv[i], NULL, 10);
-            if (errno != 0)
-            {
-                cerr << "Failed to parse argument into a number: " << strerror(errno)
-                     << endl;
-                exit(1);
-            }
-            cout << "Fibonacci sequence number at index " << n << " is " << fib(n)
-                 << endl;
-        }
-    }
-}

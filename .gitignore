@@ -23,5 +23,6 @@
 /types
 /wasi-sdk*
 /vcpkg
+/vcpkg_installed
 .coveralls.yml
 *.tsbuildinfo

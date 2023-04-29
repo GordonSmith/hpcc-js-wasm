@@ -1,5 +1,3 @@
 default world utils {
-  import print: func(msg: string)
-
-  export run: func()
+  export hello: func(name: string) -> string
 }
