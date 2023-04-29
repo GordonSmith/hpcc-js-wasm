@@ -1,12 +1,6 @@
 project(graphvizlib)
 
-# find and link libraries
-find_path(Graphviz_INCLUDE_DIRS NAMES graphviz/gvc.h HINTS "${VCPKG_INSTALLED_DIR}" REQUIRED)
-
-# display directories where Graphviz libraries and headers are found
-message("Graphviz libraries: ${graphviz_LIBRARIES}")
-message("Graphviz include directories: ${Graphviz_INCLUDE_DIRS}")
-
+set(expat_DIR "${VCPKG_SHARE_DIR}/expat")
 find_package(expat CONFIG REQUIRED)
 
 # See:  https://github.com/emscripten-core/emscripten/blob/main/src/settings.js
@@ -26,7 +20,7 @@ string(REPLACE ";" " " LINK_FLAGS "${EM_LINK_FLAGS}")
 add_custom_command(
     MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/main.idl
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/main_glue.js ${CMAKE_CURRENT_BINARY_DIR}/main_glue.cpp
-    COMMAND python3 ${CMAKE_BINARY_DIR}/../emsdk/upstream/emscripten/tools/webidl_binder.py ${CMAKE_CURRENT_SOURCE_DIR}/main.idl ${CMAKE_CURRENT_BINARY_DIR}/main_glue
+    COMMAND python3 ${REPO_DIR}/emsdk/upstream/emscripten/tools/webidl_binder.py ${CMAKE_CURRENT_SOURCE_DIR}/main.idl ${CMAKE_CURRENT_BINARY_DIR}/main_glue
 )
 set_property(SOURCE main.cpp APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/main_glue.cpp)
 #  ---  ---  ---
@@ -36,7 +30,7 @@ set(SRCS
 )
 
 include_directories(
-    ${Graphviz_INCLUDE_DIRS}/graphviz
+    ${VCPKG_INCLUDE_DIR}/graphviz
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -47,41 +41,29 @@ add_executable(graphvizlib
 set_target_properties(graphvizlib PROPERTIES COMPILE_FLAGS "${CPP_FLAGS}")
 set_target_properties(graphvizlib PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
 
-# link libraries
-function(add_graphviz_library library)
-    find_library(GRAPHVIZ_${library} NAMES ${library})
-    if(GRAPHVIZ_${library})
-        target_link_libraries(graphvizlib PRIVATE ${GRAPHVIZ_${library}})
-    else()
-        message(FATAL_ERROR "Could not find library ${library}!")
-    endif()
-endfunction()
-
-# common gvplugin_core gvplugin_dot_layout gvplugin_neato_layout ortho gvc cdt cgraph dotgen neatogen fdpgen sfdpgen twopigen circogen label osage patchwork pack sparse pathplan xdot
-add_graphviz_library(common)
-add_graphviz_library(gvc)
-add_graphviz_library(gvplugin_core)
-add_graphviz_library(gvplugin_dot_layout)
-add_graphviz_library(gvplugin_neato_layout)
-add_graphviz_library(ortho)
-add_graphviz_library(cdt)
-add_graphviz_library(cgraph)
-add_graphviz_library(dotgen)
-add_graphviz_library(neatogen)
-add_graphviz_library(fdpgen)
-add_graphviz_library(sfdpgen)
-add_graphviz_library(twopigen)
-add_graphviz_library(circogen)
-add_graphviz_library(label)
-add_graphviz_library(osage)
-add_graphviz_library(patchwork)
-add_graphviz_library(pack)
-add_graphviz_library(sparse)
-add_graphviz_library(pathplan)
-add_graphviz_library(xdot)
-
 target_link_libraries(graphvizlib PRIVATE
-    ${EXPAT_LIBRARIES}
+    expat::expat
+    ${VCPKG_LIB_DIR}/libcommon.a
+    ${VCPKG_LIB_DIR}/libgvc.a
+    ${VCPKG_LIB_DIR}/libgvplugin_core.a
+    ${VCPKG_LIB_DIR}/libgvplugin_dot_layout.a
+    ${VCPKG_LIB_DIR}/libgvplugin_neato_layout.a
+    ${VCPKG_LIB_DIR}/libortho.a
+    ${VCPKG_LIB_DIR}/libcdt.a
+    ${VCPKG_LIB_DIR}/libcgraph.a
+    ${VCPKG_LIB_DIR}/libdotgen.a
+    ${VCPKG_LIB_DIR}/libneatogen.a
+    ${VCPKG_LIB_DIR}/libfdpgen.a
+    ${VCPKG_LIB_DIR}/libsfdpgen.a
+    ${VCPKG_LIB_DIR}/libtwopigen.a
+    ${VCPKG_LIB_DIR}/libcircogen.a
+    ${VCPKG_LIB_DIR}/liblabel.a
+    ${VCPKG_LIB_DIR}/libosage.a
+    ${VCPKG_LIB_DIR}/libpatchwork.a
+    ${VCPKG_LIB_DIR}/libpack.a
+    ${VCPKG_LIB_DIR}/libsparse.a
+    ${VCPKG_LIB_DIR}/libpathplan.a
+    ${VCPKG_LIB_DIR}/libxdot.a
 )
 
 packWasm(graphvizlib)
