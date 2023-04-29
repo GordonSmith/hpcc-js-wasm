@@ -23,6 +23,15 @@ add_custom_command(
 set_property(SOURCE main.cpp APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/main_glue.cpp)
 #  ---  ---  ---
 
+#  Generate Glue from WIT file  ---
+# add_custom_command(
+#     MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/main.wit
+#     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/base91.c ${CMAKE_CURRENT_BINARY_DIR}/base91.h ${CMAKE_CURRENT_BINARY_DIR}/base91_wit_component_type.o
+#     COMMAND wit-bindgen guest c ${CMAKE_CURRENT_SOURCE_DIR}/main.wit
+# )
+# set_property(SOURCE main.cpp APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/base91.c)
+#  ---  ---  ---
+
 include_directories(
     ${VCPKG_INCLUDE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}

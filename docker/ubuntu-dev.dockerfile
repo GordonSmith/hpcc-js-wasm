@@ -18,6 +18,11 @@ RUN apt-get install -y git cmake wget zip
 RUN apt-get install -y gcc-multilib g++-multilib pkg-config autoconf bison libtool flex
 RUN apt-get install -y python3 python3-pip
 
+## Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+RUN cargo install --git https://github.com/bytecodealliance/wit-bindgen wit-bindgen-cli
+
 # Set the working directory
 WORKDIR /usr/src-ts/app
 
