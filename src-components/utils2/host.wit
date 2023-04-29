@@ -8,8 +8,8 @@ interface iterator {
   next: func() -> row
 }
 */
-default world utils {
+default world utils2 {
   // import itr: self.iterator
 
-  // export hello: func(name: string) -> string
+  export hello: func(name: string) -> string
 }

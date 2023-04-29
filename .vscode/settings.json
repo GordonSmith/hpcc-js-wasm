@@ -5,6 +5,7 @@
     "files.associations": {
         "*.json": "json",
         "*.mod": "ecl",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "chrono": "cpp"
     }
 }

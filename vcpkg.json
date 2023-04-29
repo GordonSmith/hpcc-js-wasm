@@ -6,6 +6,7 @@
         "base91",
         "expat",
         "graphviz",
+        "pthreads",
         "triangle",
         "zstd"
     ]
