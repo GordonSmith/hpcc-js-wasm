@@ -13,6 +13,7 @@
 /docs/.nojekyll
 /docs/README.md
 /emsdk*
+/wasi-sdk-*
 /lib-*
 /node_modules
 /rust

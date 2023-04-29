@@ -1,10 +1,10 @@
 #!/bin/bash
 
-source ./emsdk/emsdk_env.sh
+# source ./emsdk/emsdk_env.sh
 if [ ! -d "./build" ] 
 then
     mkdir -p build
-    cmake -S . -B ./build -DCMAKE_BUILD_TYPE=MinSizeRel
+    cmake -S . -B ./build -G "Ninja"
 fi
 
 mkdir -p ./lib-esm
