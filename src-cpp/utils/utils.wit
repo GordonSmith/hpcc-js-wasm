@@ -1,7 +1,5 @@
-interface exports {
-  version: func() -> string
-}
+default world host {
+  import print: func(msg: string)
 
-world utils-xxx {
-  default export exports
+  export run: func()
 }

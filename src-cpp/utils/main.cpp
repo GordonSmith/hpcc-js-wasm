@@ -1,8 +1,9 @@
-#include "utils_xxx.h"
+#include "host.h"
 
-const char *const version = "0.6.0";
-
-void utils_xxx_version(utils_xxx_string_t *ret)
+void host_run()
 {
-    utils_xxx_string_set(ret, version);
+    host_string_t my_string;
+    host_string_set(&my_string, "Hello, world!");
+
+    host_print(&my_string);
 }

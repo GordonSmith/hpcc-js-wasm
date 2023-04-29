@@ -22,9 +22,9 @@ string(REPLACE ";" " " LINK_FLAGS "${EM_LINK_FLAGS}")
 add_custom_command(
     MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/utils.wit
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/utils.c ${CMAKE_CURRENT_BINARY_DIR}/utils.h ${CMAKE_CURRENT_BINARY_DIR}/utils_wit_component_type.o
-    COMMAND wit-bindgen host js ${CMAKE_CURRENT_SOURCE_DIR}/utils.wit
+    COMMAND wit-bindgen c ${CMAKE_CURRENT_SOURCE_DIR}/utils.wit
 )
-set_property(SOURCE main.cpp APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/utils.c)
+set_property(SOURCE main.cpp APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/host.c)
 #  ---  ---  ---
 
 include_directories(
@@ -34,15 +34,15 @@ include_directories(
 
 add_executable(utils
     main.cpp
-    utils.h
-    utils_xxx.c
+    host.h
+    host.c
+    ${CMAKE_CURRENT_BINARY_DIR}/host_component_type.o
 )
 
 # set_target_properties(utils PROPERTIES COMPILE_FLAGS "${CPP_FLAGS}")
 # set_target_properties(utils PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
 
 target_link_libraries(utils
-    # ${CMAKE_CURRENT_BINARY_DIR}/utils_component_type.o
 )
 
-packWasm(utils)
+# packWasm(utils)

@@ -9,5 +9,5 @@ fi
 
 mkdir -p ./lib-esm
 cd ./build
-cmake --build . -- -j
+cmake --build . --parallel
 cd ..
