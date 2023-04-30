@@ -85,6 +85,7 @@
     "bundle-debug": "rollup -c --configDebug",
     "bundle-watch": "npm run bundle-debug -- -w",
     "bundle-sfx": "rollup -c ./rollup-sfx.config.js",
+    "bundle-components": "esbuild --bundle --platform=node --format=esm --outdir=./dist/components ./build/src-components/test/js/test.component.js",
     "gen-docs": "typedoc",
     "gen-docs-watch": "typedoc --watch",
     "build-docs-vitepress": "vitepress build docs",
@@ -124,9 +125,9 @@
     "yargs": "17.7.2"
   },
   "devDependencies": {
-    "@bytecodealliance/componentize-js": "^0.0.5",
+    "@bytecodealliance/componentize-js": "0.0.5",
     "@bytecodealliance/jco": "0.6.0",
-    "@bytecodealliance/preview2-shim": "^0.0.7",
+    "@bytecodealliance/preview2-shim": "0.0.7",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
     "@rollup/plugin-commonjs": "24.1.0",
     "@rollup/plugin-node-resolve": "15.0.2",

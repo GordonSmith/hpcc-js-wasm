@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.22)
 
 cmake_path(GET CMAKE_CURRENT_SOURCE_DIR PARENT_PATH REPO_DIR)
 set(WASI_SDK_PREFIX ${REPO_DIR}/wasi-sdk-20.0)

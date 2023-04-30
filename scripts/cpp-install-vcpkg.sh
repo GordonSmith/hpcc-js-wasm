@@ -12,6 +12,8 @@ then
     ./bootstrap-vcpkg.sh
     cd ..
 fi
-./vcpkg/vcpkg install --overlay-ports=./vcpkg-overlays --triplet=x64-linux --x-install-root=./vcpkg/vcpkg-installed_linux
+# ./vcpkg/vcpkg install --overlay-ports=./vcpkg-overlays --triplet=x64-linux --x-install-root=./vcpkg/vcpkg-installed_linux
+# ./vcpkg/vcpkg install --overlay-ports=./vcpkg-overlays --overlay-triplets=./vcpkg-triplets --triplet=wasm32-wasi_sdk --x-install-root=./vcpkg/vcpkg-installed_wasm
+
 source ./emsdk/emsdk_env.sh
 ./vcpkg/vcpkg install --overlay-ports=./vcpkg-overlays --triplet=wasm32-emscripten --x-install-root=./vcpkg/vcpkg-installed_wasm
