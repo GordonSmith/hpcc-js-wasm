@@ -45,6 +45,14 @@ if(with_sfdp)
   add_definitions(-DSFDP)
 endif()
 
+add_definitions(-DHAVE_X11_INTRINSIC_H=0)
+
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wl,--no-entry -fno-exceptions")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--no-entry -fno-exceptions -mexec-model=reactor --sysroot=${WASI_SDK_PREFIX}/share/wasi-sysroot")
+add_definitions(-D_WASI_EMULATED_SIGNAL=1 -D_WASI_EMULATED_MMAN=1)
+add_compile_options(-v )
+add_link_options(-v -lwasi-emulated-signal -lwasi-emulated-mman)
+
 # ===================== Append local CMake module directory ====================
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -230,8 +238,8 @@ if(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
 else()
   # Enable common warnings flags
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+  # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+  # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 endif()
 
 if(use_coverage)
