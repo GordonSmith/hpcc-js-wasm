@@ -47,11 +47,10 @@ endif()
 
 add_definitions(-DHAVE_X11_INTRINSIC_H=0)
 
-# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wl,--no-entry -fno-exceptions")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--no-entry -fno-exceptions -mexec-model=reactor --sysroot=${WASI_SDK_PREFIX}/share/wasi-sysroot")
-add_definitions(-D_WASI_EMULATED_SIGNAL=1 -D_WASI_EMULATED_MMAN=1)
-add_compile_options(-v )
-add_link_options(-v -lwasi-emulated-signal -lwasi-emulated-mman)
+# add_definitions(-D_WASI_EMULATED_SIGNAL=1 -D_WASI_EMULATED_MMAN=1 -D_WASI_EMULATED_PROCESS_CLOCKS -DF_DUPFD)
+# add_link_options(-lwasi-emulated-signal -lwasi-emulated-mman -lwasi-emulated-process-clocks)
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostartfiles -Wl,--no-entry -fno-exceptions --sysroot=${WASI_SDK_PREFIX}/share/wasi-sysroot")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -nostartfiles -Wl,--no-entry -fno-exceptions --sysroot=${WASI_SDK_PREFIX}/share/wasi-sysroot")
 
 # ===================== Append local CMake module directory ====================
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -122,6 +121,7 @@ if(with_expat)
 endif()
 
 find_package(GD)
+# find_package(GTS)
 
 if(enable_ltdl)
   find_package(LTDL)
@@ -229,6 +229,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# enable LTO in release builds
+# include(CheckIPOSupported)
+# check_ipo_supported(RESULT HAVE_IPO)
+# if(CMAKE_BUILD_TYPE STREQUAL "Release" OR
+#    CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+#   if(HAVE_IPO)
+#     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+#   endif()
+# endif()
+
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
   # MSVC warning C4996 mostly fires on completely valid code. The changes
   # proposed in the warning text often seriously compromise the code
@@ -238,8 +248,8 @@ if(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
 else()
   # Enable common warnings flags
-  # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-  # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 endif()
 
 if(use_coverage)

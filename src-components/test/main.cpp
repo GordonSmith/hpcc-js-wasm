@@ -2,11 +2,7 @@
 #include <string.h>
 #include <string>
 
-#include <gvc.h>
-#include <gvplugin.h>
-#include <graphviz_version.h>
-#include <fstream>
-
+#include "graphviz.hpp"
 #include "hw.h"
 
 void hw_run(void)
@@ -16,15 +12,17 @@ void hw_run(void)
     hw_print(&msg);
     hw_string_free(&msg);
 
-    // const char buff[32] = {0};
+    const char *dot = "digraph G {Hello->World}";
 
-    // hw_string_set(&msg, buff);
+    // Graphviz gv;
+    // const char *svg = gv.layout("digraph G {Hello->World}", "svg", "dot");
+    // hw_string_set(&msg, svg);
     // hw_print(&msg);
     // hw_string_free(&msg);
 }
 
-int main(int argc, char **argv)
-{
-    hw_run();
-    return 0;
-}
+// int main(int argc, char **argv)
+// {
+//     hw_run();
+//     return 0;
+// }

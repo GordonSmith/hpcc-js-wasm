@@ -26,8 +26,11 @@ set(VCPKG_LIBRARY_LINKAGE static)
 # set(VCPKG_C_FLAGS "${VCPKG_C_FLAGS} -D_WASI_EMULATED_SIGNAL")
 # set(VCPKG_CXX_FLAGS "${VCPKG_CXX_FLAGS} -D_WASI_EMULATED_SIGNAL")
 # set(CMAKE_EXECUTABLE_SUFFIX ".wasm")
-set(VCPKG_C_FLAGS "${VCPKG_C_FLAGS} -fno-exceptions -mexec-model=reactor --sysroot=${WASI_SDK_PREFIX}/share/wasi-sysroot")
-set(VCPKG_CXX_FLAGS "${VCPKG_CXX_FLAGS} -fno-exceptions -mexec-model=reactor --sysroot=${WASI_SDK_PREFIX}/share/wasi-sysroot")
+# set(VCPKG_C_FLAGS "${VCPKG_C_FLAGS} -fno-exceptions -mexec-model=reactor --sysroot=${WASI_SDK_PREFIX}/share/wasi-sysroot")
+# set(VCPKG_CXX_FLAGS "${VCPKG_CXX_FLAGS} -fno-exceptions -mexec-model=reactor --sysroot=${WASI_SDK_PREFIX}/share/wasi-sysroot")
+
+set(VCPKG_C_FLAGS "${VCPKG_C_FLAGS} -fno-exceptions -D_WASI_EMULATED_SIGNAL -Wl,-lwasi-emulated-signal -D_WASI_EMULATED_MMAN -Wl,-lwasi-emulated-mman -nostartfiles -Wl,--no-entry -fno-exceptions --sysroot=${WASI_SDK_PREFIX}/share/wasi-sysroot")
+set(VCPKG_CXX_FLAGS "${VCPKG_CXX_FLAGS} -fno-exceptions -D_WASI_EMULATED_SIGNAL -Wl,-lwasi-emulated-signal -D_WASI_EMULATED_MMAN -Wl,-lwasi-emulated-mman -nostartfiles -Wl,--no-entry -fno-exceptions --sysroot=${WASI_SDK_PREFIX}/share/wasi-sysroot")
 
 set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE "${WASI_SDK_PREFIX}/share/cmake/wasi-sdk.cmake")
 
