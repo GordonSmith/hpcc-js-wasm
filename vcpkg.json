@@ -7,6 +7,10 @@
         "expat",
         "graphviz",
         "triangle",
+        {
+            "name": "wasmedge",
+            "platform": "!emscripten"
+        },
         "zstd"
     ]
 }

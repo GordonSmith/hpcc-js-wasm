@@ -1,0 +1,67 @@
+{
+  "name": "wasm-micro-runtime",
+  "version-semver": "1.2.1",
+  "port-version": 1,
+  "homepage": "https://bytecodealliance.github.io/wamr.dev/",
+  "description": "WebAssembly Micro Runtime (WAMR) is a lightweight standalone WebAssembly (Wasm) runtime with small footprint, high performance and highly configurable features for applications cross from embedded, IoT, edge to Trusted Execution Environment (TEE), smart contract, cloud native and so on.",
+  "supports": "!emscripten",
+  "dependencies": [
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    },
+    "asmjit"
+  ],
+  "default-features": [
+    "interpreter",
+    "aot",
+    "libc-builtin",
+    "libc-wasi",
+    "fast-interpreter"
+  ],
+  "features": {
+    "interpreter": {
+      "description": "Interpreter"
+    },
+    "aot": {
+      "description": "AOT compiler"
+    },
+    "jit": {
+      "description": "Interpreter with JIT"
+    },
+    "fast-jit": {
+      "description": "Interpreter with JIT"
+    },
+    "libc-builtin": {
+      "description": "Builtin libc"
+    },
+    "libc-wasi": {
+      "description": "WASI libc"
+    },
+    "fast-interpreter": {
+      "description": "Fast interpreter"
+    },
+    "multi-module": {
+      "description": "Multi-module support"
+    },
+    "lib-pthread": {
+      "description": "Pthread library"
+    },
+    "lib-wasi-threads": {
+      "description": "WASI threads library"
+    },
+    "mini-loader": {
+      "description": "Mini loader"
+    },
+    "simd": {
+      "description": "SIMD support"
+    },
+    "ref-types": {
+      "description": "Reference types support"
+    }
+  }
+}
