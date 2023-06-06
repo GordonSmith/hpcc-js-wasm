@@ -4,8 +4,11 @@
     "version": "1",
     "dependencies": [
         "base91",
+        "boost-regex",
         "expat",
         "graphviz",
+        "libyaml",
+        "lz4",
         "triangle",
         "zstd"
     ]

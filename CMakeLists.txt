@@ -69,6 +69,7 @@ endif ()
 set(EMSDK_DIR "${CMAKE_SOURCE_DIR}/emsdk")
 set(EXPAT_DIR "${CMAKE_SOURCE_DIR}/src-expat/expat")
 set(GRAPHVIZ_DIR "${CMAKE_SOURCE_DIR}/third-party/graphviz")
+set(HPCC_SOURCE_DIR "${CMAKE_SOURCE_DIR}/HPCC-Platform")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
