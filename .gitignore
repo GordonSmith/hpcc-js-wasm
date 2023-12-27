@@ -22,6 +22,6 @@
 /tmp
 /types
 /wasi-sdk*
-/vcpkg
+/wit-bindgen
 .coveralls.yml
 *.tsbuildinfo
