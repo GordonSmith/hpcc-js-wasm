@@ -1,0 +1,19 @@
+/* 
+interface iterator {
+  record row {
+    value: string,
+    done: bool,
+  }
+
+  next: func() -> row
+}
+*/
+package hpcc-wasm:test;
+
+world test {
+  import print: func(msg: string);
+
+  export echo: func(msg: string) -> string;
+  export add: func(a: u32, b:u32) -> u32;
+  export sub: func(a: u32, b:u32) -> u32;
+}
