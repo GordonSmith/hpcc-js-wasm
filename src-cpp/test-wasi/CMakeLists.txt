@@ -1,4 +1,4 @@
-project(test)
+project(test_wasi)
 
 function(wit2code witFile)
     add_custom_command(
@@ -13,7 +13,7 @@ function(wit2code witFile)
     add_custom_target(wit-generate-${witFile} ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${witFile}/cpp/${witFile}.c)
 endfunction()
 
-wit2code(test)
+wit2code(test_wasi)
 
 set(CMAKE_EXECUTABLE_SUFFIX ".wasm")
 set(CMAKE_SHARED_LIBRARY_SUFFIX ".wasm")
@@ -25,27 +25,27 @@ set(CMAKE_EXECUTABLE_SUFFIX ".wasm")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -nostartfiles -fno-exceptions --sysroot=${WASI_SDK_PREFIX}/share/wasi-sysroot -Wl,--no-entry")
 
 include_directories(
-    ${CMAKE_CURRENT_BINARY_DIR}/test/cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/test_wasi/cpp
 )
 
-add_executable(add
+add_executable(test_wasi
     main.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/test/cpp/test.c
+    ${CMAKE_CURRENT_BINARY_DIR}/test_wasi/cpp/test_wasi.c
 )
 
-target_link_libraries(add
-    ${CMAKE_CURRENT_BINARY_DIR}/test/cpp/test_component_type.o
+target_link_libraries(test_wasi
+    ${CMAKE_CURRENT_BINARY_DIR}/test_wasi/cpp/test_wasi_component_type.o
 )
 
-# add_custom_command(
-#     TARGET add POST_BUILD
-#     COMMAND wasm-tools component new ${CMAKE_CURRENT_BINARY_DIR}/add.wasm -o ${HPCC_WASM_ROOT}/build/guest/cpp/bin/add.component.wasm --adapt wasi_snapshot_preview1=${HPCC_WASM_ROOT}/wit-bindgen/wasi_preview1_component_adapter.reactor.wasm
-#     # COMMAND npx jco transpile ${CMAKE_CURRENT_BINARY_DIR}/test.component.wasm -o ${CMAKE_CURRENT_BINARY_DIR}/js --wasi-shim --map wasi-*=@bytecodealliance/preview2-shim/* --map print=../../../../src-components/test/logger.js 
-# )
-# set_property(SOURCE main.cpp APPEND PROPERTY OBJECT_DEPENDS ${HPCC_WASM_ROOT}/build/guest/cpp/wit/test.c)
+add_custom_command(
+    TARGET test_wasi POST_BUILD
+    COMMAND wasm-tools component new ${CMAKE_CURRENT_BINARY_DIR}/test_wasi.wasm -o ${CMAKE_CURRENT_BINARY_DIR}/test_wasi.component.wasm --adapt wasi_snapshot_preview1=${REPO_DIR}/wit-bindgen/wasi_snapshot_preview1.reactor.wasm
+    COMMAND npx -y jco transpile ${CMAKE_CURRENT_BINARY_DIR}/test_wasi.component.wasm -o ${CMAKE_CURRENT_BINARY_DIR}/js #--wasi-shim --map wasi-*=@bytecodealliance/preview2-shim/* --map print=../../../../src-components/test_wasi/logger.js 
+)
+set_property(SOURCE main.cpp APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/test_wasi/cpp/test_wasi.c)
 
 # Install the target and export the target information
-install(TARGETS add
+install(TARGETS test_wasi
     EXPORT addConfig
     RUNTIME DESTINATION bin
 )
@@ -53,6 +53,6 @@ install(TARGETS add
 # Export the target information to a file
 install(EXPORT addConfig
     FILE addConfig.cmake
-    NAMESPACE add::
-    DESTINATION lib/cmake/add
+    NAMESPACE test_wasi::
+    DESTINATION lib/cmake/test_wasi
 )

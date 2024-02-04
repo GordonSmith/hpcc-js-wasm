@@ -8,9 +8,9 @@ interface iterator {
   next: func() -> row
 }
 */
-package hpcc-wasm:test;
+package hpcc-wasm:test-wasi;
 
-world test {
+world test-wasi {
   import print: func(msg: string);
 
   export echo: func(msg: string) -> string;

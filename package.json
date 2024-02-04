@@ -49,8 +49,8 @@
       "default": "./dist/zstd.umd.js"
     }
   },
-  "module": "dist/index.js",
   "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "browser": "dist/index.umd.js",
   "unpkg": "dist/index.umd.js",
   "jsdelivr": "dist/index.umd.js",
@@ -65,11 +65,16 @@
     "src-ts/*.css"
   ],
   "scripts": {
-    "install-emsdk": "./emsdk/emsdk install latest && ./emsdk/emsdk activate latest",
+    "install-emsdk": "run-script-os",
+    "install-emsdk:linux": "./scripts/cpp-install-emsdk.sh",
+    "install-emsdk:win32": "wsl -e ./scripts/cpp-install-emsdk.sh",
+    "install-vcpkg": "run-script-os",
+    "install-vcpkg:linux": "./scripts/cpp-install-vcpkg.sh",
+    "install-vcpkg:win32": "wsl -e ./scripts/cpp-install-vcpkg.sh",
     "install-wasi-sdk": "./scripts/install-wasi-sdk.sh",
     "install-wit-bindgen": "./scripts/install-wit-bindgen.sh",
-    "install-build-deps": "run-s install-emsdk install-wasi-sdk install-wit-bindgen",
-    "uninstall-build-deps": "rimraf wasi-sdk-20.0 wit-bindgen",
+    "install-build-deps": "run-s install-emsdk install-vcpkg install-wasi-sdk install-wit-bindgen",
+    "uninstall-build-deps": "rimraf ./emsdk ./vcpkg ./src-expat ./src-vcpkg wasi-sdk-20.0 wasi-sdk wit-bindgen",
     "clean-build": "rimraf .nyc_output bin build coverage dist* lib* output-* tmp types *.tsbuildinfo vcpkg/vcpkg",
     "clean-docs": "rimraf docs/.vitepress/dist docs/classes docs/interfaces docs/modules docs/.nojekyll docs/README.md",
     "clean": "run-p clean-build clean-docs",
@@ -121,6 +126,7 @@
     "yargs": "17.7.2"
   },
   "devDependencies": {
+    "@bytecodealliance/jco": "1.0.0",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
     "@rollup/plugin-commonjs": "25.0.7",
     "@rollup/plugin-node-resolve": "15.2.3",

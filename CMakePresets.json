@@ -11,13 +11,13 @@
             }
         },
         {
-            "name": "wasi",
+            "name": "vcpkg-wasi",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
                 "REPO_DIR": "${sourceDir}",
-                "WASI_SDK_PREFIX": "${sourceDir}/wasi-sdk-20.0",
-                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/wasi-sdk-20.0/share/cmake/wasi-sdk.cmake"
+                "WASI_SDK_PREFIX": "${sourceDir}/wasi-sdk",
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/wasi-sdk/share/cmake/wasi-sdk.cmake"
             }
         },
         {
