@@ -4,9 +4,9 @@
         {
             "name": "vcpkg",
             "generator": "Ninja",
+            "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
             "cacheVariables": {
                 "REPO_DIR": "${sourceDir}",
-                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
                 "VCPKG_INSTALL_OPTIONS": "--downloads-root=${sourceDir}/build/vcpkg_downloads;--x-buildtrees-root=${sourceDir}/build/vcpkg_buildtrees;--x-packages-root=${sourceDir}/build/vcpkg_packages"
             }
         },
@@ -14,10 +14,11 @@
             "name": "vcpkg-wasi",
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/build",
+            "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
             "cacheVariables": {
                 "REPO_DIR": "${sourceDir}",
-                "WASI_SDK_PREFIX": "${sourceDir}/wasi-sdk",
-                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/wasi-sdk/share/cmake/wasi-sdk.cmake"
+                "CMAKE_TOOLCHAIN_FILE_XXX": "${sourceDir}/wasi-sdk/share/cmake/wasi-sdk.cmake",
+                "WASI_SDK_PREFIX": "${sourceDir}/wasi-sdk"
             }
         },
         {

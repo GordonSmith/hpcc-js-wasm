@@ -1,5 +1,8 @@
 project(test_wasi)
 
+# find and link libraries
+find_path(Graphviz_INCLUDE_DIRS NAMES graphviz/gvc.h HINTS "${REPO_DIR}/vcpkg/vcpkg-installed_wasm/wasm32-emscripten/include" REQUIRED)
+
 function(wit2code witFile)
     add_custom_command(
         MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${witFile}.wit
@@ -22,9 +25,11 @@ set(CMAKE_SHARED_LIBRARY_SUFFIX ".wasm")
 # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-entry -Wl,--export-all")
 
 set(CMAKE_EXECUTABLE_SUFFIX ".wasm")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -nostartfiles -fno-exceptions --sysroot=${WASI_SDK_PREFIX}/share/wasi-sysroot -Wl,--no-entry")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WASI_EMULATED_SIGNAL --target=wasm32-unknown-wasi -nostartfiles -fno-exceptions --sysroot=${WASI_SDK_PREFIX}/share/wasi-sysroot -Wl,--no-entry")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lwasi-emulated-signal")
 
 include_directories(
+    ${Graphviz_INCLUDE_DIRS}/graphviz
     ${CMAKE_CURRENT_BINARY_DIR}/test_wasi/cpp
 )
 

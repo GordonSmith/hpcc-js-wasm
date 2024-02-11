@@ -1,4 +1,4 @@
-package hpcc-wasm:test-wasi;
+package hpcc-js-wasm:graphviz-wasi;
 
 interface host {
     log: func(msg:string);
@@ -8,7 +8,7 @@ interface guest {
     version: func() -> string;
 }
 
-world test-wasi {
+world graphviz-wasi {
     import host;
     export guest;
 }

@@ -8,7 +8,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_INSTALL_PREFIX "..")
 
-if (NOT WASI_SDK_PREFIX)
+if (WASI_SDK_PREFIX)
+else ()
     # option(ENABLE_SANITIZERS "Enable Clang's sanitizer options" OFF)
     # execute_process(COMMAND source ./emsdk/emsdk_env.sh)
 
@@ -92,7 +93,6 @@ if (NOT WASI_SDK_PREFIX)
 
         add_dependencies(sfx-${targetID} ${targetID} base91lib zstdlib)
     endfunction ()
-
-endif (NOT WASI_SDK_PREFIX)
+endif ()
 
 add_subdirectory(src-cpp)

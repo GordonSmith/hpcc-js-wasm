@@ -1,29 +1,11 @@
+#include <gvc.h>
+#include <gvplugin.h>
+#include <graphviz_version.h>
+
 #include "test_wasi.h"
 
-#include <string>
-
-std::string s;
-void test_wasi_echo(test_wasi_string_t *msg, test_wasi_string_t *ret)
+void exports_hpcc_wasm_test_wasi_guest_version(test_wasi_string_t *ret)
 {
-    std::string tmp((const char *)msg->ptr, msg->len);
-    tmp += ":echo";
-
-    test_wasi_string_dup(ret, s.c_str());
-    test_wasi_print(ret);
-}
-
-uint32_t test_wasi_add(uint32_t a, uint32_t b)
-{
-    test_wasi_string_t msg;
-    test_wasi_string_dup(&msg, "test_add");
-    test_wasi_print(&msg);
-    return a + b;
-}
-
-uint32_t test_wasi_sub(uint32_t a, uint32_t b)
-{
-    test_wasi_string_t msg;
-    test_wasi_string_dup(&msg, "test_sub");
-    test_wasi_print(&msg);
-    return a - b;
+    test_wasi_string_dup(ret, PACKAGE_VERSION);
+    hpcc_wasm_test_wasi_host_log(ret);
 }
