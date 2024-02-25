@@ -34,6 +34,7 @@ set_property(SOURCE main.cpp APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_CURRENT_BINA
 set(SRCS
     main.hpp
     main.cpp
+    times.cpp
     util.hpp
     util.cpp
 )

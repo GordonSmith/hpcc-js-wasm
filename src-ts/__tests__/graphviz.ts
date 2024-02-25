@@ -3,6 +3,7 @@ import { Engine, Format, Graphviz } from "@hpcc-js/wasm/graphviz";
 import { badDot, dot } from "./dot001.js";
 import { ortho } from "./dot002.js";
 import { dotMemory } from "./dot003.js";
+import { dotFreeze } from "./dot004.js";
 
 export const formats: Format[] = ["svg", "dot", "json", "dot_json", "xdot_json", "plain", "plain-ext"];
 export const engines: Engine[] = ["circo", "dot", "fdp", "sfdp", "neato", "osage", "patchwork", "twopi", "nop", "nop2"];
@@ -182,6 +183,23 @@ describe("graphviz", function () {
                 break;
             }
             Graphviz.unload();
+        }
+    });
+
+    it.only("random freeze", async function () {
+        this.timeout(10000);
+        for (let i = 0; i < 50; ++i) {
+            console.log(`i:  ${i}`);
+            try {
+                const graphviz = await Graphviz.load();
+                const svg = graphviz.dot(dotFreeze, "json");
+                expect(svg).to.be.not.empty;
+                Graphviz.unload();
+            } catch (e: any) {
+                console.log(`Failed at i:  ${i} - ${e.message}`);
+                expect(false, e.message).to.be.true;
+                break;
+            }
         }
     });
 
