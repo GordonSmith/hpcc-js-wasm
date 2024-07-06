@@ -42,7 +42,7 @@ export class Llama extends WasmLibrary {
     static load(): Promise<Llama> {
         if (!g_llama) {
             g_llama = loadWasm().then((module: any) => {
-                return new Llama(module)
+                return new Llama(module);
             });
         }
         return g_llama;

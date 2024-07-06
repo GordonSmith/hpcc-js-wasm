@@ -1,5 +1,3 @@
-#include <stdlib.h>
-
 #include "common.h"
 #include "llama.h"
 
@@ -205,7 +203,7 @@ struct llama
 public:
     static const char *version(void)
     {
-        return "0.0.1";
+        return "b2700";
     }
 
     static void *malloc(size_t __size)

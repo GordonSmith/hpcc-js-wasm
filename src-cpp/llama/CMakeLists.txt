@@ -1,5 +1,7 @@
 project(llamalib)
 
+set(CMAKE_CXX_STANDARD 14)
+
 find_package(Llama CONFIG REQUIRED)
 
 # See:  https://github.com/emscripten-core/emscripten/blob/main/src/settings.js
