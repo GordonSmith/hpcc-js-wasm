@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-int simple(int argc, char **argv)
+int simple(int argc, const char **argv)
 {
     gpt_params params;
 
@@ -213,6 +213,14 @@ public:
     static void free(void *__ptr)
     {
         ::free(__ptr);
+    }
+
+    static void test()
+    {
+        std::cout << "Hello" << std::endl;
+        int argc = 2;
+        const char *argv[] = {"tinyllama-1.1b-1t-openorca.Q4_K_M.gguf", "Who are you?"};
+        simple(argc, argv);
     }
 };
 

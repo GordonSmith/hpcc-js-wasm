@@ -1,7 +1,7 @@
 import { expect } from "chai";
-import { Llama } from "@hpcc-js/wasm/llama";
+import { Llama } from "../llama";
 
-describe("llama", function () {
+describe.only("llama", function () {
     it("version", async function () {
         let llama = await Llama.load();
         let v = llama.version();
@@ -21,4 +21,8 @@ describe("llama", function () {
         Llama.unload();
     });
 
+    it.skip("test", async function () {
+        let llama = await Llama.load();
+        llama.test();
+    });
 });

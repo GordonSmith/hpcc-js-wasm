@@ -1,5 +1,5 @@
 // @ts-ignore
-import { loadWasm, unloadWasm } from "./llamalib.wasm.js";
+import { loadWasm, unloadWasm } from "../lib-esm/llamalib.wasm.js";
 import { WasmLibrary } from "./wasm-library.js";
 
 //  Ref:  http://facebook.github.io/llama/llama_manual.html
@@ -60,5 +60,12 @@ export class Llama extends WasmLibrary {
      */
     version(): string {
         return this._exports.version();
+    }
+
+    /**
+     * @returns The Llama c++ test
+     */
+    test() {
+        this._exports.test();
     }
 }
