@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+#ifdef _INC_CPP
 int main(int argc, char **argv)
 {
     gpt_params params;
@@ -197,6 +198,7 @@ int main(int argc, char **argv)
 
     return 0;
 }
+#endif
 
 struct llama
 {

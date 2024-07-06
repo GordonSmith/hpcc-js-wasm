@@ -49,6 +49,12 @@
       "require": "./dist/graphviz.cjs",
       "default": "./dist/graphviz.umd.js"
     },
+    "./llama": {
+      "types": "./types/llama.d.ts",
+      "import": "./dist/llama.js",
+      "require": "./dist/llama.cjs",
+      "default": "./dist/llama.umd.js"
+    },
     "./zstd": {
       "types": "./types/zstd.d.ts",
       "import": "./dist/zstd.js",
