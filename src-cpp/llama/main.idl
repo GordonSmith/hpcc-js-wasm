@@ -1,0 +1,7 @@
+interface llama
+{
+    [Const] static DOMString version();
+
+    static any malloc(unsigned long size);
+    static void free(any ptr);
+};

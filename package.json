@@ -8,13 +8,14 @@
     "webassembly",
     "wasm",
     "dot",
+    "llama",
     "zstd",
     "graphviz-dot",
     "zstandard",
     "expat",
     "base91",
     "expat-xml-parser",
-    "webassemby"
+    "webassembly"
   ],
   "type": "module",
   "exports": {
