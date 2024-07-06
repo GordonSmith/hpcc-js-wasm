@@ -6,8 +6,7 @@
 #include <string>
 #include <vector>
 
-#ifdef _INC_CPP
-int main(int argc, char **argv)
+int simple(int argc, char **argv)
 {
     gpt_params params;
 
@@ -37,7 +36,8 @@ int main(int argc, char **argv)
 
     // init LLM
 
-    llama_backend_init(params.numa);
+    llama_backend_init();
+    llama_numa_init(params.numa);
 
     // initialize the model
 
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
     if (n_kv_req > n_ctx)
     {
         LOG_TEE("%s: error: n_kv_req > n_ctx, the required KV cache size is not big enough\n", __func__);
-        LOG_TEE("%s:        either reduce n_parallel or increase n_ctx\n", __func__);
+        LOG_TEE("%s:        either reduce n_len or increase n_ctx\n", __func__);
         return 1;
     }
 
@@ -196,7 +196,6 @@ int main(int argc, char **argv)
 
     return 0;
 }
-#endif
 
 struct llama
 {
