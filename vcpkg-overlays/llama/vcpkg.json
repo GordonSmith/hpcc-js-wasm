@@ -1,6 +1,6 @@
 {
   "name": "llama",
-  "version-string": "b2865",
+  "version-string": "b3324",
   "homepage": "https://github.com/ggerganov/llama.cpp",
   "description": "Inference of LLaMA model in pure C/C++.",
   "dependencies": [
