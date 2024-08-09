@@ -38,5 +38,3 @@ set_target_properties(zstdlib PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
 target_link_libraries(zstdlib
     PRIVATE $<IF:$<TARGET_EXISTS:zstd::libzstd_shared>,zstd::libzstd_shared,zstd::libzstd_static>
 )
-
-packWasm(zstdlib)

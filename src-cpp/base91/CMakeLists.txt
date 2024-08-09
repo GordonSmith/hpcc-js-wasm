@@ -39,5 +39,3 @@ target_link_libraries(base91lib
     PRIVATE unofficial::base91::base91
 )
 
-packWasm(base91lib)
-

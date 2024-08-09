@@ -38,5 +38,3 @@ set_target_properties(expatlib PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
 target_link_libraries(expatlib
     expat::expat
 )
-
-packWasm(expatlib)

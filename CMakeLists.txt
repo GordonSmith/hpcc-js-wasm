@@ -79,14 +79,4 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(PACK_MODE "-d")
 endif ()
 
-function(packWasm targetID)
-    add_custom_target(sfx-${targetID} ALL
-        COMMAND node ./utils/sfx-wasm.js ${PACK_MODE} ${CMAKE_CURRENT_BINARY_DIR}/${targetID}.wasm > ${REPO_DIR}/build/${targetID}.wasm.js
-        WORKING_DIRECTORY ${REPO_DIR}
-        COMMENT "SFX Wasm ${targetID}"
-    ) 
-
-    add_dependencies(sfx-${targetID} ${targetID} base91lib zstdlib)
-endfunction ()
-
 add_subdirectory(src-cpp)

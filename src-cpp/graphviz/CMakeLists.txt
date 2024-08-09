@@ -88,8 +88,6 @@ target_link_libraries(graphvizlib PRIVATE
     ${EXPAT_LIBRARIES}
 )
 
-packWasm(graphvizlib)
-
 # add_executable(graphvizlib-web
 #     ${SRCS}
 # )

@@ -70,6 +70,9 @@
     "types/*",
     "src-ts/*.css"
   ],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "install-emsdk": "run-script-os",
     "install-emsdk:linux": "./scripts/cpp-install-emsdk.sh",
@@ -115,7 +118,9 @@
     "watch": "run-p compile-types-watch compile-ts-watch",
     "serve-docs": "vitepress serve docs",
     "serve": "ws",
-    "lint": "eslint src-ts/**/*.ts",
+    "lint-skypack": "npx -y @skypack/package-check",
+    "lint-eslint": "eslint src-ts/**/*.ts",
+    "lint": "run-p lint-eslint lint-skypack",
     "lint-fix": "npm run lint -- --fix",
     "test-cli": "node ./bin/dot-wasm.js -v",
     "test-cli-help": "node ./bin/dot-wasm.js",
@@ -131,8 +136,8 @@
     "tag": "run-s standard-version git-push",
     "tag-next": "run-s standard-version-next git-push",
     "purge-jsdelivr": "node ./utils/purge-jsdelivr.js",
-    "update": "npx npm-check-updates -u -t minor",
-    "update-major": "npx npm-check-updates -u"
+    "update": "npx -y npm-check-updates -u -t minor",
+    "update-major": "npx -y npm-check-updates -u"
   },
   "dependencies": {
     "yargs": "17.7.2"
@@ -152,8 +157,9 @@
     "chai": "5.1.1",
     "coveralls": "3.1.1",
     "esbuild": "0.23.0",
+    "esbuild-plugin-umd-wrapper": "3.0.0",
+    "esbuild-plugin-sfx-wasm": "1.0.0",
     "eslint": "9.8.0",
-    "fzstd": "0.1.1",
     "globals": "15.9.0",
     "karma": "6.4.4",
     "karma-chai": "0.1.0",

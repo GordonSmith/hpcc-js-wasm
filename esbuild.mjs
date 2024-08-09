@@ -1,6 +1,8 @@
 import * as process from "process";
 import { readFileSync } from "fs";
 import * as esbuild from "esbuild";
+import { umdWrapper } from "esbuild-plugin-umd-wrapper";
+import sfxWasm from "esbuild-plugin-sfx-wasm";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
@@ -83,9 +85,10 @@ function build(config) {
     isDevelopment && console.log("Start:  ", config.entryPoints[0], config.outfile);
     return esbuild.build({
         ...config,
-        sourcemap: "external",
+        sourcemap: "linked",
         plugins: [
             ...(config.plugins ?? []),
+            sfxWasm()
         ]
     }).then(() => {
         isDevelopment && console.log("Stop:   ", config.entryPoints[0], config.outfile);
@@ -99,6 +102,7 @@ async function watch(config) {
         sourcemap: "linked",
         plugins: [
             ...(config.plugins ?? []),
+            sfxWasm(),
             rebuildNotify(config),
         ]
     }).then(ctx => {
@@ -120,14 +124,15 @@ function browserTpl(input, output, format, globalName = "", external = []) {
         globalName,
         bundle: true,
         minify: isProduction,
-        external
+        external,
+        plugins: format === "umd" ? [umdWrapper()] : []
     });
 }
 
 function browserBoth(input, output, globalName = undefined, external = []) {
     return Promise.all([
         browserTpl(input, output, "esm", globalName, external),
-        browserTpl(input, output, "iife", globalName, external)
+        browserTpl(input, output, "umd", globalName, external)
     ]);
 }
 

@@ -1,5 +1,5 @@
 // @ts-ignore
-import { loadWasm, unloadWasm } from "../build/zstdlib.wasm.js";
+import { loadWasm, unloadWasm } from "../build/src-cpp/zstd/zstdlib.wasm";
 import { WasmLibrary } from "./wasm-library.js";
 
 //  Ref:  http://facebook.github.io/zstd/zstd_manual.html
