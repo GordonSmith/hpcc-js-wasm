@@ -11,6 +11,7 @@ set(EM_LINK_FLAGS
     "-sEXPORTED_FUNCTIONS=\"[]\""
     "-sEXPORTED_RUNTIME_METHODS=\"[UTF8ToString]\""
     "--post-js ${CMAKE_CURRENT_BINARY_DIR}/main_glue.js"
+    "--emit-tsd ${CMAKE_CURRENT_BINARY_DIR}/base91lib.d.ts"
 )
 string(REPLACE ";" " " LINK_FLAGS "${EM_LINK_FLAGS}")
 

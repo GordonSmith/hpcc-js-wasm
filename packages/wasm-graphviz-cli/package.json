@@ -1,0 +1,28 @@
+{
+  "name": "@hpcc-js/wasm-graphviz-cli",
+  "version": "1.0.2",
+  "description": "",
+  "keywords": [],
+  "type": "module",
+  "bin": {
+    "wasm-graphviz-cli": "bin/index.js"
+  },
+  "files": [
+    "bin/*.*"
+  ],
+  "scripts": {
+    "clean": "rimraf ./bin",
+    "build": "esbuild --format=esm --outfile=./bin/index.js --banner:js='#!/usr/bin/env node' ./src/index.ts",
+    "lint-eslint": "eslint src/**/*.ts",
+    "lint": "run-p lint-eslint",
+    "test-cli": "npx . -v",
+    "test-cli-help": "npx .",
+    "test-node": "npx . -v"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@hpcc-js/wasm": "2.18.2",
+    "yargs": "17.7.2"
+  }
+}

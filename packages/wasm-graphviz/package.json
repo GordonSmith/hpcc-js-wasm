@@ -1,0 +1,49 @@
+{
+  "name": "@hpcc-js/wasm-graphviz",
+  "version": "1.0.0",
+  "description": "hpcc-js - WASM Graphviz",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.umd.js"
+    }
+  },
+  "files": [
+    "dist/**/*",
+    "types/**/*"
+  ],
+  "scripts": {
+    "clean": "rimraf ./dist ./types",
+    "compile-types": "tsc --project tsconfig.json --emitDeclarationOnly",
+    "compile-types-watch": "npm run compile-types -- --watch",
+    "compile-ts": "node esbuild.mjs",
+    "compile-ts-dev": "npm run compile-ts -- --mode=development",
+    "compile-ts-watch": "npm run compile-ts-dev -- --watch",
+    "compile": "run-p compile-types compile-ts",
+    "compile-dev": "run-p compile-types compile-ts-dev",
+    "lint-skypack": "npx -y @skypack/package-check",
+    "lint-eslint": "eslint src-ts/**/*.ts",
+    "lint": "run-p lint-eslint lint-skypack",
+    "test-cli": "npx . -v",
+    "test-cli-help": "npx .",
+    "test-node": "npx . -v"
+  },
+  "dependencies": {
+    "@hpcc-js/wasm": "2.18.2",
+    "yargs": "17.7.2"
+  },
+  "keywords": [
+    "graphviz",
+    "typescript",
+    "webassembly",
+    "wasm",
+    "dot",
+    "graphviz-dot",
+    "webassemby"
+  ],
+  "author": "hpcc-systems",
+  "license": "Apache-2.0"
+}

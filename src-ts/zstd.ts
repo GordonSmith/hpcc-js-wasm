@@ -1,5 +1,5 @@
 // @ts-ignore
-import { loadWasm, unloadWasm } from "../build/src-cpp/zstd/zstdlib.wasm";
+import load, { reset } from "../build/src-cpp/zstd/zstdlib.wasm";
 import { WasmLibrary } from "./wasm-library.js";
 
 //  Ref:  http://facebook.github.io/zstd/zstd_manual.html
@@ -41,7 +41,7 @@ export class Zstd extends WasmLibrary {
      */
     static load(): Promise<Zstd> {
         if (!g_zstd) {
-            g_zstd = loadWasm().then((module: any) => {
+            g_zstd = load().then((module: any) => {
                 return new Zstd(module)
             });
         }
@@ -52,7 +52,7 @@ export class Zstd extends WasmLibrary {
      * Unloades the compiled wasm instance.
      */
     static unload() {
-        unloadWasm();
+        reset();
     }
 
     /**

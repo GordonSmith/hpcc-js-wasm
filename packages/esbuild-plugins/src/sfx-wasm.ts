@@ -1,20 +1,14 @@
 import { readFile } from "fs/promises";
 import { Base91, Zstd } from "@hpcc-js/wasm";
+import type { Plugin, PluginBuild } from "esbuild";
 
-export default function (options) {
-    return {
-        name: "esbuild-plugin-sfx-wasm",
-        setup(build) {
-            build.onLoad({ filter: /\.wasm$/ }, async args => {
-                const wasm = await readFile(args.path);
-                const wrapperPath = args.path.replace(/\.wasm$/, ".js");
-                const zstd = await Zstd.load();
-                const data = zstd.compress(wasm);
-                const base91 = await Base91.load();
-                const str = base91.encode(data);
+function tpl(wasmJsPath: string, base91Wasm: string, base91CompressedWasm: string) {
 
-                const contents = `\
-import { decompress } from "fzstd";
+    const compressed = (base91CompressedWasm.length + 8 * 1024) <= base91Wasm.length;
+
+    return `\
+${compressed ? 'import { decompress } from "fzstd";' : ''}
+import wrapper from "${wasmJsPath}";
 
 const table = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,./:;<=>?@[]^_\`{|}~"';
 
@@ -52,20 +46,13 @@ function decode(raw: string): Uint8Array {
     return new Uint8Array(ret);
 }
 
-export function extract(raw: string): Uint8Array {
-    const compressed = decode(raw);
-    return decompress(compressed);
-}
-
-import wrapper from "${wrapperPath}";
-
-const blobStr = '${str}';
+const blobStr = '${compressed ? base91CompressedWasm : base91Wasm}';
 
 let g_module;
 let g_wasmBinary;
-export function loadWasm() {
+export default function() {
     if (!g_wasmBinary) {
-        g_wasmBinary = extract(blobStr)
+        g_wasmBinary = ${compressed ? "decompress(decode(blobStr))" : "decode(blobStr)"};
     }
     if (!g_module) {
         g_module = wrapper({
@@ -76,18 +63,34 @@ export function loadWasm() {
     return g_module;
 }
 
-export function unloadWasm() {
+export function reset() {
     if (g_module) {
         g_module = undefined;
     }
+}`.trim();
 }
-            `.trim();
+
+export function sfxWasm(): Plugin {
+    return {
+        name: "sfx-wasm",
+
+        setup(build: PluginBuild) {
+
+            build.onLoad({ filter: /\.wasm$/ }, async args => {
+                const base91 = await Base91.load();
+                const zstd = await Zstd.load();
+
+                const wasm = await readFile(args.path);
+                const wasmJsPath = args.path.replace(/\.wasm$/, ".js");
+                const base91Wasm = base91.encode(wasm);
+                const compressedWasm = zstd.compress(wasm);
+                const base91CompressedWasm = base91.encode(compressedWasm);
 
                 return {
-                    contents,
+                    contents: tpl(wasmJsPath, base91Wasm, base91CompressedWasm),
                     loader: "ts",
                 };
-            })
+            });
         }
     }
 };

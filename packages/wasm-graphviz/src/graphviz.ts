@@ -1,5 +1,5 @@
 // @ts-ignore
-import load, { reset } from "../build/src-cpp/graphviz/graphvizlib.wasm";
+import load, { reset } from "../../../build/src-cpp/graphviz/graphvizlib.wasm";
 
 /**
  * Various graphic and data formats for end user, web, documents and other applications.  See [Output Formats](https://graphviz.gitlab.io/docs/outputs/) for more information.

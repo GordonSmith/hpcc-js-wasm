@@ -1,5 +1,5 @@
-// @ts-ignore
-import { loadWasm, unloadWasm } from "../build/src-cpp/base91/base91lib.wasm";
+//@ts-ignore
+import load, { reset } from "../build/src-cpp/base91/base91lib.wasm";
 import { WasmLibrary } from "./wasm-library.js";
 
 //  Ref:  http://base91.sourceforge.net/#a5
@@ -37,7 +37,7 @@ export class Base91 extends WasmLibrary {
      */
     static load(): Promise<Base91> {
         if (!g_base91) {
-            g_base91 = loadWasm().then((module: any) => {
+            g_base91 = load().then((module: any) => {
                 return new Base91(module)
             });
         }
@@ -48,7 +48,7 @@ export class Base91 extends WasmLibrary {
      * Unloades the compiled wasm instance.
      */
     static unload() {
-        unloadWasm();
+        reset();
     }
 
     /**

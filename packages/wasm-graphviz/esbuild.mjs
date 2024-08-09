@@ -2,7 +2,7 @@ import * as process from "process";
 import { readFileSync } from "fs";
 import * as esbuild from "esbuild";
 import { umdWrapper } from "esbuild-plugin-umd-wrapper";
-import sfxWasm from "@hpcc-js/esbuild-plugin";
+import sfxWasm from "../esbuild-plugin";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
@@ -34,6 +34,102 @@ const argv = await myYargs.argv;
 const isDevelopment = argv.mode === "development";
 const isProduction = !isDevelopment;
 const isWatch = argv.watch;
+
+//  plugins  ---
+let wasmPlugin = {
+    name: 'wasm',
+    setup(build) {
+        // Resolve ".wasm" files to a path with a namespace
+        build.onResolve({ filter: /\.wasm$/ }, args => {
+            // If this is the import inside the stub module, import the
+            // binary itself. Put the path in the "wasm-binary" namespace
+            // to tell our binary load callback to load the binary file.
+            if (args.namespace === 'wasm-stub') {
+                return {
+                    path: args.path,
+                    namespace: 'wasm-binary',
+                }
+            }
+
+            // Otherwise, generate the JavaScript stub module for this
+            // ".wasm" file. Put it in the "wasm-stub" namespace to tell
+            // our stub load callback to fill it with JavaScript.
+            //
+            // Resolve relative paths to absolute paths here since this
+            // resolve callback is given "resolveDir", the directory to
+            // resolve imports against.
+            if (args.resolveDir === '') {
+                return // Ignore unresolvable paths
+            }
+            return {
+                path: path.isAbsolute(args.path) ? args.path : path.join(args.resolveDir, args.path),
+                namespace: 'wasm-stub',
+            }
+        })
+
+        // Virtual modules in the "wasm-stub" namespace are filled with
+        // the JavaScript code for compiling the WebAssembly binary. The
+        // binary itself is imported from a second virtual module.
+        build.onLoad({ filter: /.*/, namespace: 'wasm-stub' }, async (args) => ({
+            contents: `import wasm from ${JSON.stringify(args.path)}
+          export default (imports) =>
+            WebAssembly.instantiate(wasm, imports).then(
+              result => result.instance.exports)`,
+        }))
+
+        // Virtual modules in the "wasm-binary" namespace contain the
+        // actual bytes of the WebAssembly file. This uses esbuild's
+        // built-in "binary" loader instead of manually embedding the
+        // binary data inside JavaScript code ourselves.
+        build.onLoad({ filter: /.*/, namespace: 'wasm-binary' }, async (args) => ({
+            contents: await fs.promises.readFile(args.path),
+            loader: 'binary',
+        }))
+    },
+}
+const excludeSourceMapPlugin = ({ filter }) => ({
+    name: "excludeSourceMapPlugin",
+
+    setup(build) {
+        build.onLoad({ filter }, (args) => {
+            return {
+                contents:
+                    readFileSync(args.path, "utf8") +
+                    "\n//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIiJdLCJtYXBwaW5ncyI6IkEifQ==",
+                loader: "default",
+            };
+        });
+    },
+});
+
+const esbuildProblemMatcherPlugin = ({ filter }) => ({
+    name: "esbuild-problem-matcher",
+
+    setup(build) {
+        build.onStart(() => {
+            console.log("[watch] build started");
+        });
+        build.onEnd((result) => {
+            result.errors.forEach(({ text, location }) => {
+                console.error(`✘ [ERROR] ${text}`);
+                console.error(`    ${location.file}:${location.line}:${location.column}:`);
+            });
+            console.log("[watch] build finished");
+        });
+    },
+});
+
+function rebuildNotify(config) {
+    return {
+        name: "rebuild-notify",
+
+        setup(build) {
+            build.onEnd(result => {
+                console.log(`Built ${config.outfile}`);
+            });
+        },
+    };
+}
 
 //  helpers  ---
 function build(config) {

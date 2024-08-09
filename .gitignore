@@ -4,7 +4,7 @@
 /bin
 /build
 /coverage
-/dist
+dist/
 /dist-test
 /docs/.vitepress/cache
 /docs/.vitepress/dist
@@ -20,7 +20,7 @@
 /third-party
 /src-ts/*.wasm.ts
 /tmp
-/types
+types/
 /wasi-sdk*
 /wit-bindgen
 /vcpkg

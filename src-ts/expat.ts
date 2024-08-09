@@ -1,5 +1,5 @@
 // @ts-ignore
-import { loadWasm, unloadWasm } from "../build/src-cpp/expat/expatlib/expatlib.wasm";
+import load, { reset } from "../build/src-cpp/expat/expatlib/expatlib.wasm";
 
 export type Attributes = { [key: string]: string };
 export interface IParser {
@@ -61,7 +61,7 @@ export class Expat {
      * @returns A promise to an instance of the Expat class.
      */
     static load(): Promise<Expat> {
-        return loadWasm().then((module: any) => {
+        return load().then((module: any) => {
             return new Expat(module);
         });
     }
@@ -70,7 +70,7 @@ export class Expat {
      * Unloades the compiled wasm instance.
      */
     static unload() {
-        unloadWasm();
+        reset();
     }
 
     /**
