@@ -2,7 +2,7 @@ import * as process from "process";
 import { readFileSync } from "fs";
 import * as esbuild from "esbuild";
 import { umdWrapper } from "esbuild-plugin-umd-wrapper";
-import sfxWasm from "@hpcc-js/esbuild-plugin";
+import { rebuildLogger, sfxWasm } from "@hpcc-js/esbuild-plugins";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
@@ -57,7 +57,7 @@ async function watch(config) {
         sourcemap: "external",
         plugins: [
             ...(config.plugins ?? []),
-            rebuildNotify(config),
+            rebuildLogger(config),
             sfxWasm()
         ]
     }).then(ctx => {
