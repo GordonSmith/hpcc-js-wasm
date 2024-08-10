@@ -1,7 +1,7 @@
 import type { PluginBuild, Plugin } from "esbuild";
 
 export interface RebuildLoggerOptions {
-    outfile: string;
+    outfile?: string;
 }
 
 export function rebuildLogger(opts: RebuildLoggerOptions): Plugin {
@@ -15,7 +15,7 @@ export function rebuildLogger(opts: RebuildLoggerOptions): Plugin {
             });
 
             build.onEnd(() => {
-                console.log(`Rebuilt ${opts.outfile}`);
+                console.log(`Rebuilt ${opts.outfile ?? "Unknown"}`);
             });
         }
     };

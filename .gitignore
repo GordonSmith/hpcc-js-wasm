@@ -1,11 +1,11 @@
 /.nyc_output
 /.vscode/c_cpp_properties.json
 /.vscode/ipch
-/bin
+bin/
 /build
 /coverage
 dist/
-/dist-test
+dist-test/
 /docs/.vitepress/cache
 /docs/.vitepress/dist
 /docs/classes

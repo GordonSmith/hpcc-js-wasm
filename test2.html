@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<!-- Content-Type: application/xhtml+xml -->
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<body>
+    <div id="1">1</div>
+    <script type="module">
+
+        const base64Image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAZBAMAAAA2x5hQAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAADUExURUeK/z7BOdMAAAAJcEhZcwAADsIAAA7CARUoSoAAAAAOSURBVCjPYxgFNAMMDAABXgABAvs87wAAAABJRU5ErkJggg==";
+        const byteCharacters = atob(base64Image.split(',')[1]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/png' });
+        const fakeUrl = URL.createObjectURL(blob);
+
+        const dot_sample_img = `digraph G { node[shape=box]
+blue_file[label="blue_file" image="blue.png" imagepath="/"]
+
+blue_inline[label="${fakeUrl}" image="${fakeUrl}"]
+}`;
+
+        const images = [
+            {
+                path: fakeUrl,
+                width: "25px",
+                height: "25px"
+            }
+            ,
+            {
+                path: "blue.png",
+                width: "25px",
+                height: "25px"
+            }
+        ];
+
+        const files = [
+            {
+                path: "/blue.png",
+                data:
+                    "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A\x00\x00\x00\x0D\x49\x48\x44\x52\x00\x00\x00\x19\x00\x00\x00\x19\x04\x03\x00\x00\x00\x36\xC7\x98\x50\x00\x00\x00\x01\x73\x52\x47\x42\x00\xAE\xCE\x1C\xE9\x00\x00\x00\x04\x67\x41\x4D\x41\x00\x00\xB1\x8F\x0B\xFC\x61\x05\x00\x00\x00\x03\x50\x4C\x54\x45\x47\x8A\xFF\x3E\xC1\x39\xD3\x00\x00\x00\x09\x70\x48\x59\x73\x00\x00\x0E\xC2\x00\x00\x0E\xC2\x01\x15\x28\x4A\x80\x00\x00\x00\x0E\x49\x44\x41\x54\x28\xCF\x63\x18\x05\x34\x03\x0C\x0C\x00\x01\x5E\x00\x01\x02\xFB\x3C\xEF\x00\x00\x00\x00\x49\x45\x4E\x44\xAE\x42\x60\x82"
+            }
+        ];
+
+        import { Graphviz } from "https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/index.js";
+        const graphviz = await Graphviz.load();
+        layout(dot_sample_img, "1");
+
+        function layout(dot, domId) {
+            document.getElementById(domId).innerHTML = graphviz.dot(
+                dot,
+                "svg",
+                {
+                    images: images,
+                    files: files
+                }
+            );
+        }
+
+    </script>
+</body>
+
+</html>

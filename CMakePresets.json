@@ -6,7 +6,6 @@
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
-                "REPO_DIR": "${sourceDir}",
                 "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
             }
         },

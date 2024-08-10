@@ -19,8 +19,10 @@
         "clean": "rimraf ./dist ./types",
         "build-types": "tsc --project tsconfig.json --emitDeclarationOnly",
         "build-types-watch": "npm run build-types -- --watch",
-        "build-ts": "esbuild ./src/index.ts --platform=node --format=esm --bundle --packages=external --minify --sourcemap --outfile=./dist/index.js",
+        "build-ts-dev": "esbuild ./src/index.ts --platform=node --format=esm --bundle --packages=external --sourcemap --outfile=./dist/index.js",
+        "build-ts": "npm run build-ts-dev --minify",
         "build-ts-watch": "npm run build-ts-dev -- --watch",
+        "build-dev": "run-p build-types build-ts-dev",
         "build": "run-p build-types build-ts",
         "lint-skypack": "npx -y @skypack/package-check",
         "lint-eslint": "eslint src/**/*.ts",
@@ -35,7 +37,10 @@
     },
     "keywords": [
         "esbuild",
-        "plugins"
+        "plugins",
+        "WebAssembly",
+        "wasm",
+        "sfx"
     ],
     "author": "hpcc-systems",
     "repository": {

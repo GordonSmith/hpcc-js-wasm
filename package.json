@@ -62,10 +62,9 @@
   "jsdelivr": "./dist/index.umd.js",
   "types": "./types/index.d.ts",
   "bin": {
-    "dot-wasm": "./bin/dot-wasm.js"
+    "dot-wasm": "node ./node_modules/@hpcc-js/wasm-graphviz-cli/bin/index.js"
   },
   "files": [
-    "bin/*.*",
     "dist/*.*",
     "types/*",
     "src-ts/*.css"
@@ -85,7 +84,8 @@
     "clean-build": "rimraf --glob .nyc_output bin build coverage output-* tmp vcpkg/vcpkg",
     "clean-dist": "rimraf --glob dist* lib* output-* types *.tsbuildinfo",
     "clean-docs": "rimraf docs/.vitepress/dist docs/classes docs/interfaces docs/modules docs/.nojekyll docs/README.md",
-    "clean": "run-p clean-build clean-dist clean-docs",
+    "clean-ws": "npm run clean -ws --if-present",
+    "clean": "run-p clean-ws clean-build clean-dist clean-docs",
     "copy-res": "cp ./docs/*.png ./docs/.vitepress/dist",
     "compile-types": "tsc --project tsconfig.json --emitDeclarationOnly",
     "compile-types-watch": "npm run compile-types -- --watch",
@@ -110,8 +110,8 @@
     "pack-duckdb-eh-worker": "node ./utils/sfx-wasm.js --nw ./node_modules/@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js > ./build/duckdb-browser-eh.worker.js",
     "pack-duckdb-eh": "node ./utils/sfx-wasm.js --nw ./node_modules/@duckdb/duckdb-wasm/dist/duckdb-eh.wasm > ./build/duckdb-eh.wasm.js",
     "pack-duckdb": "run-p pack-duckdb-eh pack-duckdb-eh-worker pack-duckdb-eh-worker-node",
-    "build-ws": "npm run build -ws --no",
-    "build": "run-s build-ws compile-cpp pack-duckdb compile",
+    "build-ws": "npm run build -ws --if-present",
+    "build": "run-s compile-cpp build-ws pack-duckdb compile",
     "standard-version": "standard-version",
     "standard-version-next": "standard-version -p next",
     "standard-version-dryrun": "standard-version --dry-run",
@@ -142,7 +142,7 @@
     "update-major": "npx -y npm-check-updates -u"
   },
   "dependencies": {
-    "yargs": "17.7.2"
+    "@hpcc-js/wasm-graphviz-cli": "*"
   },
   "devDependencies": {
     "@duckdb/duckdb-wasm": "1.28.1-dev106.0",

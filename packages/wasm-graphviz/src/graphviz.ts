@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
 import load, { reset } from "../../../build/src-cpp/graphviz/graphvizlib.wasm";
 
 /**
