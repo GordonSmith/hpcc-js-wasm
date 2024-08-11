@@ -1,6 +1,7 @@
 /.nyc_output
 /.vscode/c_cpp_properties.json
 /.vscode/ipch
+.nx/
 bin/
 /build
 /coverage

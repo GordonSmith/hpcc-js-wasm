@@ -25,7 +25,6 @@
       "cache": true,
       "dependsOn": [],
       "outputs": [
-        "{projectRoot}/buils",
         "{projectRoot}/dist",
         "{projectRoot}/dist-test"
       ]
