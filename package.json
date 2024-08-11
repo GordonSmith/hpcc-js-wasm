@@ -146,7 +146,6 @@
     "@hpcc-js/wasm-graphviz-cli": "*"
   },
   "devDependencies": {
-    "@duckdb/duckdb-wasm": "1.28.1-dev106.0",
     "@eslint/js": "^9.8.0",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
     "@types/chai": "4.3.17",

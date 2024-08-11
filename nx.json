@@ -22,12 +22,7 @@
       "dependsOn": []
     },
     "build": {
-      "cache": true,
-      "dependsOn": [],
-      "outputs": [
-        "{projectRoot}/dist",
-        "{projectRoot}/dist-test"
-      ]
+      "dependsOn": []
     },
     "lint-skypack": {
       "dependsOn": []
@@ -58,5 +53,6 @@
     "test-firefox": {
       "dependsOn": []
     }
-  }
+  },
+  "nxCloudAccessToken": "Nzc5Nzk5NGQtOTljMi00OGMyLTkxOTQtZTQ0ODEyZTA5YTIyfHJlYWQtd3JpdGU="
 }

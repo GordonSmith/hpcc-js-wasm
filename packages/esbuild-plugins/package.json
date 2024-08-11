@@ -8,6 +8,10 @@
         ".": {
             "types": "./types/index.d.ts",
             "import": "./dist/index.js"
+        },
+        "./sfx-wrapper": {
+            "types": "./types/sfx-wrapper.d.ts",
+            "import": "./dist/sfx-wrapper.js"
         }
     },
     "types": "./types/index.d.ts",
@@ -23,7 +27,8 @@
         "build-ts": "npm run build-ts-dev --minify",
         "build-ts-watch": "npm run build-ts-dev -- --watch",
         "build-dev": "run-p build-types build-ts-dev",
-        "build": "run-p build-types build-ts",
+        "build-sfx-wrapper": "esbuild ./src/sfx-wrapper.ts --platform=node --format=esm --bundle --packages=external --sourcemap --outfile=./dist/sfx-wrapper.js",
+        "build": "run-p build-types build-ts build-sfx-wrapper",
         "lint-skypack": "npx -y @skypack/package-check",
         "lint-eslint": "eslint src/**/*.ts",
         "lint": "run-p lint-eslint lint-skypack",
@@ -32,7 +37,7 @@
         "test-node": "npx . -v"
     },
     "dependencies": {
-        "@hpcc-js/wasm": "2.18.2",
+        "@hpcc-js/wasm": "2.18.0",
         "fzstd": "0.1.1"
     },
     "devDependencies": {

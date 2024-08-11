@@ -33,7 +33,6 @@
         "test": "run-s test-chrome test-node"
     },
     "dependencies": {
-        "@hpcc-js/wasm": "2.18.2",
         "yargs": "17.7.2"
     },
     "devDependencies": {
