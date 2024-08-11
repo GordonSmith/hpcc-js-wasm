@@ -28,14 +28,14 @@
         "build": "run-p build-types build-ts",
         "lint-skypack": "npx -y @skypack/package-check",
         "lint-eslint": "eslint src/**/*.ts",
-        "lint": "run-p lint-eslint lint-skypack",
-        "test-cli": "npx . -v",
-        "test-cli-help": "npx . --help",
-        "test": "run-p test-cli test-cli-help"
+        "lint": "run-p lint-eslint lint-skypack"
     },
     "dependencies": {
         "@hpcc-js/wasm-graphviz": "*",
         "yargs": "17.7.2"
+    },
+    "devDependencies": {
+        "@hpcc-js/esbuild-plugins": "1.0.0"
     },
     "keywords": [
         "graphviz",

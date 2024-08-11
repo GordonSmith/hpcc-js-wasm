@@ -1,0 +1,63 @@
+{
+  "targetDefaults": {
+    "clean": {
+      "dependsOn": []
+    },
+    "build-types": {
+      "dependsOn": []
+    },
+    "build-types-watch": {
+      "dependsOn": []
+    },
+    "build-ts-dev": {
+      "dependsOn": []
+    },
+    "build-ts": {
+      "dependsOn": []
+    },
+    "build-ts-watch": {
+      "dependsOn": []
+    },
+    "build-dev": {
+      "dependsOn": []
+    },
+    "build": {
+      "cache": true,
+      "dependsOn": [],
+      "outputs": [
+        "{projectRoot}/buils",
+        "{projectRoot}/dist",
+        "{projectRoot}/dist-test"
+      ]
+    },
+    "lint-skypack": {
+      "dependsOn": []
+    },
+    "lint-eslint": {
+      "dependsOn": []
+    },
+    "lint": {
+      "cache": true,
+      "dependsOn": []
+    },
+    "test-cli": {
+      "dependsOn": []
+    },
+    "test-cli-help": {
+      "dependsOn": []
+    },
+    "test-node": {
+      "dependsOn": []
+    },
+    "test": {
+      "cache": true,
+      "dependsOn": []
+    },
+    "test-chrome": {
+      "dependsOn": []
+    },
+    "test-firefox": {
+      "dependsOn": []
+    }
+  }
+}

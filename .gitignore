@@ -15,7 +15,7 @@ dist-test/
 /docs/README.md
 /emsdk*
 /lib-*
-/node_modules
+node_modules/
 /rust
 /third-party
 /src-ts/*.wasm.ts
@@ -26,3 +26,5 @@ types/
 /vcpkg
 .coveralls.yml
 *.tsbuildinfo
+
+.nx/cache

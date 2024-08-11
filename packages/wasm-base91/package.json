@@ -1,8 +1,7 @@
 {
-    "private": true,
-    "name": "@hpcc-js/esbuild-plugins",
+    "name": "@hpcc-js/wasm-base91",
     "version": "1.0.0",
-    "description": "Various esbuild plugins",
+    "description": "hpcc-js - WASM Base91",
     "type": "module",
     "exports": {
         ".": {
@@ -13,37 +12,41 @@
     "types": "./types/index.d.ts",
     "files": [
         "dist/**/*",
+        "src/**/*",
         "types/**/*"
     ],
     "scripts": {
-        "clean": "rimraf ./dist ./types",
+        "clean": "rimraf ./dist ./dist-test ./types",
         "build-types": "tsc --project tsconfig.json --emitDeclarationOnly",
         "build-types-watch": "npm run build-types -- --watch",
-        "build-ts-dev": "esbuild ./src/index.ts --platform=node --format=esm --bundle --packages=external --sourcemap --outfile=./dist/index.js",
-        "build-ts": "npm run build-ts-dev --minify",
-        "build-ts-watch": "npm run build-ts-dev -- --watch",
+        "build-ts": "node esbuild.mjs",
+        "build-ts-dev": "npm run build-ts -- --mode=development",
+        "build-ts-watch": "npm run compile-ts-dev -- --watch",
         "build-dev": "run-p build-types build-ts-dev",
         "build": "run-p build-types build-ts",
         "lint-skypack": "npx -y @skypack/package-check",
         "lint-eslint": "eslint src/**/*.ts",
         "lint": "run-p lint-eslint lint-skypack",
-        "test-cli": "npx . -v",
-        "test-cli-help": "npx .",
-        "test-node": "npx . -v"
+        "test-chrome": "karma start --single-run --browsers ChromiumHeadless karma.conf.cjs",
+        "test-firefox": "karma start --single-run --browsers Firefox karma.conf.cjs",
+        "test-node": "mocha ./dist-test/index.node.js --reporter spec",
+        "test": "run-s test-chrome test-node"
     },
     "dependencies": {
         "@hpcc-js/wasm": "2.18.2",
-        "fzstd": "0.1.1"
+        "yargs": "17.7.2"
     },
     "devDependencies": {
-        "@types/node": "20"
+        "@hpcc-js/esbuild-plugins": "1.0.0"
     },
     "keywords": [
-        "esbuild",
-        "plugins",
-        "WebAssembly",
+        "graphviz",
+        "typescript",
+        "webassembly",
         "wasm",
-        "sfx"
+        "dot",
+        "neato",
+        "twopi"
     ],
     "author": "hpcc-systems",
     "repository": {
