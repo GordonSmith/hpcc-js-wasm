@@ -132,6 +132,7 @@
     "test-chrome": "karma start --single-run --browsers ChromiumHeadless karma.conf.cjs",
     "test-firefox": "karma start --single-run --browsers Firefox karma.conf.cjs",
     "test-node": "node ./bin/dot-wasm.js -v && mocha ./dist-test/index.node.cjs --reporter spec && mocha ./dist-test/index.node.js --reporter spec",
+    "test-ws": "npm run test -ws --if-present",
     "test": "run-s test-bundle test-bundle-node test-bundle-umd test-chrome test-node",
     "coverage": "nyc npm run test-node",
     "coverage-report": "nyc report --reporter=lcov",
