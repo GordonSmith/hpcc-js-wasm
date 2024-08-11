@@ -1,6 +1,6 @@
 {
     "name": "@hpcc-js/wasm-duckdb",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "hpcc-js - WASM DuckDB",
     "type": "module",
     "exports": {
@@ -40,7 +40,7 @@
     },
     "devDependencies": {
         "@duckdb/duckdb-wasm": "1.28.1-dev106.0",
-        "@hpcc-js/esbuild-plugins": "1.0.0",
+        "@hpcc-js/esbuild-plugins": "^1.0.1",
         "npm-run-all": "4.1.5"
     },
     "keywords": [
