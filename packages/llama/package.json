@@ -37,7 +37,13 @@
     "update": "npx -y npm-check-updates -u -t minor",
     "update-major": "npx -y npm-check-updates -u"
   },
-  "dependencies": {},
+  "dependencies": {
+    "langchain": "0.2.17",
+    "@langchain/core": "0.2.31",
+    "@langchain/community": "0.2.31",
+    "@langchain/ollama": "0.0.4",
+    "faiss-node": "0.5.1"
+  },
   "devDependencies": {},
   "keywords": [
     "graphviz",
