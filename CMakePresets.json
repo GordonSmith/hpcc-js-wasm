@@ -33,6 +33,16 @@
             }
         },
         {
+            "name": "vcpkg-emscripten-Release",
+            "inherits": [
+                "vcpkg-emscripten"
+            ],
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
             "name": "vcpkg-emscripten-RelWithDebInfo",
             "inherits": [
                 "vcpkg-emscripten"

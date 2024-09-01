@@ -1,5 +1,6 @@
 // @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
 import load, { reset } from "../../../build/packages/base91/src-cpp/base91lib.wasm";
+import type { MainModule } from "../../../build/packages/base91/src-cpp/base91lib.js";
 import { WasmLibrary } from "./wasm-library.ts";
 
 //  Ref:  http://base91.sourceforge.net/#a5
@@ -22,8 +23,8 @@ let g_base91: Promise<Base91>;
  */
 export class Base91 extends WasmLibrary {
 
-    private constructor(_module: any) {
-        super(_module, new _module.CBasE91());
+    private constructor(_module: MainModule) {
+        super(_module, new _module.CBase91());
     }
 
     /**
@@ -37,7 +38,7 @@ export class Base91 extends WasmLibrary {
      */
     static load(): Promise<Base91> {
         if (!g_base91) {
-            g_base91 = load().then((module: any) => {
+            g_base91 = load().then((module: MainModule) => {
                 return new Base91(module)
             });
         }

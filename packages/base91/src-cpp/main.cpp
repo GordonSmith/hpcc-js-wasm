@@ -1,32 +1,53 @@
 #include <string>
 #include <base91.hpp>
 
+#include <emscripten/bind.h>
+#include <emscripten/val.h>
+
+using namespace emscripten;
+
 const char *const version = "0.6.0";
 
-class CBasE91
+class WasmMemory
+{
+public:
+    size_t size;
+    void *ptr;
+
+    WasmMemory(void *ptr, size_t size) : ptr(ptr), size(size)
+    {
+    }
+
+    WasmMemory(size_t size) : size(size)
+    {
+        ptr = malloc(size);
+    }
+
+    ~WasmMemory()
+    {
+        free(ptr);
+    }
+
+    val get()
+    {
+        return val(typed_memory_view(size, static_cast<uint8_t *>(ptr)));
+    }
+};
+
+class CBase91
 {
 protected:
     basE91 m_basE91;
 
 public:
-    CBasE91()
+    CBase91()
     {
         reset();
     }
 
-    static void *malloc(size_t __size)
+    val version()
     {
-        return ::malloc(__size);
-    }
-
-    static void free(void *__ptr)
-    {
-        ::free(__ptr);
-    }
-
-    const char *version()
-    {
-        return ::version;
+        return val(::version);
     }
 
     void reset()
@@ -34,26 +55,48 @@ public:
         basE91_init(&m_basE91);
     }
 
-    size_t encode(const void *data, size_t dataLen, void *dataOut)
+    WasmMemory *encode(const WasmMemory *mem)
     {
-        return basE91_encode(&m_basE91, data, dataLen, dataOut);
+        char *dataOut;
+        size_t dataOutLen = basE91_encode(&m_basE91, mem->ptr, mem->size, dataOut);
+        return new WasmMemory(dataOut, dataOutLen);
     }
 
-    size_t encode_end(void *dataOut)
+    WasmMemory *encode_end(const WasmMemory *mem)
     {
-        return basE91_encode_end(&m_basE91, dataOut);
+        char *dataOut;
+        size_t dataOutLen = basE91_encode_end(&m_basE91, dataOut);
+        return new WasmMemory(dataOut, dataOutLen);
     }
 
-    size_t decode(const void *data, size_t dataLen, void *dataOut)
+    WasmMemory *decode(const WasmMemory *mem)
     {
-        return basE91_decode(&m_basE91, data, dataLen, dataOut);
+        char *dataOut;
+        size_t dataOutLen = basE91_decode(&m_basE91, mem->ptr, mem->size, dataOut);
+        return new WasmMemory(dataOut, dataOutLen);
     }
 
-    size_t decode_end(void *dataOut)
+    WasmMemory *decode_end(const WasmMemory *mem)
     {
-        return basE91_decode_end(&m_basE91, dataOut);
+        char *dataOut;
+        size_t dataOutLen = basE91_decode_end(&m_basE91, dataOut);
+        return new WasmMemory(dataOut, dataOutLen);
     }
 };
 
-//  Include JS Glue  ---
-#include "main_glue.cpp"
+//  ---  EMSCRIPTEN BINDINGS  ---  EMSCRIPTEN BINDINGS  ---  EMSCRIPTEN BINDINGS  ---  EMSCRIPTEN BINDINGS  ---
+
+EMSCRIPTEN_BINDINGS(base91_class)
+{
+    class_<WasmMemory>("WasmMemory")
+        .constructor<size_t>()
+        .function("get", &WasmMemory::get);
+
+    class_<CBase91>("CBase91")
+        .function("version", &CBase91::version)
+        .function("reset", &CBase91::reset)
+        .function("encode", &CBase91::encode, return_value_policy::take_ownership())
+        .function("encode_end", &CBase91::encode_end, return_value_policy::take_ownership())
+        .function("decode", &CBase91::decode, return_value_policy::take_ownership())
+        .function("decode_end", &CBase91::decode_end, return_value_policy::take_ownership());
+}

@@ -3,26 +3,21 @@ project(base91lib)
 find_package(unofficial-base91 CONFIG REQUIRED)
 
 # See:  https://github.com/emscripten-core/emscripten/blob/main/src/settings.js
+
+set(EM_CPP_FLAGS 
+    ${EM_CPP_FLAGS}
+)
 string(REPLACE ";" " " CPP_FLAGS "${EM_CPP_FLAGS}")
 
 set(EM_LINK_FLAGS 
     ${EM_LINK_FLAGS}
-    "-sEXPORT_NAME='${CMAKE_PROJECT_NAME}'"
-    "-sEXPORTED_FUNCTIONS=\"[]\""
-    "-sEXPORTED_RUNTIME_METHODS=\"[UTF8ToString]\""
-    "--post-js ${CMAKE_CURRENT_BINARY_DIR}/main_glue.js"
+    "-s EXPORT_NAME='${CMAKE_PROJECT_NAME}'"
+    "-s EXPORTED_FUNCTIONS=\"[]\""
+    "-s EXPORTED_RUNTIME_METHODS=\"[UTF8ToString]\""
+    "-lembind"
     "--emit-tsd ${CMAKE_CURRENT_BINARY_DIR}/base91lib.d.ts"
 )
 string(REPLACE ";" " " LINK_FLAGS "${EM_LINK_FLAGS}")
-
-#  Generate Glue from IDL file  ---
-add_custom_command(
-    MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/main.idl
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/main_glue.js ${CMAKE_CURRENT_BINARY_DIR}/main_glue.cpp
-    COMMAND python3 ${CMAKE_BINARY_DIR}/../emsdk/upstream/emscripten/tools/webidl_binder.py ${CMAKE_CURRENT_SOURCE_DIR}/main.idl ${CMAKE_CURRENT_BINARY_DIR}/main_glue
-)
-set_property(SOURCE main.cpp APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/main_glue.cpp)
-#  ---  ---  ---
 
 include_directories(
     ${VCPKG_INCLUDE_DIR}

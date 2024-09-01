@@ -13,30 +13,30 @@ set(EM_CPP_FLAGS
 )
 
 set(EM_LINK_FLAGS 
-    "-sASSERTIONS=0"
-    "-sINVOKE_RUN=0"
-    "-sALLOW_MEMORY_GROWTH=1"
-    # "-sWASM=1"
-    "-sENVIRONMENT=webview"
-    "-sFILESYSTEM=0"
-    # "-sMINIMAL_RUNTIME=1"
-    "-sMODULARIZE=1" 
-    "-sEXPORT_ES6=1"
-    # "-sIGNORE_CLOSURE_COMPILER_ERRORS=0"
-    # "-sWASM_BIGINT=1"
-    # "-sSTANDALONE_WASM=0"
-    # "-sBINARYEN_ASYNC_COMPILATION=1"
-    # "-sDYNAMIC_EXECUTION=0"
-    "-sPOLYFILL=0"
-    # "-sSTRICT=0"
-    "-sIGNORE_MISSING_MAIN=0"
-    "-sAUTO_JS_LIBRARIES=0"
-    "-sAUTO_NATIVE_LIBRARIES=0"
-    "-sAUTO_ARCHIVE_INDEXES=0"
-    "-sDEFAULT_TO_CXX=0"
-    "-sUSE_GLFW=0"
-    "-sALLOW_UNIMPLEMENTED_SYSCALLS=1"
-    "-sINCOMING_MODULE_JS_API=\"['wasmBinary']\""
+    "-s ASSERTIONS=0"
+    "-s INVOKE_RUN=0"
+    "-s ALLOW_MEMORY_GROWTH=1"
+    # "-s WASM=1"
+    "-s ENVIRONMENT=webview"
+    "-s FILESYSTEM=0"
+    "-s MINIMAL_RUNTIME=2"
+    "-s MODULARIZE=1" 
+    "-s EXPORT_ES6=1"
+    # "-s IGNORE_CLOSURE_COMPILER_ERRORS=0"
+    # "-s WASM_BIGINT=1"
+    # "-s STANDALONE_WASM=0"
+    # "-s BINARYEN_ASYNC_COMPILATION=1"
+    # "-s DYNAMIC_EXECUTION=0"
+    "-s POLYFILL=0"
+    # "-s STRICT=0"
+    "-s IGNORE_MISSING_MAIN=0"
+    "-s AUTO_JS_LIBRARIES=0"
+    "-s AUTO_NATIVE_LIBRARIES=0"
+    "-s AUTO_ARCHIVE_INDEXES=0"
+    "-s DEFAULT_TO_CXX=0"
+    "-s USE_GLFW=0"
+    "-s ALLOW_UNIMPLEMENTED_SYSCALLS=1"
+    "-s INCOMING_MODULE_JS_API=\"['wasmBinary']\""
     "--no-entry"
     "--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/src-cpp/src/pre.js"
     "--post-js ${CMAKE_CURRENT_SOURCE_DIR}/src-cpp/src/post.js"
@@ -45,7 +45,7 @@ set(EM_LINK_FLAGS
 if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     set(EM_LINK_FLAGS 
         ${EM_LINK_FLAGS}
-        "-sUSE_ES6_IMPORT_META=1"
+        "-s USE_ES6_IMPORT_META=1"
         "-gsource-map"
         "--source-map-base ./"  #  Debugging c++ only works in browser with "Experimental DWARF support turned on"
     )
@@ -59,13 +59,13 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebIn
         set(EM_LINK_FLAGS 
             ${EM_LINK_FLAGS}
             "-fsanitize=address"
-            "-sENVIRONMENT=web,node"
+            "-s ENVIRONMENT=web,node"
         )
     endif ()
 else ()
     set(EM_LINK_FLAGS 
         ${EM_LINK_FLAGS}
-        "-sUSE_ES6_IMPORT_META=0"
+        "-s USE_ES6_IMPORT_META=0"
     )
 endif ()
 

@@ -1,6 +1,6 @@
-interface CBasE91
+interface CBase91
 {
-  void CBasE91();
+  void CBase91();
   static any malloc(unsigned long size);
   static void free(any ptr);
   [Const] DOMString version();
@@ -10,3 +10,4 @@ interface CBasE91
   unsigned long decode([Const] any data, unsigned long dataLen, any dataOut);
   unsigned long decode_end(any dataOut);
 };
+s

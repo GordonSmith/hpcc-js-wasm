@@ -15,12 +15,12 @@ string(REPLACE ";" " " CPP_FLAGS "${EM_CPP_FLAGS}")
 
 set(EM_LINK_FLAGS 
     ${EM_LINK_FLAGS}
-    "-sEXPORT_NAME='${CMAKE_PROJECT_NAME}'"
-    "-sFILESYSTEM=1"
-    "-sFORCE_FILESYSTEM=1"
-    "-sWASMFS=1"
-    "-lembind"
+    "-s EXPORT_NAME='${CMAKE_PROJECT_NAME}'"
+    "-s FILESYSTEM=1"
+    "-s FORCE_FILESYSTEM=1"
+    "-s WASMFS=1"
     "-fwasm-exceptions"
+    "-lembind"
     "--emit-tsd ${CMAKE_CURRENT_BINARY_DIR}/llamalib.d.ts"
 )
 string(REPLACE ";" " " LINK_FLAGS "${EM_LINK_FLAGS}")
