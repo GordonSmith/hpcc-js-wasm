@@ -2,6 +2,10 @@ project(base91lib)
 
 find_package(unofficial-base91 CONFIG REQUIRED)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build")
+
 # See:  https://github.com/emscripten-core/emscripten/blob/main/src/settings.js
 
 set(EM_CPP_FLAGS 
@@ -15,7 +19,7 @@ set(EM_LINK_FLAGS
     "-s EXPORTED_FUNCTIONS=\"[]\""
     "-s EXPORTED_RUNTIME_METHODS=\"[UTF8ToString]\""
     "-lembind"
-    "--emit-tsd ${CMAKE_CURRENT_BINARY_DIR}/base91lib.d.ts"
+    "--emit-tsd ${CMAKE_CURRENT_SOURCE_DIR}/build/base91lib.wasm.d.ts"
 )
 string(REPLACE ";" " " LINK_FLAGS "${EM_LINK_FLAGS}")
 
@@ -25,7 +29,7 @@ include_directories(
 )
 
 add_executable(base91lib
-    main.cpp
+    src-cpp/main.cpp
 )
 
 set_target_properties(base91lib PROPERTIES COMPILE_FLAGS "${CPP_FLAGS}")

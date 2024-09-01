@@ -82,7 +82,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(PACK_MODE "-d")
 endif ()
 
-add_subdirectory(packages/base91/src-cpp)
+add_subdirectory(packages/base91)
 add_subdirectory(packages/expat/src-cpp)
 add_subdirectory(packages/graphviz/src-cpp)
 add_subdirectory(packages/llama/src-cpp)

@@ -93,6 +93,7 @@ EMSCRIPTEN_BINDINGS(base91_class)
         .function("get", &WasmMemory::get);
 
     class_<CBase91>("CBase91")
+        .constructor<>()
         .function("version", &CBase91::version)
         .function("reset", &CBase91::reset)
         .function("encode", &CBase91::encode, return_value_policy::take_ownership())

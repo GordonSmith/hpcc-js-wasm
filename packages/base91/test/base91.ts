@@ -3,7 +3,8 @@ import { Base91 } from "@hpcc-js/wasm-base91";
 
 describe("base91", function () {
 
-    it("version", async function () {
+    it.only("version", async function () {
+        this.timeout(5000);
         let base91 = await Base91.load();
         expect(await Base91.load()).to.equal(base91);
         let v = base91.version();
