@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.json": "json",
+        "*.mod": "ecl",
+        "array": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp",
+        "cstdint": "cpp"
+    }
+}

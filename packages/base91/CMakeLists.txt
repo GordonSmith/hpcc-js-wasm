@@ -17,7 +17,8 @@ set(EM_LINK_FLAGS
     ${EM_LINK_FLAGS}
     "-s EXPORT_NAME='${CMAKE_PROJECT_NAME}'"
     "-s EXPORTED_FUNCTIONS=\"[]\""
-    "-s EXPORTED_RUNTIME_METHODS=\"[UTF8ToString]\""
+    "-s EXPORTED_RUNTIME_METHODS=\"['UTF8ToString']\""
+    # "-lembind"
     "--post-js ${CMAKE_CURRENT_SOURCE_DIR}/build/main_glue.js"
     "--emit-tsd ${CMAKE_CURRENT_SOURCE_DIR}/build/base91lib.wasm.d.ts"
 )

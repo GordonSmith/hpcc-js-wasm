@@ -5,7 +5,8 @@
         "declarationDir": "./types",
     },
     "include": [
-        "./src/**/*"
+        "./src/index.ts",
+        "./src/index-node.ts"
     ],
     "references": []
 }
