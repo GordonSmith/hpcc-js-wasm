@@ -19,7 +19,8 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "MinSizeRel",
                 "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake",
-                "VCPKG_TARGET_TRIPLET": "wasm32-emscripten"
+                "VCPKG_TARGET_TRIPLET": "wasm32-emscripten",
+                "EMNAPI_FIND_NODE_ADDON_API": "ON"
             }
         },
         {

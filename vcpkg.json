@@ -7,13 +7,22 @@
       "name": "expat"
     },
     {
+      "name": "fp16"
+    },
+    {
       "name": "graphviz"
+    },
+    {
+      "name": "hnswlib"
     },
     {
       "name": "llama"
     },
     {
       "name": "triangle"
+    },
+    {
+      "name": "usearch"
     },
     {
       "name": "zstd"

@@ -1,0 +1,58 @@
+{
+  "name": "@hpcc-js/wasm-usearch",
+  "version": "1.3.0",
+  "description": "hpcc-js - WASM USearch",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./types/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*",
+    "types/**/*"
+  ],
+  "scripts": {
+    "clean": "rimraf ./build ./dist ./dist-test ./types",
+    "build-cpp": "cmake --build ../../build --target usearchlib",
+    "build-cpp-watch": "chokidar 'src-cpp/**.*' -c 'npm run build-cpp'",
+    "build-types": "tsc --project tsconfig.json --emitDeclarationOnly",
+    "build-types-watch": "npm run build-types -- --watch",
+    "build-ts": "node esbuild.mjs",
+    "build-ts-dev": "npm run build-ts -- --development",
+    "build-ts-watch": "npm run build-ts-dev -- --watch",
+    "build-dev": "run-p build-types build-ts-dev",
+    "build": "npm-run-all -s build-cpp -p build-types build-ts",
+    "lint-skypack": "npx -y @skypack/package-check",
+    "lint-eslint": "eslint src/**/*.ts",
+    "lint": "run-p lint-eslint",
+    "test-chrome": "karma start --single-run --browsers ChromiumHeadless karma.conf.cjs",
+    "test-firefox": "karma start --single-run --browsers Firefox karma.conf.cjs",
+    "test-node": "mocha ./dist-test/index.node.js --reporter spec",
+    "test": "run-s test-chrome test-node",
+    "update": "npx -y npm-check-updates -u -t minor",
+    "update-major": "npx -y npm-check-updates -u"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": [
+    "graphviz",
+    "typescript",
+    "webassembly",
+    "wasm",
+    "dot",
+    "neato",
+    "twopi"
+  ],
+  "author": "hpcc-systems",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hpcc-systems/hpcc-js-wasm.git"
+  },
+  "homepage": "https://hpcc-systems.github.io/hpcc-js-wasm/",
+  "license": "Apache-2.0"
+}

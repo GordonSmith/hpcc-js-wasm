@@ -1,0 +1,53 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "test-browser",
+            "type": "msedge",
+            "request": "launch",
+            "url": "file://${workspaceRoot}/test.html",
+            "webRoot": "${workspaceRoot}",
+            "sourceMapPathOverrides": {
+                "webpack:///./*": "${workspaceRoot}/*",
+                "webpack:///*": "/*"
+            },
+        },
+        {
+            "name": "test-node",
+            "type": "node",
+            "request": "launch",
+            "runtimeArgs": [
+                "run-script",
+                "test-node"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/**/*.js",
+                "${workspaceFolder}/**/*.c",
+                "!**/node_modules/**"
+            ],
+        },
+        {
+            "name": "index-docs",
+            "type": "node",
+            "program": "${workspaceFolder}/dist-test/index-docs.node.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "name": "esbuild",
+            "type": "node",
+            "program": "${workspaceFolder}/esbuild.mjs",
+            "request": "launch",
+            "args": [],
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        }
+    ]
+}
