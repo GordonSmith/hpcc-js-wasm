@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { Llama, WebBlob } from "@hpcc-js/wasm-llama";
 
-describe.only("llama", function () {
+describe("llama", function () {
     it("version", async function () {
         let llama = await Llama.load();
         let v = llama.version();
