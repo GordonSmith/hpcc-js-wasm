@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Home</title>
+</head>
+
+<body>
+    <h1>Home</h1>
+    <p>Welcome to the home page.</p>
+    <script type="module">
+        // const workerSource = './dist/worker-browser.js';
+
+        // fetch(workerSource)
+        //     .then(result => result.blob())
+        //     .then(blob => {
+        //         const blobUrl = URL.createObjectURL(blob);
+        //         return new Worker(blobUrl, { "type": "module" });
+        //     }).then(worker => {
+        //         worker.onmessage = (e) => {
+        //             console.log(e.data);
+        //         };
+        //         worker.postMessage({
+        //             type: "embedding",
+        //             content: "Hello and Welcome!"
+        //         });
+        //     })
+        //     .catch(error => {
+        //         console.error(error);
+        //     })
+        //     ;
+
+        const worker = new Worker(new URL("./dist/worker-browser.js", import.meta.url), { type: "module" });
+        worker.onmessage = (e) => {
+            console.log(e.data);
+        };
+        for (let i = 0; i < 10; i++) {
+            const msg = {
+                type: "embedding",
+                content: "Hello and Welcome!"
+            };
+            worker.postMessage(msg);
+        }
+    </script>
+</body>
+
+</html>s

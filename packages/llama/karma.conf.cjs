@@ -3,7 +3,8 @@ module.exports = function (config) {
         frameworks: ['mocha'],
         files: [
             { pattern: 'dist-test/index.browser.js', type: 'module' },
-            { pattern: 'dist-test/*.js', watched: false, included: false, served: true, type: module }
+            { pattern: 'dist-test/*.js', watched: false, included: false, served: true, type: module },
+            { pattern: 'dist/*.js', watched: false, included: false, served: true, type: module }
         ],
         proxies: {
             "/dist/": "/base/dist/",

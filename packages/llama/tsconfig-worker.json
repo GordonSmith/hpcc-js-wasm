@@ -4,12 +4,12 @@
         "rootDir": "./src",
         "declarationDir": "./types",
         "lib": [
-            "DOM",
-            "ES2020"
+            "ES6",
+            "WebWorker"
         ]
     },
     "include": [
-        "./src/index.ts",
+        "./src/worker-browser.ts"
     ],
     "references": []
 }

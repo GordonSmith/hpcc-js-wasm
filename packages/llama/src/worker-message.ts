@@ -1,4 +1,4 @@
-import { Llama, WebBlob } from "@hpcc-js/wasm-llama";
+import { Llama } from "./index.ts";
 
 //  Requests  ----------------------------------------------------------------
 export interface WorkerMessage {
@@ -7,6 +7,7 @@ export interface WorkerMessage {
 
 export interface EmbeddingMessage extends WorkerMessage {
     type: "embedding";
+    id: number;
     content: string;
 }
 export const isEmbeddingMessage = (message: WorkerMessage): message is EmbeddingMessage => message.type === "embedding";
@@ -14,6 +15,7 @@ export const isEmbeddingMessage = (message: WorkerMessage): message is Embedding
 //  Responses  ---------------------------------------------------------------
 export interface WorkerResponse {
     type: unknown;
+    id: number;
 }
 
 export interface ErrorResponse extends WorkerResponse {
@@ -31,7 +33,8 @@ export const isEmbeddingResponse = (response: WorkerResponse): response is Embed
 
 //  --------------------------------------------------------------------------  
 const modelUrl = new URL("https://huggingface.co/CompendiumLabs/bge-base-en-v1.5-gguf/resolve/main/bge-base-en-v1.5-q4_k_m.gguf");
-export const modelPromise = WebBlob.create(modelUrl)
+export const modelPromise = fetch(modelUrl)
+    .then(response => response.blob())
     .then(blob => blob.arrayBuffer())
     .then(data => new Uint8Array(data))
     ;

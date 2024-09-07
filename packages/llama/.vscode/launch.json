@@ -2,15 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "test-browser",
+            "name": "serve-karma-test-browser",
             "type": "msedge",
             "request": "launch",
-            "url": "file://${workspaceRoot}/test.html",
+            "sourceMaps": true,
             "webRoot": "${workspaceRoot}",
-            "sourceMapPathOverrides": {
-                "webpack:///./*": "${workspaceRoot}/*",
-                "webpack:///*": "/*"
-            },
+            "url": "http://localhost:9877/debug.html",
+            "runtimeArgs": []
         },
         {
             "name": "test-node",
@@ -31,20 +29,43 @@
             ],
         },
         {
+            "name": "test-browser",
+            "type": "node",
+            "request": "launch",
+            "runtimeArgs": [
+                "run-script",
+                "test-browser"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/**/*.js",
+                "${workspaceFolder}/**/*.c",
+                "!**/node_modules/**"
+            ],
+        },
+        {
+            "name": "http://127.0.0.1:8080",
+            "type": "msedge",
+            "request": "launch",
+            "url": "http://127.0.0.1:8080",
+            "webRoot": "${workspaceFolder}",
+            "sourceMaps": true,
+            "smartStep": true,
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "runtimeArgs": [
+                "--disable-web-security"
+            ]
+        },
+        {
             "name": "index-docs",
             "type": "node",
             "program": "${workspaceFolder}/dist-test/index-docs.node.js",
             "request": "launch",
-            "skipFiles": [
-                "<node_internals>/**"
-            ]
-        },
-        {
-            "name": "esbuild",
-            "type": "node",
-            "program": "${workspaceFolder}/esbuild.mjs",
-            "request": "launch",
-            "args": [],
             "skipFiles": [
                 "<node_internals>/**"
             ]
