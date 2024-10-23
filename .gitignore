@@ -21,7 +21,6 @@ dist-test/
 node_modules/
 /packages/llama/docs
 /rust
-/third-party
 /src-ts/*.wasm.ts
 /tmp
 types/

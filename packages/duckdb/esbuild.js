@@ -1,4 +1,5 @@
-import { browserTpl } from "@hpcc-js/esbuild-plugins";
+import { neutralTpl } from "@hpcc-js/esbuild-plugins";
 
 //  config  ---
-await browserTpl("src/index.ts", "dist/index");
+await neutralTpl("src/index.ts", "dist/index");
+

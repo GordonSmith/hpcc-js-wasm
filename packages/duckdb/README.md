@@ -1,39 +1,24 @@
-# @hpcc-js/wasm-duckdb
+# @hpcc-js/wasm-base91
 
-This package rewraps the DuckDB webassembly distribution provided by DuckDB, this is purly a convenience to provide a consistent loading experience with the rest of the @hpcc-js.wasm library.
-See [DuckDB](https://github.com/duckdb/duckdb) and [DuckDB-wasm](https://github.com/duckdb/duckdb-wasm) for more details.
+This package provides a WebAssembly wrapper around the [Base91](https://base91.sourceforge.net/) library.  This allows for the encoding and decoding of binary data to a more compact form than Base64.
 
 ## Installation
 
 ```sh
-npm install @hpcc-js/wasm-duckdb
+npm install @hpcc-js/wasm-base91
 ```
 
-## Usage
+## Quick Start
 
 ```typescript
-import { DuckDB } from "@hpcc-js/wasm-duckdb";
+import { Base91 } from "@hpcc-js/wasm-base91";
 
-let duckdb = await DuckDB.load();
-const c = await duckdb.db.connect();
+const base91 = await Base91.load();
 
-const data = [
-    { "col1": 1, "col2": "foo" },
-    { "col1": 2, "col2": "bar" },
-];
-await duckdb.db.registerFileText("rows.json", JSON.stringify(data));
-await c.insertJSONFromPath('rows.json', { name: 'rows' });
-
-const arrowResult = await c.query("SELECT * FROM read_json_auto('rows.json')");
-const result = arrowResult.toArray().map((row) => row.toJSON());
-expect(result.length).to.equal(data.length);
-for (let i = 0; i < result.length; i++) {
-    expect(result[i].col2).to.equal(data[i].col2);
-}
-
-c.close();
+const encoded_data = await base91.encode(data);
+const decoded_data = await base91.decode(encoded_data);
 ```
 
 ## Reference
 
-* [API Documentation](https://hpcc-systems.github.io/hpcc-js-wasm/duckdb/src/duckdb/classes/DuckDB.html)
+* [API Documentation](https://hpcc-systems.github.io/hpcc-js-wasm/base91/src/base91/classes/Base91.html)

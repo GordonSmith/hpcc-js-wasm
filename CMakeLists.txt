@@ -70,8 +70,7 @@ else ()
 endif ()
 
 set(EMSDK_DIR "${CMAKE_SOURCE_DIR}/emsdk")
-set(EXPAT_DIR "${CMAKE_SOURCE_DIR}/src-expat/expat")
-set(GRAPHVIZ_DIR "${CMAKE_SOURCE_DIR}/third-party/graphviz")
+set(DUCKDB_DIR "${CMAKE_SOURCE_DIR}/third-party/duckdb-wasm")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -83,6 +82,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif ()
 
 add_subdirectory(packages/base91/src-cpp)
+add_subdirectory(packages/duckdb/src-cpp)
 add_subdirectory(packages/expat/src-cpp)
 add_subdirectory(packages/graphviz/src-cpp)
 add_subdirectory(packages/llama/src-cpp)

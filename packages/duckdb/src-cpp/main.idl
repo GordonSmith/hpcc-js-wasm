@@ -1,0 +1,7 @@
+interface CDuckDB
+{
+  void CDuckDB();
+  static any malloc(unsigned long size);
+  static void free(any ptr);
+  [Const] DOMString version();
+};

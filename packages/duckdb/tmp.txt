@@ -1,0 +1,3 @@
+DevTools can't show authored sources. but you can debug the deployed code.
+Error loading url wasm://wasm/base91lib.wasm.map: Fetch through target failed: Unsupported URL scheme; Fallback HTTP
+error: status code 404, net::ERR UNKNOWN URL SCHEME

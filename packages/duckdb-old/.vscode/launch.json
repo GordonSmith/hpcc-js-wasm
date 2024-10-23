@@ -10,7 +10,7 @@
             "args": [
                 "run",
                 "--inspect-brk",
-                "--project",
+                "--mode",
                 "browser",
                 "--no-file-parallelism"
             ],

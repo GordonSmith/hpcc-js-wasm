@@ -1,41 +1,29 @@
-import load, { reset } from "../build/duckdb-eh.wasm.ts";
-import loadWasmWorker, { reset as resetWasmWorker } from "../build/duckdb-browser-eh.worker.ts";
-import { AsyncDuckDB, ConsoleLogger } from "@duckdb/duckdb-wasm";
+// @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
+import load, { reset } from "../../../build/packages/duckdb/src-cpp/duckdblib.wasm";
+import { WasmLibrary } from "./wasm-library.ts";
+
+//  Ref:  http://duckdb.sourceforge.net/#a5
+
+let g_duckdb: Promise<DuckDB>;
 
 /**
- * DuckDB WASM library, a in-process SQL OLAP Database Management System..
+ * Base 91 WASM library, similar to Base 64 but uses more characters resulting in smaller strings.
  * 
- * See [DuckDB](https://github.com/duckdb/duckdb) for more details.
+ * See [DuckDB](https://duckdb.sourceforge.net/) for more details.
  *
  * ```ts
  * import { DuckDB } from "@hpcc-js/wasm-duckdb";
  * 
- * let duckdb = await DuckDB.load();
- * const c = await duckdb.db.connect();
+ * const duckdb = await DuckDB.load();
  * 
- * const data = [
- *     { "col1": 1, "col2": "foo" },
- *     { "col1": 2, "col2": "bar" },
- * ];
- * await duckdb.db.registerFileText("rows.json", JSON.stringify(data));
- * await c.insertJSONFromPath('rows.json', { name: 'rows' });
- * 
- * const arrowResult = await c.query("SELECT * FROM read_json_auto('rows.json')");
- * const result = arrowResult.toArray().map((row) => row.toJSON());
- * expect(result.length).to.equal(data.length);
- * for (let i = 0; i < result.length; i++) {
- *     expect(result[i].col2).to.equal(data[i].col2);
- * }
- * 
- * c.close();
+ * const encoded_data = await duckdb.encode(data);
+ * const decoded_data = await duckdb.decode(encoded_data);
  * ```
  */
-export class DuckDB {
+export class DuckDB extends WasmLibrary {
 
-    db: AsyncDuckDB;
-
-    private constructor(db: AsyncDuckDB, protected _version: string) {
-        this.db = db;
+    private constructor(_module: any) {
+        super(_module, new _module.CDuckDB());
     }
 
     /**
@@ -48,34 +36,66 @@ export class DuckDB {
      * @returns A promise to an instance of the DuckDB class.
      */
     static load(): Promise<DuckDB> {
-        const workerUrl = URL.createObjectURL(
-            new Blob([loadWasmWorker()], { type: "text/javascript" })
-        );
-        const worker = new Worker(workerUrl);
-        URL.revokeObjectURL(workerUrl);
-        const logger = new ConsoleLogger();
-        const db = new AsyncDuckDB(logger, worker);
-        const wasmUrl = URL.createObjectURL(
-            new Blob([load()], { "type": "application/wasm" })
-        );
-        return db.instantiate(wasmUrl, null).then(async () => {
-            URL.revokeObjectURL(wasmUrl);
-            return new DuckDB(db, await db.getVersion());
-        });
+        if (!g_duckdb) {
+            g_duckdb = load().then((module: any) => {
+                return new DuckDB(module)
+            });
+        }
+        return g_duckdb;
     }
 
     /**
      * Unloades the compiled wasm instance.
      */
     static unload() {
-        resetWasmWorker();
         reset();
     }
 
     /**
-     * @returns The DuckDB version
+     * @returns The DuckDB c++ version
      */
     version(): string {
-        return this._version;
+        return this._exports.version();
+    }
+
+    /**
+     * @param data Data to encode.
+     * @returns string containing the Base 91 encoded data
+     */
+    encode(data: Uint8Array): string {
+        this._exports.reset();
+
+        const unencoded = this.uint8_heapu8(data);
+        const encoded = this.malloc_heapu8(unencoded.size + Math.ceil(unencoded.size / 4));
+
+        encoded.size = this._exports.encode(unencoded.ptr, unencoded.size, encoded.ptr);
+        let retVal = this.heapu8_string(encoded);
+        encoded.size = this._exports.encode_end(encoded.ptr);
+        retVal += this.heapu8_string(encoded);
+
+        this.free_heapu8(encoded);
+        this.free_heapu8(unencoded);
+        return retVal;
+    }
+
+    /**
+     * 
+     * @param duckdbStr encoded string
+     * @returns origonal data
+     */
+    decode(duckdbStr: string): Uint8Array {
+        this._exports.reset();
+
+        const encoded = this.string_heapu8(duckdbStr);
+        const unencoded = this.malloc_heapu8(encoded.size);
+
+        unencoded.size = this._exports.decode(encoded.ptr, encoded.size, unencoded.ptr);
+        let retVal = this.heapu8_uint8(unencoded);
+        unencoded.size = this._exports.decode_end(unencoded.ptr);
+        retVal = new Uint8Array([...retVal, ...this.heapu8_view(unencoded)]);
+
+        this.free_heapu8(unencoded);
+        this.free_heapu8(encoded);
+        return retVal;
     }
 }

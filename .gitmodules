@@ -1,0 +1,3 @@
+[submodule "third-party/duckdb-wasm"]
+	path = third-party/duckdb-wasm
+	url = git@github.com:GordonSmith/duckdb-wasm.git
