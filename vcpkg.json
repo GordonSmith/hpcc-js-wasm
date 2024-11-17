@@ -4,6 +4,9 @@
       "name": "base91"
     },
     {
+      "name": "flatbuffers"
+    },
+    {
       "name": "expat"
     },
     {

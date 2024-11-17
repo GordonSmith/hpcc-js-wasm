@@ -1,0 +1,59 @@
+// @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
+import load, { reset } from "../../../build/packages/flatc/src-cpp/flatclib.wasm";
+import type { MainModule } from "../../../build/packages/flatc/src-cpp/flatclib.js";
+import { WasmLibrary } from "./wasm-library.ts";
+
+//  Ref:  http://facebook.github.io/flatbuffers/flatbuffers_manual.html
+//  Ref:  https://github.com/facebook/flatbuffers
+
+/**
+ * The Zstandard WASM library, provides a simplified wrapper around the Zstandard c++ library.
+ * 
+ * See [Zstandard](https://facebook.github.io/flatbuffers/) for more details.
+ * 
+ * ```ts
+ * import { Flatbuffers } from "@hpcc-js/wasm-flatbuffers";
+ * 
+ * const flatbuffers = await Flatbuffers.load();
+ * 
+ * //  Generate some "data"
+ * const data = new Uint8Array(Array.from({ length: 100000 }, (_, i) => i % 256));
+ * 
+ * const compressed_data = flatbuffers.compress(data);
+ * const decompressed_data = flatbuffers.decompress(compressed_data);
+ * ```
+ */
+export class FlatC {
+
+    private constructor(protected _module: MainModule) {
+    }
+
+    /**
+     * Compiles and instantiates the raw wasm.
+     * 
+     * ::: info
+     * In general WebAssembly compilation is disallowed on the main thread if the buffer size is larger than 4KB, hence forcing `load` to be asynchronous;
+     * :::
+     * 
+     * @returns A promise to an instance of the Flatbuffers class.
+     */
+    static load(): Promise<FlatC> {
+        return load().then((module: any) => {
+            return new FlatC(module)
+        });
+    }
+
+    /**
+     * Unloades the compiled wasm instance.
+     */
+    static unload() {
+        reset();
+    }
+
+    /**
+     * @returns The Flatbuffers c++ version
+     */
+    version(): string {
+        return this._module.version();
+    }
+}

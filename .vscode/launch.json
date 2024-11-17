@@ -57,6 +57,13 @@
             "webRoot": "${workspaceRoot}"
         },
         {
+            "name": "hw-flatbuffers.html",
+            "type": "msedge",
+            "request": "launch",
+            "url": "http://localhost:8000/hw-flatbuffers.html",
+            "webRoot": "${workspaceRoot}"
+        },
+        {
             "name": "hw-zstd.html",
             "type": "msedge",
             "request": "launch",
