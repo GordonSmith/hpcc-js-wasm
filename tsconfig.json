@@ -1,7 +1,10 @@
 {
     "extends": "./packages/tsconfig.json",
     "compilerOptions": {
-        "rootDir": "./packages"
+        "rootDir": "./packages",
+        "types": [
+            "node"
+        ]
     },
     "include": [],
     "references": []

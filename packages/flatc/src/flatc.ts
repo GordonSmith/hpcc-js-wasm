@@ -1,7 +1,6 @@
 // @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
 import load, { reset } from "../../../build/packages/flatc/src-cpp/flatclib.wasm";
 import type { MainModule } from "../../../build/packages/flatc/src-cpp/flatclib.js";
-import { WasmLibrary } from "./wasm-library.ts";
 
 //  Ref:  http://facebook.github.io/flatbuffers/flatbuffers_manual.html
 //  Ref:  https://github.com/facebook/flatbuffers
@@ -49,6 +48,21 @@ export class FlatC {
     static unload() {
         reset();
     }
+
+    main(_args: string[]): [number, string[]] {
+        const args = new this._module.VectorString();
+        _args.forEach(arg => {
+            args.push_back(arg);
+        });
+        const retVal = new this._module.VectorString();
+        const int = this._module.main(args, retVal);
+        const _retVal: string[] = [];
+        for (let i = 0; i < retVal.size(); ++i) {
+            _retVal.push(retVal.get(i)?.toString() ?? "");
+        }
+        return [int, _retVal];
+    }
+
 
     /**
      * @returns The Flatbuffers c++ version
