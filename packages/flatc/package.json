@@ -21,10 +21,11 @@
     "gen-types": "tsc --project tsconfig.json --emitDeclarationOnly",
     "gen-types-watch": "npm run gen-types -- --watch",
     "bundle": "node esbuild.js",
-    "bundle-bin": "esbuild ./src/bin.ts --platform=node --format=esm --bundle --packages=external --sourcemap  --outfile=./bin/index.js --banner:js='#!/usr/bin/env node'",
     "bundle-dev": "npm run bundle -- --development",
-    "bundle-watch": "npm run bundle-dev -- --watch",
-    "build-dev": "run-p gen-types bundle-dev",
+    "bundle-dev-watch": "npm run bundle-dev -- --watch",
+    "bundle-bin": "esbuild ./src/bin.ts --platform=node --format=esm --bundle --packages=external --sourcemap  --outfile=./bin/index.js --banner:js='#!/usr/bin/env node'",
+    "bundle-bin-watch": "npm run bundle-bin -- --watch",
+    "build-dev": "run-p gen-types bundle-dev bundle-bin",
     "build": "run-p gen-types bundle bundle-bin",
     "lint-skypack": "npx -y @skypack/package-check",
     "lint-eslint": "eslint src/**/*.ts tests/**/*.ts",
@@ -37,7 +38,8 @@
     "update-major": "npx -y npm-check-updates -u"
   },
   "devDependencies": {
-    "@types/node": "^22.9.0"
+    "@types/node": "^22.9.0",
+    "@hpcc-js/wasm-utils": "^1.0.0"
   },
   "keywords": [
     "graphviz",

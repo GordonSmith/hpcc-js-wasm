@@ -24,7 +24,7 @@ import type { MainModule } from "../../../build/packages/flatc/src-cpp/flatclib.
  */
 export class FlatC {
 
-    private constructor(protected _module: MainModule) {
+    private constructor(public _module: MainModule) {
     }
 
     /**
@@ -55,10 +55,19 @@ export class FlatC {
             args.push_back(arg);
         });
         const retVal = new this._module.VectorString();
-        const int = this._module.main(args, retVal);
+        let int = 0;
         const _retVal: string[] = [];
-        for (let i = 0; i < retVal.size(); ++i) {
-            _retVal.push(retVal.get(i)?.toString() ?? "");
+        try {
+            int = this._module.main(args, retVal);
+            for (let i = 0; i < retVal.size(); ++i) {
+                _retVal.push(retVal.get(i)?.toString() ?? "");
+            }
+        } catch (e: any) {
+            console.error(e);
+            int = e?.status ?? -1;
+        } finally {
+            args.delete();
+            retVal.delete();
         }
         return [int, _retVal];
     }

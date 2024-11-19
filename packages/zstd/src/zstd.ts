@@ -1,6 +1,6 @@
 // @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
 import load, { reset } from "../../../build/packages/zstd/src-cpp/zstdlib.wasm";
-import { WasmLibrary } from "./wasm-library.ts";
+import { WasmLibrary } from "@hpcc-js/wasm-utils";
 
 //  Ref:  http://facebook.github.io/zstd/zstd_manual.html
 //  Ref:  https://github.com/facebook/zstd

@@ -2,19 +2,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "bin/index.js",
-            "program": "${workspaceFolder}/bin/index.js",
-            "request": "launch",
-            "args": [
-                "--cpp",
-                "./tests/monster.fbs"
-            ],
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "type": "node"
-        },
-        {
             "name": "test-browser-start",
             "type": "node",
             "request": "launch",

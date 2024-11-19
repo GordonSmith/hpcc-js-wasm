@@ -2,9 +2,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "gen-types-watch",
+            "label": "gen-types-watch-browser",
             "type": "npm",
-            "script": "gen-types-watch",
+            "script": "gen-types-watch-browser",
             "problemMatcher": [
                 "$tsc-watch"
             ],
@@ -13,18 +13,20 @@
             }
         },
         {
-            "label": "bundle-dev-watch",
+            "label": "gen-types-watch-node",
             "type": "npm",
-            "script": "bundle-dev-watch",
-            "problemMatcher": [],
+            "script": "gen-types-watch-node",
+            "problemMatcher": [
+                "$tsc-watch"
+            ],
             "presentation": {
                 "group": "group-build"
             }
         },
         {
-            "label": "bundle-bin-watch",
+            "label": "bundle-watch",
             "type": "npm",
-            "script": "bundle-bin-watch",
+            "script": "bundle-watch",
             "problemMatcher": [],
             "presentation": {
                 "group": "group-build"
@@ -33,9 +35,9 @@
         {
             "label": "build",
             "dependsOn": [
-                "gen-types-watch",
-                "bundle-dev-watch",
-                "bundle-bin-watch"
+                "gen-types-watch-browser",
+                "gen-types-watch-node",
+                "bundle-watch"
             ],
             "group": {
                 "kind": "build",

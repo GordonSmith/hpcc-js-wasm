@@ -4,7 +4,7 @@
  * WebBlob is a Blob implementation for web resources that supports range requests.
  */
 
-interface WebBlobCreateOptions {
+export interface WebBlobCreateOptions {
     /**
      * @default 1_000_000
      *

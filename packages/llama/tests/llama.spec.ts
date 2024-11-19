@@ -28,22 +28,22 @@ describe("llama", () => {
     it("test", async () => {
 
         let llama = await Llama.load();
-        const model = "https://huggingface.co/CompendiumLabs/bge-base-en-v1.5-gguf/resolve/main/bge-base-en-v1.5-q4_k_m.gguf";
-        const webBlob: Blob = await WebBlob.create(new URL(model));
+        const modelUrl = "https://huggingface.co/CompendiumLabs/bge-base-en-v1.5-gguf/resolve/main/bge-base-en-v1.5-q4_k_m.gguf";
+        const webBlob: Blob = await WebBlob.create(new URL(modelUrl));
         expect(webBlob.type).to.be.a.string;
         expect(webBlob.type).equals("binary/octet-stream");
-        const data: ArrayBuffer = await webBlob.arrayBuffer();
-        expect(data).to.be.instanceOf(ArrayBuffer);
-        expect(data.byteLength).to.be.greaterThan(0);
+        const model: ArrayBuffer = await webBlob.arrayBuffer();
+        expect(model).to.be.instanceOf(ArrayBuffer);
+        expect(model.byteLength).to.be.greaterThan(0);
 
-        const embeddings = llama.embedding("Hello and Welcome!", new Uint8Array(data));
+        const embeddings = llama.embedding("Hello and Welcome!", new Uint8Array(model));
         expect(embeddings).to.be.instanceOf(Array);
         expect(embeddings.length).equals(1);
         expect(embeddings[0]).to.be.a.instanceOf(Array);
         expect(embeddings[0].length).to.be.greaterThan(0);
         expect(embeddings[0][0]).to.be.a("number");
 
-        const embeddings2 = llama.embedding("Hello and Welcome!", new Uint8Array(data));
+        const embeddings2 = llama.embedding("Hello and Welcome!", new Uint8Array(model));
         expect(embeddings2).to.be.instanceOf(Array);
         expect(embeddings2.length).equals(1);
         expect(embeddings2[0]).to.be.a.instanceOf(Array);
@@ -55,7 +55,7 @@ describe("llama", () => {
         Llama.unload();
         llama = await Llama.load();
 
-        const embeddings3 = llama.embedding("Hello and Welcome!", new Uint8Array(data));
+        const embeddings3 = llama.embedding("Hello and Welcome!", new Uint8Array(model));
         expect(embeddings3).to.be.instanceOf(Array);
         expect(embeddings3.length).equals(1);
         expect(embeddings3[0]).to.be.a.instanceOf(Array);
