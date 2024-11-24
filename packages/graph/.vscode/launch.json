@@ -1,0 +1,58 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "test-browser-start",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceRoot}/../../node_modules/vitest/vitest.mjs",
+            "console": "integratedTerminal",
+            "args": [
+                "run",
+                "--inspect-brk",
+                "--project",
+                "browser",
+                "--no-file-parallelism"
+            ],
+            "presentation": {
+                "hidden": true
+            },
+        },
+        {
+            "name": "test-browser-attach",
+            "type": "chrome",
+            "request": "attach",
+            "port": 9229,
+            "presentation": {
+                "hidden": true
+            }
+        },
+        {
+            "name": "test-node",
+            "type": "node",
+            "request": "launch",
+            "runtimeArgs": [
+                "run-script",
+                "test-node"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/**/*.js",
+                "!**/node_modules/**"
+            ],
+        }
+    ],
+    "compounds": [
+        {
+            "name": "test-browser",
+            "configurations": [
+                "test-browser-attach",
+                "test-browser-start"
+            ],
+            "stopAll": true
+        }
+    ]
+}
