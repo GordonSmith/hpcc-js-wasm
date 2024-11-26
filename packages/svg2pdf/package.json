@@ -1,0 +1,58 @@
+{
+  "name": "@hpcc-js/wasm-svg2pdf",
+  "version": "1.3.1",
+  "description": "hpcc-js - WASM Svg2pdf",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./types/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*",
+    "types/**/*"
+  ],
+  "scripts": {
+    "clean": "rimraf coverage dist dist-test target types .nyc_output",
+    "gen-js": "jco transpile --no-nodejs-compat --base64-cutoff 3000000 -o ./build ./target/wasm32-wasip1/release/svg2pdflib.wasm",
+    "gen-types": "tsc --project tsconfig.json --emitDeclarationOnly",
+    "gen-types-watch": "npm run gen-types -- --watch",
+    "bundle": "vite build",
+    "bundle-dev": "npm run bundle -- --development",
+    "bundle-watch": "npm run bundle-dev -- --watch",
+    "build-dev": "run-p gen-types bundle-dev",
+    "build": "npm-run-all --serial gen-js --parallel gen-types bundle",
+    "lint-skypack": "npx -y @skypack/package-check",
+    "lint-eslint": "eslint src/**/*.ts tests/**/*.ts",
+    "lint": "run-p lint-eslint",
+    "test-browser": "vitest run --project browser",
+    "test-node": "vitest run --project node",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "update": "npx -y npm-check-updates -u -t minor",
+    "update-major": "npx -y npm-check-updates -u"
+  },
+  "devDependencies": {
+    "@bytecodealliance/jco": "1.8.1",
+    "vite-plugin-top-level-await": "1.4.4",
+    "vite-plugin-arraybuffer": "0.0.8",
+    "vite": "6.0.0"
+  },
+  "keywords": [
+    "svg",
+    "pdf",
+    "webassembly",
+    "wasm"
+  ],
+  "author": "hpcc-systems",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hpcc-systems/hpcc-js-wasm.git"
+  },
+  "homepage": "https://hpcc-systems.github.io/hpcc-js-wasm/",
+  "license": "Apache-2.0"
+}

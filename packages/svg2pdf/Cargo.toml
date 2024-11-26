@@ -1,0 +1,23 @@
+[package]
+name = "svg2pdflib"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+svg2pdf = "0.12.0"
+wit-bindgen-rt = { version = "0.35.0", features = ["bitflags"] }
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+codegen-units = 1
+opt-level = "s"
+debug = false
+strip = true
+lto = true
+
+[package.metadata.component]
+package = "component:svg2pdflib"
+
+[package.metadata.component.dependencies]

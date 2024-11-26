@@ -1,0 +1,11 @@
+package hpcc:svg2pdflib@0.1.0;
+
+@since(version = 0.1.0)
+interface svg2pdflib {
+    svg2pdf: func(svg: string, fonts: list<list<u8>>) -> list<u8>;
+    svg2pdf2: func(svg: string) -> list<u8>;
+}
+
+world component {
+    export svg2pdflib;
+}
