@@ -1,10 +1,11 @@
 import { svg2pdflib } from "../build/svg2pdflib.js";
-// @ts-ignore
-import roboto from "../fonts/Roboto-Regular.ttf?uint8array";
+// // @ts-ignore
+// import roboto from "../fonts/Roboto-Regular.ttf?uint8array";
 // @ts-ignore
 import noto from "../fonts/NotoSerif-Regular.ttf?uint8array";
 
-export function svg2pdf(svg: string) {
+export function svg2pdf(svg: string, roboto: Uint8Array) {
+    console.log("roboto", roboto.length);
     return svg2pdflib.svg2pdf(svg, [roboto, noto]);
 }
 

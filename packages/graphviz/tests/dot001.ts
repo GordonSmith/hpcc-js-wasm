@@ -1,6 +1,8 @@
 export const dot = `
 digraph G {
-    node [shape=rect fontname="Roboto-Regular" fontsize=12];
+    fontname="Noto Serif";
+    node [shape=rect fontname="Noto Serif" fontsize=12];
+    edge [fontname="Noto Serif" fontsize=12];
 
     subgraph cluster_0 {
         style=filled;
