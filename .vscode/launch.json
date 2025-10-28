@@ -97,8 +97,8 @@
         {
             "name": "esbuild",
             "type": "node",
-            "program": "${workspaceFolder}/packages/wasm/esbuild.js",
-            "cwd": "${workspaceFolder}/packages/wasm",
+            "program": "${workspaceFolder}/packages/base91/esbuild.js",
+            "cwd": "${workspaceFolder}/packages/base91",
             "request": "launch",
             "args": [],
             "skipFiles": [

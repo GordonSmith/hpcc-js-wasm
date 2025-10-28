@@ -24,7 +24,7 @@ describe("zstd", function () {
 
     it("compress", async function () {
         const zstd = await Zstd.load();
-        const data = new Uint8Array(Array.from({ length: 1000 }, (_, i) => i % 256));
+        const data = new Uint8Array(Array.from({ length: 9999 }, (_, i) => i % 256));
         const compressed_data = zstd.compress(data);
         const data2 = zstd.decompress(compressed_data);
         expect(data).to.deep.equal(data2);
@@ -43,9 +43,10 @@ describe("zstd", function () {
 
     it("compress-levels", async function () {
         const zstd = await Zstd.load();
-        const data = new Uint8Array(Array.from({ length: 10000 }, (_, i) => i % 256 > 128 ? Math.random() * 256 : i % 256));
+        const data = new Uint8Array(Array.from({ length: 100000 }, (_, i) => i % 256 > 128 ? Math.random() * 256 : i % 256));
         for (let c = 0; c <= zstd.maxCLevel(); ++c) {
             const compressed_data = zstd.compress(data, c);
+            console.log("c-level: " + c + " compressed: " + compressed_data.length + " ratio: " + (compressed_data.length / data.length));
             const data2 = zstd.decompress(compressed_data);
             expect(data).to.deep.equal(data2);
         }

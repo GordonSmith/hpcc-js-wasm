@@ -34,7 +34,7 @@ class KeywordParser extends StackParser {
 describe("expat", function () {
     it("version", async function () {
         let expat = await Expat.load();
-        let v = await expat.version();
+        let v = expat.version();
         expect(v).to.be.a.string;
         expect(v).to.equal("expat_2.7.1");
         console.log("expat version: " + v);

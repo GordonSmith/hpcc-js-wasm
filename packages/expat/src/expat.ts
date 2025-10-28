@@ -1,5 +1,5 @@
-// @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
-import load, { reset } from "../../../build/packages/expat/src-cpp/expatlib/expatlib.wasm";
+import { resources } from "../../../build/packages/expat/expatlib.component.js";
+import { Callback } from "./types.ts";
 
 export type Attributes = { [key: string]: string };
 export interface IParser {
@@ -19,6 +19,8 @@ function parseAttrs(attrs: string): Attributes {
     });
     return retVal;
 }
+
+let g_expat: Expat | undefined;
 
 /**
  * Expat XML parser WASM library, provides a simplified wrapper around the Expat XML Parser library.  
@@ -46,9 +48,23 @@ function parseAttrs(attrs: string): Attributes {
  * ```
  
  */
-export class Expat {
+export class Expat extends Callback {
 
-    private constructor(protected _module: any) {
+    private _instance: resources.Expat;
+    private _callback: IParser | undefined;
+
+    private constructor() {
+        super();
+        this._instance = new resources.Expat(this);
+    }
+    startElement(tag: string, attrs: string): void {
+        this._callback?.startElement(tag, parseAttrs(attrs));
+    }
+    endElement(tag: string): void {
+        this._callback?.endElement(tag);
+    }
+    characterData(content: string): void {
+        this._callback?.characterData(content);
     }
 
     /**
@@ -60,17 +76,20 @@ export class Expat {
      * 
      * @returns A promise to an instance of the Expat class.
      */
-    static load(): Promise<Expat> {
-        return load().then((module: any) => {
-            return new Expat(module);
-        });
+    static async load(): Promise<Expat> {
+        if (!g_expat) {
+            // Wait a tick to ensure the component module is fully loaded
+            await new Promise(resolve => setTimeout(resolve, 0));
+            g_expat = new Expat();
+        }
+        return g_expat;
     }
 
     /**
      * Unloades the compiled wasm instance.
      */
     static unload() {
-        reset();
+        g_expat = undefined;
     }
 
     /**
@@ -78,7 +97,7 @@ export class Expat {
      * @returns The Expat c++ version
      */
     version(): string {
-        return this._module.CExpat.prototype.version();
+        return this._instance.version();
     }
 
     /**
@@ -93,20 +112,11 @@ export class Expat {
      * @returns `true`|`false` if the XML parse succeeds.
      */
     parse(xml: string, callback: IParser): boolean {
-        const parser = new this._module.CExpatJS();
-        parser.startElement = function () {
-            callback.startElement(this.tag(), parseAttrs(this.attrs()));
-        };
-        parser.endElement = function () {
-            callback.endElement(this.tag());
-        };
-        parser.characterData = function () {
-            callback.characterData(this.content());
-        };
-        parser.create();
-        const retVal = parser.parse(xml);
-        parser.destroy();
-        this._module.destroy(parser);
+        this._callback = callback;
+
+        this._instance.create();
+        const retVal = this._instance.parse(xml);
+        this._instance.destroy();
         return retVal;
     }
 }

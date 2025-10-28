@@ -17,7 +17,7 @@
     "types/**/*"
   ],
   "scripts": {
-    "clean": "rimraf coverage dist dist-test types .nyc_output",
+    "clean": "rimraf src-component coverage dist dist-test types .nyc_output",
     "gen-types": "tsc --project tsconfig.json --emitDeclarationOnly",
     "gen-types-watch": "npm run gen-types -- --watch",
     "bundle": "node esbuild.js",
@@ -36,9 +36,7 @@
     "update-major": "npx -y npm-check-updates -u"
   },
   "dependencies": {},
-  "devDependencies": {
-    "@hpcc-js/esbuild-plugins": "1.5.2"
-  },
+  "devDependencies": {},
   "keywords": [
     "base64",
     "base91",

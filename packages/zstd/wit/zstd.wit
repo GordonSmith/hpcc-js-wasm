@@ -1,0 +1,21 @@
+package hpcc-js:zstd;
+
+interface zstd {
+    version: func() -> string;
+
+    compress: func(src: list<u8>, compression-level: u32) -> list<u8>;
+    decompress: func(src: list<u8>) -> list<u8>;
+    get-frame-content-size: func(src: list<u8>) -> u64;
+    find-frame-compressed-size: func(src: list<u8>) -> u32;
+
+    compress-bound: func(src-size: u32) -> u32;
+    is-error: func(code: u32) -> u32;
+    get-error-name: func(code: u32) -> string;
+    min-c-level: func() -> s32;
+    max-c-level: func() -> s32;
+    default-c-level: func() -> s32;
+}
+
+world root {
+    export zstd;
+}

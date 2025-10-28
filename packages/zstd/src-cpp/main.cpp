@@ -1,75 +1,58 @@
-#include <stdlib.h>
-
 #include <zstd.h>
+#include <cstdlib>
+#include "root.h"
 
-struct zstd
+extern "C"
 {
-public:
-    static const char *version(void)
+    void exports_hpcc_js_zstd_zstd_version(root_string_t *ret)
     {
-        return ZSTD_versionString();
+        root_string_dup(ret, ZSTD_versionString());
     }
-
-    static void *malloc(size_t __size)
+    void exports_hpcc_js_zstd_zstd_compress(root_list_u8_t *src, uint32_t compression_level, root_list_u8_t *ret)
     {
-        return ::malloc(__size);
+        size_t dst_capacity = ZSTD_compressBound(src->len);
+        void *dst = malloc(dst_capacity);
+        size_t compressed_size = ZSTD_compress(dst, dst_capacity, src->ptr, src->len, compression_level);
+        ret->len = compressed_size;
+        ret->ptr = (uint8_t *)dst;
     }
-
-    static void free(void *__ptr)
+    void exports_hpcc_js_zstd_zstd_decompress(root_list_u8_t *src, root_list_u8_t *ret)
     {
-        ::free(__ptr);
+        size_t decompressed_size = ZSTD_getFrameContentSize((const void *)src->ptr, src->len);
+        ret->len = decompressed_size;
+        ret->ptr = (uint8_t *)malloc(decompressed_size);
+        ZSTD_decompress((void *)ret->ptr, ret->len, (const void *)src->ptr, src->len);
     }
-
-    static size_t compress(void *dst, size_t dstCapacity, const void *src, size_t srcSize, int compressionLevel)
+    uint64_t exports_hpcc_js_zstd_zstd_get_frame_content_size(root_list_u8_t *src)
     {
-        return ZSTD_compress(dst, dstCapacity, src, srcSize, compressionLevel);
+        return ZSTD_getFrameContentSize((const void *)src->ptr, src->len);
     }
-
-    static size_t decompress(void *dst, size_t dstCapacity, const void *src, size_t compressedSize)
+    uint32_t exports_hpcc_js_zstd_zstd_find_frame_compressed_size(root_list_u8_t *src)
     {
-        return ZSTD_decompress(dst, dstCapacity, src, compressedSize);
+        return ZSTD_findFrameCompressedSize((const void *)src->ptr, src->len);
     }
-
-    static unsigned long long getFrameContentSize(const void *src, size_t srcSize)
+    uint32_t exports_hpcc_js_zstd_zstd_compress_bound(uint32_t src_size)
     {
-        return ZSTD_getFrameContentSize(src, srcSize);
+        return ZSTD_compressBound(src_size);
     }
-
-    static size_t findFrameCompressedSize(const void *src, size_t srcSize)
-    {
-        return ZSTD_findFrameCompressedSize(src, srcSize);
-    }
-
-    static size_t compressBound(size_t srcSize) /*!< maximum compressed size in worst case single-pass scenario */
-    {
-        return ZSTD_compressBound(srcSize);
-    }
-
-    static unsigned isError(size_t code) /*!< tells if a `size_t` function result is an error code */
+    uint32_t exports_hpcc_js_zstd_zstd_is_error(uint32_t code)
     {
         return ZSTD_isError(code);
     }
-
-    static const char *getErrorName(size_t code) /*!< provides readable string from an error code */
+    void exports_hpcc_js_zstd_zstd_get_error_name(uint32_t code, root_string_t *ret)
     {
-        return ZSTD_getErrorName(code);
+        root_string_dup(ret, ZSTD_getErrorName(code));
     }
-
-    static int minCLevel(void) /*!< minimum negative compression level allowed, requires v1.4.0+ */
+    int32_t exports_hpcc_js_zstd_zstd_min_c_level(void)
     {
         return ZSTD_minCLevel();
     }
-
-    static int maxCLevel(void) /*!< maximum compression level available */
+    int32_t exports_hpcc_js_zstd_zstd_max_c_level(void)
     {
         return ZSTD_maxCLevel();
     }
-
-    static int defaultCLevel(void) /*!< default compression level, specified by ZSTD_CLEVEL_DEFAULT, requires v1.5.0+ */
+    int32_t exports_hpcc_js_zstd_zstd_default_c_level(void)
     {
         return ZSTD_defaultCLevel();
     }
-};
-
-//  Include JS Glue  ---
-#include "main_glue.cpp"
+}

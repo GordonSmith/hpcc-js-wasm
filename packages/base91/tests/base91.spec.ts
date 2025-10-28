@@ -22,9 +22,12 @@ describe("base91", function () {
 
     it("simple", async function () {
         const base91 = await Base91.load();
-        const data = new Uint8Array(Array.from({ length: 1000 }, (_, i) => i % 256));
+        const data = new Uint8Array(Array.from({ length: 10000 }, (_, i) => i % 256));
         const base91Str = base91.encode(data);
-        const data2 = await base91.decode(base91Str);
+        const data2 = base91.decode(base91Str);
         expect(data).to.deep.equal(data2);
+        const base91Str2 = base91.encode(data2);
+        const data3 = base91.decode(base91Str2);
+        expect(data).to.deep.equal(data3);
     });
 });

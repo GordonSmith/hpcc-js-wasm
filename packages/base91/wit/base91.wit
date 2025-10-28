@@ -1,0 +1,18 @@
+package hpcc-js:base91;
+
+interface resources {
+    resource base91 {
+        constructor();
+
+        version: func() -> string;
+        reset: func();
+        encode: func(data: list<u8>) -> string;
+        encode-end: func() -> string;
+        decode: func(data: string) -> list<u8>;
+        decode-end: func() -> string;
+    }
+}
+
+world root {
+    export resources;
+}

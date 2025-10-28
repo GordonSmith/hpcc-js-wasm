@@ -51,6 +51,51 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "MinSizeRel"
             }
+        },
+        {
+            "name": "vcpkg-wasi",
+            "hidden": true,
+            "inherits": [
+                "vcpkg"
+            ],
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "MinSizeRel",
+                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/wasi-sdk/share/cmake/wasi-sdk.cmake",
+                "VCPKG_TARGET_TRIPLET": "wasm32-emscripten",
+                "WASI_SDK_PREFIX": "${sourceDir}/wasi-sdk",
+                "CMAKE_SYSROOT": "${sourceDir}/wasi-sdk/share/wasi-sysroot"
+            }
+        },
+        {
+            "name": "vcpkg-wasi-Debug",
+            "inherits": [
+                "vcpkg-wasi"
+            ],
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "vcpkg-wasi-RelWithDebInfo",
+            "inherits": [
+                "vcpkg-wasi"
+            ],
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "vcpkg-wasi-MinSizeRel",
+            "inherits": [
+                "vcpkg-wasi"
+            ],
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "MinSizeRel"
+            }
         }
     ]
 }

@@ -1,11 +1,9 @@
-// @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
-import load, { reset } from "../../../build/packages/zstd/src-cpp/zstdlib.wasm";
-import { WasmLibrary } from "./wasm-library.ts";
+import { zstd } from "../../../build/packages/zstd/zstdlib.component.js";
 
 //  Ref:  http://facebook.github.io/zstd/zstd_manual.html
 //  Ref:  https://github.com/facebook/zstd
 
-let g_zstd: Promise<Zstd>;
+let g_zstd: Zstd | undefined;
 
 /**
  * The Zstandard WASM library, provides a simplified wrapper around the Zstandard c++ library.
@@ -24,10 +22,9 @@ let g_zstd: Promise<Zstd>;
  * const decompressed_data = zstd.decompress(compressed_data);
  * ```
  */
-export class Zstd extends WasmLibrary {
+export class Zstd {
 
-    private constructor(_module: any) {
-        super(_module, _module.zstd.prototype);
+    private constructor() {
     }
 
     /**
@@ -39,11 +36,11 @@ export class Zstd extends WasmLibrary {
      * 
      * @returns A promise to an instance of the Zstd class.
      */
-    static load(): Promise<Zstd> {
+    static async load(): Promise<Zstd> {
         if (!g_zstd) {
-            g_zstd = load().then((module: any) => {
-                return new Zstd(module)
-            });
+            // Wait a tick to ensure the component module is fully loaded
+            await new Promise(resolve => setTimeout(resolve, 0));
+            g_zstd = new Zstd();
         }
         return g_zstd;
     }
@@ -52,14 +49,14 @@ export class Zstd extends WasmLibrary {
      * Unloades the compiled wasm instance.
      */
     static unload() {
-        reset();
+        g_zstd = undefined;
     }
 
     /**
      * @returns The Zstd c++ version
      */
     version(): string {
-        return this._exports.version();
+        return zstd.version();
     }
 
     /**
@@ -72,20 +69,7 @@ export class Zstd extends WasmLibrary {
      * :::
      */
     compress(data: Uint8Array, compressionLevel: number = this.defaultCLevel()): Uint8Array {
-        const uncompressed = this.uint8_heapu8(data);
-
-        const compressedSize = this._exports.compressBound(data.length);
-        const compressed = this.malloc_heapu8(compressedSize);
-        compressed.size = this._exports.compress(compressed.ptr, compressedSize, uncompressed.ptr, uncompressed.size, compressionLevel);
-        /* istanbul ignore if  */
-        if (this._exports.isError(compressed.size)) {
-            console.error(this._exports.getErrorName(compressed.size));
-        }
-        const retVal = this.heapu8_uint8(compressed);
-
-        this.free_heapu8(compressed);
-        this.free_heapu8(uncompressed);
-        return retVal;
+        return zstd.compress(data, compressionLevel);
     }
 
     /**
@@ -93,38 +77,21 @@ export class Zstd extends WasmLibrary {
      * @returns Uncompressed data.
      */
     decompress(compressedData: Uint8Array): Uint8Array {
-        const compressed = this.uint8_heapu8(compressedData);
-        const uncompressedSize = this._exports.getFrameContentSize(compressed.ptr, compressed.size);
-        /* istanbul ignore if  */
-        if (this._exports.isError(uncompressedSize)) {
-            console.error(this._exports.getErrorName(uncompressedSize));
-        }
-        const uncompressed = this.malloc_heapu8(uncompressedSize);
-
-        uncompressed.size = this._exports.decompress(uncompressed.ptr, uncompressedSize, compressed.ptr, compressed.size);
-        /* istanbul ignore if  */
-        if (this._exports.isError(uncompressed.size)) {
-            console.error(this._exports.getErrorName(uncompressed.size));
-        }
-        const retVal = this.heapu8_uint8(uncompressed);
-
-        this.free_heapu8(uncompressed);
-        this.free_heapu8(compressed);
-        return retVal;
+        return zstd.decompress(compressedData);
     }
 
     /**
      * @returns Default compression level (see notes above above).
      */
     defaultCLevel(): number {
-        return this._exports.defaultCLevel();
+        return zstd.defaultCLevel();
     }
 
     minCLevel(): number {
-        return this._exports.minCLevel();
+        return zstd.minCLevel();
     }
 
     maxCLevel(): number {
-        return this._exports.maxCLevel();
+        return zstd.maxCLevel();
     }
 }

@@ -1,10 +1,8 @@
-// @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
-import load, { reset } from "../../../build/packages/base91/src-cpp/base91lib.wasm";
-import { WasmLibrary } from "./wasm-library.ts";
+import { resources } from "../../../build/packages/base91/base91lib.component.js";
 
 //  Ref:  http://base91.sourceforge.net/#a5
 
-let g_base91: Promise<Base91>;
+let g_base91: Base91 | undefined;
 
 /**
  * Base 91 WASM library, similar to Base 64 but uses more characters resulting in smaller strings.
@@ -16,46 +14,48 @@ let g_base91: Promise<Base91>;
  * 
  * const base91 = await Base91.load();
  * 
- * const encoded_data = await base91.encode(data);
- * const decoded_data = await base91.decode(encoded_data);
+ * const encoded_data = base91.encode(data);
+ * const decoded_data = base91.decode(encoded_data);
  * ```
  */
-export class Base91 extends WasmLibrary {
+export class Base91 {
 
-    private constructor(_module: any) {
-        super(_module, new _module.CBasE91());
+    private _instance: resources.Base91;
+
+    private constructor() {
+        this._instance = new resources.Base91();
     }
 
     /**
-     * Compiles and instantiates the raw wasm.
+     * Loads the WASM component.
      * 
      * ::: info
-     * In general WebAssembly compilation is disallowed on the main thread if the buffer size is larger than 4KB, hence forcing `load` to be asynchronous;
+     * The component is loaded asynchronously to allow for large WASM files.
      * :::
      * 
-     * @returns A promise to an instance of the Base91 class.
+     * @returns An instance of the Base91 class.
      */
-    static load(): Promise<Base91> {
+    static async load(): Promise<Base91> {
         if (!g_base91) {
-            g_base91 = load().then((module: any) => {
-                return new Base91(module)
-            });
+            // Wait a tick to ensure the component module is fully loaded
+            await new Promise(resolve => setTimeout(resolve, 0));
+            g_base91 = new Base91();
         }
         return g_base91;
     }
 
     /**
-     * Unloades the compiled wasm instance.
+     * Unloads the compiled wasm instance.
      */
     static unload() {
-        reset();
+        g_base91 = undefined;
     }
 
     /**
      * @returns The Base91 c++ version
      */
     version(): string {
-        return this._exports.version();
+        return this._instance.version();
     }
 
     /**
@@ -63,39 +63,32 @@ export class Base91 extends WasmLibrary {
      * @returns string containing the Base 91 encoded data
      */
     encode(data: Uint8Array): string {
-        this._exports.reset();
-
-        const unencoded = this.uint8_heapu8(data);
-        const encoded = this.malloc_heapu8(unencoded.size + Math.ceil(unencoded.size / 4));
-
-        encoded.size = this._exports.encode(unencoded.ptr, unencoded.size, encoded.ptr);
-        let retVal = this.heapu8_string(encoded);
-        encoded.size = this._exports.encode_end(encoded.ptr);
-        retVal += this.heapu8_string(encoded);
-
-        this.free_heapu8(encoded);
-        this.free_heapu8(unencoded);
-        return retVal;
+        this._instance.reset();
+        const encoded = this._instance.encode(data);
+        const encodedEnd = this._instance.encodeEnd();
+        return encoded + encodedEnd;
     }
 
     /**
      * 
      * @param base91Str encoded string
-     * @returns origonal data
+     * @returns original data
      */
     decode(base91Str: string): Uint8Array {
-        this._exports.reset();
+        this._instance.reset();
+        const decoded = this._instance.decode(base91Str);
+        const decodedEnd = this._instance.decodeEnd();
 
-        const encoded = this.string_heapu8(base91Str);
-        const unencoded = this.malloc_heapu8(encoded.size);
+        // Combine decoded data with any remaining bytes from decodeEnd
+        if (decodedEnd.length === 0) {
+            return decoded;
+        }
 
-        unencoded.size = this._exports.decode(encoded.ptr, encoded.size, unencoded.ptr);
-        let retVal = this.heapu8_uint8(unencoded);
-        unencoded.size = this._exports.decode_end(unencoded.ptr);
-        retVal = new Uint8Array([...retVal, ...this.heapu8_view(unencoded)]);
-
-        this.free_heapu8(unencoded);
-        this.free_heapu8(encoded);
-        return retVal;
+        const result = new Uint8Array(decoded.length + decodedEnd.length);
+        result.set(decoded, 0);
+        // Convert string to bytes
+        const endBytes = new TextEncoder().encode(decodedEnd);
+        result.set(endBytes, decoded.length);
+        return result;
     }
 }

@@ -1,0 +1,34 @@
+package hpcc-js:expat;
+
+interface types {
+
+    resource callback {
+        constructor();
+        start-element: func(tag: string, attrs: string);
+        end-element: func(tag: string);
+        character-data: func(content: string);
+    }
+}
+
+interface resources {
+    use types.{callback};
+
+    resource expat {
+        constructor(cb: borrow<callback>);
+
+        version: func() -> string;
+        create: func() -> bool;
+        destroy: func();
+        parse: func(xml: string) -> bool;
+        tag: func() -> string;
+        attrs: func() -> string;
+        content: func() -> string;
+        start-element: func();
+        end-element: func();
+        character-data: func();
+    }
+}
+
+world root {
+    export resources;
+}
