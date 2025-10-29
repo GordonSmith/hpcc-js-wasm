@@ -3,7 +3,6 @@ package hpcc-js:expat;
 interface types {
 
     resource callback {
-        constructor();
         start-element: func(tag: string, attrs: string);
         end-element: func(tag: string);
         character-data: func(content: string);

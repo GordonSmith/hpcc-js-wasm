@@ -1,4 +1,4 @@
-#include <unistd.h> // for getpid
+#include <unistd.h>
 #include "stack_parser.h"
 #include <string>
 #include <expat.h>
