@@ -9,7 +9,10 @@ const replaceConfig = {
         replaceString({
             "import.meta.url": "''",
         }),
-    ]
+    ],
+    supported: {
+        'top-level-await': true
+    }
 };
 
 //  config  ---

@@ -3,17 +3,20 @@ project(base91lib)
 find_package(unofficial-base91 CONFIG REQUIRED)
 
 # See:  https://github.com/emscripten-core/emscripten/blob/main/src/settings.js
-set(CPP_FLAGS
-
+set(EM_CPP_FLAGS
+    ${EM_CPP_FLAGS}
 )
-string(REPLACE ";" " " CPP_FLAGS "${CPP_FLAGS}")
+string(REPLACE ";" " " CPP_FLAGS "${EM_CPP_FLAGS}")
 
-set(LINK_FLAGS
+set(EM_LINK_FLAGS
+    ${EM_LINK_FLAGS}
+    "-sMODULARIZE=0" 
+    "-sEXPORT_ES6=0"
     "-sPURE_WASI=1"
     "-sSTANDALONE_WASM=1"
     "--no-entry"
 )
-string(REPLACE ";" " " LINK_FLAGS "${LINK_FLAGS}")
+string(REPLACE ";" " " LINK_FLAGS "${EM_LINK_FLAGS}")
 
 #  Generate C bindings from WIT file  --- 
 add_custom_command(

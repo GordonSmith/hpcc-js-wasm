@@ -11,5 +11,8 @@ await neutralTpl("src/index.ts", "dist/index", {
             "import.meta.url": "''",
         }),
         sfxWasm()
-    ]
+    ],
+    supported: {
+        'top-level-await': true
+    }
 });
