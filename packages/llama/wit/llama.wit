@@ -1,0 +1,51 @@
+package hpcc-js:llama;
+
+interface llama {
+    
+    /// Write a file to the WASI filesystem
+    /// 
+    /// Parameters:
+    /// - path: The file path
+    /// - data: The file contents as bytes
+    /// 
+    /// Returns: true if successful
+    write-file: func(path: string, data: list<u8>) -> bool;
+    
+    /// Read a file from the WASI filesystem
+    /// 
+    /// Parameters:
+    /// - path: The file path
+    /// 
+    /// Returns: The file contents as bytes, or empty if not found
+    read-file: func(path: string) -> list<u8>;
+    
+    /// Delete a file from the WASI filesystem
+    /// 
+    /// Parameters:
+    /// - path: The file path
+    /// 
+    /// Returns: true if successful
+    delete-file: func(path: string) -> bool;
+    
+    /// Calculate vector embeddings for input text using a model
+    /// 
+    /// Parameters:
+    /// - text: The input text to embed
+    /// - model: The GGUF model data as bytes
+    /// - format: Output format ("array" or "json")
+    /// 
+    /// Returns: A list of embedding vectors, where each vector is a list of f32 values
+    embedding: func(args: list<string>) -> list<string>;
+    
+    /// Generate text using a language model
+    /// 
+    /// Parameters:
+    /// - args: Command-line style arguments for the llama.cpp main function
+    /// 
+    /// Returns: A list of output strings (stdout and stderr)
+    main: func(args: list<string>) -> list<string>;
+}
+
+world root {
+    export llama;
+}

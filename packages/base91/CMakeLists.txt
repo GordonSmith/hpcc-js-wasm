@@ -27,7 +27,7 @@ add_custom_command(
     VERBATIM
 )
 
-add_custom_target(generate_base91_bindings
+add_custom_target(generate_${PROJECT_NAME}_bindings
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/root.c ${CMAKE_CURRENT_BINARY_DIR}/root.h ${CMAKE_CURRENT_BINARY_DIR}/root_component_type.o
 )
 #  ---  ---  ---
@@ -37,34 +37,30 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-add_executable(base91lib
+add_executable(${PROJECT_NAME}
     src-cpp/main.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/root.c
     ${CMAKE_CURRENT_BINARY_DIR}/root.h
 )
 
-add_dependencies(base91lib generate_base91_bindings)
+add_dependencies(${PROJECT_NAME} generate_${PROJECT_NAME}_bindings)
 
-set_target_properties(base91lib PROPERTIES COMPILE_FLAGS "${CPP_FLAGS}")
-set_target_properties(base91lib PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
+set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "${CPP_FLAGS}")
+set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}" SUFFIX ".wasm")
 
-target_link_libraries(base91lib
+target_link_libraries(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}/root_component_type.o
     unofficial::base91::base91
 )
 
-set_target_properties(base91lib PROPERTIES 
-    OUTPUT_NAME "base91lib"
-    SUFFIX ".wasm"
-)
-
 #  Generate WASM Component from core module  ---
 add_custom_command(
-    TARGET base91lib POST_BUILD
+    TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E echo "Creating WASM component from core module..."
-    COMMAND wasm-tools component new $<TARGET_FILE:base91lib> --adapt ${CMAKE_SOURCE_DIR}/node_modules/@bytecodealliance/jco/lib/wasi_snapshot_preview1.reactor.wasm -o ${CMAKE_CURRENT_BINARY_DIR}/base91lib.component.wasm
+    COMMAND wasm-tools component new $<TARGET_FILE:${PROJECT_NAME}> --adapt ${CMAKE_SOURCE_DIR}/node_modules/@bytecodealliance/jco/lib/wasi_snapshot_preview1.reactor.wasm -o ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.component.wasm
     COMMAND ${CMAKE_COMMAND} -E echo "Transpiling component to JavaScript..."
-    COMMAND npx jco transpile -b 10000000 --no-nodejs-compat ${CMAKE_CURRENT_BINARY_DIR}/base91lib.component.wasm -o ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND npx jco transpile -b 10000000 --no-nodejs-compat ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.component.wasm -o ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Creating and transpiling WASM component"
     VERBATIM
 )

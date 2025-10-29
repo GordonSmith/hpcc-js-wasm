@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Llama, WebBlob } from "@hpcc-js/wasm-llama";
+import { Llama, WebBlob } from "../src/index.ts";
 
 describe("llama", () => {
     it("version", async () => {
@@ -35,14 +35,14 @@ describe("llama", () => {
         expect(data).to.be.instanceOf(ArrayBuffer);
         expect(data.byteLength).to.be.greaterThan(0);
 
-        const embeddings = llama.embedding("Hello and Welcome!", new Uint8Array(data));
+        const embeddings = await llama.embedding("Hello and Welcome!", new Uint8Array(data));
         expect(embeddings).to.be.instanceOf(Array);
         expect(embeddings.length).equals(1);
         expect(embeddings[0]).to.be.a.instanceOf(Array);
         expect(embeddings[0].length).to.be.greaterThan(0);
         expect(embeddings[0][0]).to.be.a("number");
 
-        const embeddings2 = llama.embedding("Hello and Welcome!", new Uint8Array(data));
+        const embeddings2 = await llama.embedding("Hello and Welcome!", new Uint8Array(data));
         expect(embeddings2).to.be.instanceOf(Array);
         expect(embeddings2.length).equals(1);
         expect(embeddings2[0]).to.be.a.instanceOf(Array);
@@ -54,7 +54,7 @@ describe("llama", () => {
         Llama.unload();
         llama = await Llama.load();
 
-        const embeddings3 = llama.embedding("Hello and Welcome!", new Uint8Array(data));
+        const embeddings3 = await llama.embedding("Hello and Welcome!", new Uint8Array(data));
         expect(embeddings3).to.be.instanceOf(Array);
         expect(embeddings3.length).equals(1);
         expect(embeddings3[0]).to.be.a.instanceOf(Array);

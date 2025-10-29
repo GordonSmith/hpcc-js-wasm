@@ -398,11 +398,11 @@ namespace embedding
         return 0;
     }
 }
-//  ---  EMSCRIPTEN BINDINGS  ---  EMSCRIPTEN BINDINGS  ---  EMSCRIPTEN BINDINGS  ---  EMSCRIPTEN BINDINGS  ---
-
 #include "util.hpp"
-int embeddingMain(const std::vector<std::string> &args, std::vector<std::string> &retVal)
+int embeddingMain(std::vector<std::string> &args, std::vector<std::string> &retVal)
 {
+    args.insert(args.begin(), "llamalib.wasm");
+
     ArgBuffer argBuffer(args);
     int ret = 0;
     {
@@ -415,8 +415,28 @@ int embeddingMain(const std::vector<std::string> &args, std::vector<std::string>
     return ret;
 }
 
-#include <emscripten/bind.h>
-EMSCRIPTEN_BINDINGS(llama_embedding)
+#include "root.h"
+
+void exports_hpcc_js_llama_llama_embedding(root_list_string_t *args, root_list_string_t *ret)
 {
-    emscripten::function("embedding", &embeddingMain);
+    // Convert root_list_string_t to std::vector<std::string>
+    std::vector<std::string> argVector;
+    for (size_t i = 0; i < args->len; i++)
+    {
+        const char *str_ptr = reinterpret_cast<const char *>(args->ptr[i].ptr);
+        size_t str_len = args->ptr[i].len;
+        argVector.push_back(std::string(str_ptr, str_len));
+    }
+
+    // Call the embedding function
+    std::vector<std::string> retVector;
+    embeddingMain(argVector, retVector);
+
+    // Convert std::vector<std::string> back to root_list_string_t
+    ret->len = retVector.size();
+    ret->ptr = (root_string_t *)malloc(sizeof(root_string_t) * retVector.size());
+    for (size_t i = 0; i < retVector.size(); i++)
+    {
+        root_string_set(&ret->ptr[i], retVector[i].c_str());
+    }
 }

@@ -1117,7 +1117,6 @@ namespace main
     }
 }
 
-//  ---  EMSCRIPTEN BINDINGS  ---  EMSCRIPTEN BINDINGS  ---  EMSCRIPTEN BINDINGS  ---  EMSCRIPTEN BINDINGS  ---
 #include "util.hpp"
 int mainMain(std::vector<std::string> &args, std::vector<std::string> &retVal)
 {
@@ -1142,9 +1141,28 @@ int mainMain(std::vector<std::string> &args, std::vector<std::string> &retVal)
     return ret;
 }
 
-#include <emscripten/bind.h>
-EMSCRIPTEN_BINDINGS(llama_module)
+#include "root.h"
+
+void exports_hpcc_js_llama_llama_main(root_list_string_t *args, root_list_string_t *ret)
 {
-    emscripten::register_vector<std::string>("VectorString");
-    emscripten::function("main", &mainMain);
+    // Convert root_list_string_t to std::vector<std::string>
+    std::vector<std::string> argVector;
+    for (size_t i = 0; i < args->len; i++)
+    {
+        const char *str_ptr = reinterpret_cast<const char *>(args->ptr[i].ptr);
+        size_t str_len = args->ptr[i].len;
+        argVector.push_back(std::string(str_ptr, str_len));
+    }
+
+    // Call the main function
+    std::vector<std::string> retVector;
+    mainMain(argVector, retVector);
+
+    // Convert std::vector<std::string> back to root_list_string_t
+    ret->len = retVector.size();
+    ret->ptr = (root_string_t *)malloc(sizeof(root_string_t) * retVector.size());
+    for (size_t i = 0; i < retVector.size(); i++)
+    {
+        root_string_set(&ret->ptr[i], retVector[i].c_str());
+    }
 }

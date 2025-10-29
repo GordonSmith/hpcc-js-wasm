@@ -1,11 +1,25 @@
-// @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
-import load, { reset } from "../../../build/packages/llama/src-cpp/llamalib.wasm";
-import type { MainModule } from "../../../build/packages/llama/src-cpp/llamalib.js";
+import { llama } from "../../../build/packages/llama/llamalib.component.js";
 import llamaMeta from "../../../vcpkg-overlays/llama/vcpkg.json" with { type: "json" };
 
 //  Ref:  https://github.com/ggerganov/llama.cpp
 //  Ref:  http://facebook.github.io/llama/llama_manual.html
 //  Ref:  https://github.com/facebook/llama
+
+// Dynamic import of the filesystem shim
+let _setFileData: ((fileData: any) => void) | undefined;
+async function getSetFileData() {
+    if (!_setFileData) {
+        try {
+            const fs = await import("@bytecodealliance/preview2-shim/filesystem");
+            _setFileData = (fs as any)._setFileData;
+        } catch (e) {
+            console.error("Failed to load filesystem shim:", e);
+        }
+    }
+    return _setFileData;
+}
+
+let g_llama: Llama | undefined;
 
 /**
  * The llama WASM library, provides a simplified wrapper around the llama.cpp library.
@@ -26,7 +40,7 @@ import llamaMeta from "../../../vcpkg-overlays/llama/vcpkg.json" with { type: "j
  */
 export class Llama {
 
-    private constructor(protected _module: MainModule) {
+    private constructor() {
     }
 
     /**
@@ -38,17 +52,20 @@ export class Llama {
      * 
      * @returns A promise to an instance of the Llama class.
      */
-    static load(): Promise<Llama> {
-        return load().then((module: any) => {
-            return new Llama(module);
-        });
+    static async load(): Promise<Llama> {
+        if (!g_llama) {
+            // Wait a tick to ensure the component module is fully loaded
+            await new Promise(resolve => setTimeout(resolve, 0));
+            g_llama = new Llama();
+        }
+        return g_llama;
     }
 
     /**
      * Unloades the compiled wasm instance.
      */
     static unload() {
-        reset();
+        g_llama = undefined;
     }
 
     /**
@@ -63,34 +80,75 @@ export class Llama {
      * 
      * @param text The input text.
      * @param model The model to use for the embedding.
+     * @param format The output format ("array" or "json")
      * 
      * @returns The embedding of the text using the model.
      */
-    embedding(text: string, model: Uint8Array, format: string = "array"): number[][] {
-        try {
-            this._module.FS_createDataFile("/", "embeddingModel.gguf", model, true, false, false);
-        } catch (e) {
-            console.error(e);
-        }
-        const args = new this._module.VectorString();
-        args.push_back("-m"); args.push_back("/embeddingModel.gguf");
-        args.push_back("--pooling"); args.push_back("mean");
-        args.push_back("--log-disable");
-        args.push_back("-p"); args.push_back(text);
-        args.push_back("--embd-output-format"); args.push_back(format);
-        const embeddingResult = new this._module.VectorString();
+    async embedding(text: string, model: Uint8Array, format: string = "array"): Promise<number[][]> {
+        const modelPath = "embeddingModel.gguf";
         let retVal: number[][] = [];
+
         try {
-            this._module.embedding(args, embeddingResult);
-            const cout = embeddingResult.get(0);
-            retVal = JSON.parse(cout);
+            // Set up virtual filesystem with the model file
+            const setFileData = await getSetFileData();
+            if (!setFileData) {
+                console.error("Failed to load filesystem shim");
+                return retVal;
+            }
+
+            console.log("[embedding] Setting up virtual filesystem with model file, size:", model.byteLength);
+            setFileData({
+                dir: {
+                    [modelPath]: {
+                        source: model
+                    }
+                }
+            });
+            console.log("[embedding] Virtual filesystem set up complete");
+
+            // Build command-line arguments for the embedding function
+            const args: string[] = [
+                "-m", modelPath,
+                "--pooling", "mean",
+                "--log-disable",
+                "-p", text,
+                "--embd-output-format", format
+            ];
+
+            console.log("[embedding] Calling llama.embedding with args:", args);
+            // Call the WIT interface
+            const result = llama.embedding(args);
+            console.log("[embedding] Got result:", result);
+
+            // Parse the output - first element should be stdout with JSON
+            if (result.length > 0 && result[0]) {
+                const stdout = result[0];
+                try {
+                    retVal = JSON.parse(stdout);
+                } catch (e) {
+                    console.error("Failed to parse embedding output:", stdout);
+                    console.error(e);
+                }
+            }
+
+            // Log any stderr output (second element)
+            if (result.length > 1 && result[1]) {
+                console.error("Embedding stderr:", result[1]);
+            }
         } catch (e) {
-            console.error(e);
+            console.error("Embedding error:", e);
         } finally {
-            embeddingResult.delete();
-            args.delete();
-            this._module.FS_unlink("/embeddingModel.gguf");
+            // Clean up - reset the filesystem
+            try {
+                const setFileData = await getSetFileData();
+                if (setFileData) {
+                    setFileData({ dir: {} });
+                }
+            } catch (e) {
+                console.error("Failed to clean up filesystem:", e);
+            }
         }
+
         return retVal;
     }
 }

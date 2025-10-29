@@ -4,6 +4,7 @@ import { replaceFunction, replaceString } from "../../utils/esbuild-plugins.js";
 
 //  config  ---
 await neutralTpl("src/index.ts", "dist/index", {
+    external: ["@bytecodealliance/preview2-shim"],
     plugins: [
         replaceFunction({
             'findWasmBinary': 'const findWasmBinary=()=>"";'
@@ -15,5 +16,7 @@ await neutralTpl("src/index.ts", "dist/index", {
     ],
     supported: {
         'top-level-await': true
-    }
+    },
+    // Ensure source maps include source content for better debugging
+    sourcesContent: true
 });
