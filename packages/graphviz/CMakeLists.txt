@@ -10,46 +10,57 @@ message("Graphviz include directories: ${Graphviz_INCLUDE_DIRS}")
 find_package(expat CONFIG REQUIRED)
 
 # See:  https://github.com/emscripten-core/emscripten/blob/main/src/settings.js
+set(EM_CPP_FLAGS
+    ${EM_CPP_FLAGS}
+    "-fno-exceptions"
+    "-fno-rtti"
+)
 string(REPLACE ";" " " CPP_FLAGS "${EM_CPP_FLAGS}")
 
+# For WASI component builds, we need minimal Emscripten flags
+# Remove JavaScript-specific flags that are incompatible with wasm-tools component
 set(EM_LINK_FLAGS 
-    ${EM_LINK_FLAGS}
-    "-sFILESYSTEM=1"
-    "-sEXPORT_NAME='${CMAKE_PROJECT_NAME}'"
-    "-sEXPORTED_FUNCTIONS=\"['_free', '_malloc']\""
-    "-sEXPORTED_RUNTIME_METHODS=\"[UTF8ToString]\""
-    "--post-js ${CMAKE_CURRENT_BINARY_DIR}/main_glue.js"
-    "--emit-tsd ${CMAKE_CURRENT_BINARY_DIR}/graphvizlib.d.ts"
+    "--no-entry"
+    "-Wl,--export-all"
+    "-fno-exceptions"
+    "-s" "DISABLE_EXCEPTION_CATCHING=1"
+    "-s" "DISABLE_EXCEPTION_THROWING=1"
+    "-s" "STANDALONE_WASM"
 )
 string(REPLACE ";" " " LINK_FLAGS "${EM_LINK_FLAGS}")
 
-#  Generate Glue from IDL file  ---
+#  Generate C bindings from WIT file  --- 
 add_custom_command(
-    MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/main.idl
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/main_glue.js ${CMAKE_CURRENT_BINARY_DIR}/main_glue.cpp
-    COMMAND python3 ${CMAKE_BINARY_DIR}/../emsdk/upstream/emscripten/tools/webidl_binder.py ${CMAKE_CURRENT_SOURCE_DIR}/main.idl ${CMAKE_CURRENT_BINARY_DIR}/main_glue
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/root.c ${CMAKE_CURRENT_BINARY_DIR}/root.h ${CMAKE_CURRENT_BINARY_DIR}/root_component_type.o
+    COMMAND wit-bindgen c ${CMAKE_CURRENT_SOURCE_DIR}/wit/graphviz.wit --out-dir ${CMAKE_CURRENT_BINARY_DIR}
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/wit/graphviz.wit
+    COMMENT "Generating C bindings from WIT file"
+    VERBATIM
 )
-set_property(SOURCE main.cpp APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/main_glue.cpp)
-#  ---  ---  ---
 
-set(SRCS
-    main.hpp
-    main.cpp
-    util.hpp
-    util.cpp
+add_custom_target(generate_${PROJECT_NAME}_bindings
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/root.c ${CMAKE_CURRENT_BINARY_DIR}/root.h ${CMAKE_CURRENT_BINARY_DIR}/root_component_type.o
 )
+#  ---  ---  ---
 
 include_directories(
     ${Graphviz_INCLUDE_DIRS}/graphviz
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-add_executable(graphvizlib
-    ${SRCS}
+add_executable(${PROJECT_NAME}
+    src-cpp/main.cpp
+    src-cpp/util.cpp
+    src-cpp/exception_stubs.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/root.c
+    ${CMAKE_CURRENT_BINARY_DIR}/root.h
 )
 
-set_target_properties(graphvizlib PROPERTIES COMPILE_FLAGS "${CPP_FLAGS}")
-set_target_properties(graphvizlib PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
+add_dependencies(${PROJECT_NAME} generate_${PROJECT_NAME}_bindings)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "${CPP_FLAGS}")
+set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}" SUFFIX ".wasm")
 
 # link libraries
 function(add_graphviz_library library)
@@ -88,8 +99,20 @@ add_graphviz_library(vpsc)
 
 target_link_libraries(graphvizlib PRIVATE
     ${EXPAT_LIBRARIES}
+    ${CMAKE_CURRENT_BINARY_DIR}/root_component_type.o
 )
 
+
+#  Generate WASM Component from core module  ---
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E echo "Creating WASM component from core module..."
+    COMMAND wasm-tools component new $<TARGET_FILE:${PROJECT_NAME}> --adapt ${CMAKE_SOURCE_DIR}/node_modules/@bytecodealliance/jco/lib/wasi_snapshot_preview1.reactor.wasm -o ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.component.wasm
+    COMMAND ${CMAKE_COMMAND} -E echo "Transpiling component to JavaScript..."
+    COMMAND npx jco transpile -b 10000000 --no-nodejs-compat ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.component.wasm -o ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Creating and transpiling WASM component"
+    VERBATIM
+)
 # add_executable(graphvizlib-web
 #     ${SRCS}
 # )

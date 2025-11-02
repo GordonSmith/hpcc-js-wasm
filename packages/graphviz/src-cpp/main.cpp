@@ -4,7 +4,7 @@
 #include <gvplugin.h>
 #include <graphviz_version.h>
 
-#include <emscripten.h>
+#include "root.h"
 
 extern gvplugin_library_t gvplugin_dot_layout_LTX_library;
 extern gvplugin_library_t gvplugin_neato_layout_LTX_library;
@@ -59,6 +59,11 @@ const char *Graphviz::lastError()
 
 Graphviz::Graphviz(int yInvert, int nop)
 {
+    configure(yInvert, nop);
+}
+
+void Graphviz::configure(int yInvert, int nop)
+{
     Y_invert = yInvert > 0 ? yInvert : origYInvert;
     Nop = nop > 0 ? nop : origNop;
 
@@ -74,15 +79,20 @@ Graphviz::~Graphviz()
 
 void Graphviz::createFile(const char *path, const char *data)
 {
-    EM_ASM(
-        {
-            var path = UTF8ToString($0);
-            var data = UTF8ToString($1);
+    // TODO: Implement WASI file system support
+    // For now, this is disabled when building as a WASI component
+    (void)path;
+    (void)data;
 
-            FS.createPath("/", PATH.dirname(path));
-            FS.writeFile(PATH.join("/", path), data);
-        },
-        path, data);
+    // EM_ASM(
+    //     {
+    //         var path = UTF8ToString($0);
+    //         var data = UTF8ToString($1);
+
+    //         FS.createPath("/", PATH.dirname(path));
+    //         FS.writeFile(PATH.join("/", path), data);
+    //     },
+    //     path, data);
 }
 
 const char *Graphviz::layout(const char *src, const char *format, const char *engine)
@@ -165,5 +175,121 @@ const char *Graphviz::unflatten(const char *src, int maxMinlen, bool do_fans, in
     return unflatten_out;
 }
 
-//  Include JS Glue  ---
-#include "main_glue.cpp"
+namespace
+{
+    std::string to_std_string(const root_string_t *value)
+    {
+        if (!value || value->ptr == nullptr || value->len == 0)
+        {
+            return std::string();
+        }
+        return std::string(reinterpret_cast<const char *>(value->ptr), value->len);
+    }
+}
+
+extern "C"
+{
+    exports_hpcc_js_graphviz_resources_own_graphviz_t exports_hpcc_js_graphviz_resources_constructor_graphviz(void)
+    {
+        auto *instance = new Graphviz();
+        return exports_hpcc_js_graphviz_resources_graphviz_new(reinterpret_cast<exports_hpcc_js_graphviz_resources_graphviz_t *>(instance));
+    }
+
+    void exports_hpcc_js_graphviz_resources_graphviz_destructor(exports_hpcc_js_graphviz_resources_graphviz_t *rep)
+    {
+        auto *instance = reinterpret_cast<Graphviz *>(rep);
+        delete instance;
+    }
+
+    void exports_hpcc_js_graphviz_resources_method_graphviz_init(exports_hpcc_js_graphviz_resources_borrow_graphviz_t self, int32_t y_invert, int32_t nop)
+    {
+        auto *instance = reinterpret_cast<Graphviz *>(self);
+        instance->configure(y_invert, nop);
+    }
+
+    void exports_hpcc_js_graphviz_resources_method_graphviz_version(exports_hpcc_js_graphviz_resources_borrow_graphviz_t /*self*/, root_string_t *ret)
+    {
+        root_string_dup(ret, Graphviz::version());
+    }
+
+    void exports_hpcc_js_graphviz_resources_method_graphviz_last_error(exports_hpcc_js_graphviz_resources_borrow_graphviz_t /*self*/, root_string_t *ret)
+    {
+        root_string_dup(ret, Graphviz::lastError());
+    }
+
+    void exports_hpcc_js_graphviz_resources_method_graphviz_create_file(exports_hpcc_js_graphviz_resources_borrow_graphviz_t self, root_string_t *file, root_string_t *data)
+    {
+        auto *instance = reinterpret_cast<Graphviz *>(self);
+        const auto fileStr = to_std_string(file);
+        const auto dataStr = to_std_string(data);
+        instance->createFile(fileStr.c_str(), dataStr.c_str());
+    }
+
+    void exports_hpcc_js_graphviz_resources_method_graphviz_layout_result(exports_hpcc_js_graphviz_resources_borrow_graphviz_t self, root_string_t *ret)
+    {
+        auto *instance = reinterpret_cast<Graphviz *>(self);
+        root_string_dup(ret, instance->layout_result);
+    }
+
+    void exports_hpcc_js_graphviz_resources_method_graphviz_layout(exports_hpcc_js_graphviz_resources_borrow_graphviz_t self, root_string_t *dot, root_string_t *format, root_string_t *engine, root_string_t *ret)
+    {
+        auto *instance = reinterpret_cast<Graphviz *>(self);
+        const auto dotStr = to_std_string(dot);
+        const auto formatStr = to_std_string(format);
+        const auto engineStr = to_std_string(engine);
+        const char *result = instance->layout(dotStr.c_str(), formatStr.c_str(), engineStr.c_str());
+        root_string_dup(ret, result);
+    }
+
+    void exports_hpcc_js_graphviz_resources_method_graphviz_acyclic_out_file(exports_hpcc_js_graphviz_resources_borrow_graphviz_t self, root_string_t *ret)
+    {
+        auto *instance = reinterpret_cast<Graphviz *>(self);
+        root_string_dup(ret, instance->acyclic_outFile);
+    }
+
+    int32_t exports_hpcc_js_graphviz_resources_method_graphviz_acyclic_num_rev(exports_hpcc_js_graphviz_resources_borrow_graphviz_t self)
+    {
+        auto *instance = reinterpret_cast<Graphviz *>(self);
+        return static_cast<int32_t>(instance->acyclic_num_rev);
+    }
+
+    void exports_hpcc_js_graphviz_resources_method_graphviz_set_acyclic_num_rev(exports_hpcc_js_graphviz_resources_borrow_graphviz_t self, int32_t value)
+    {
+        auto *instance = reinterpret_cast<Graphviz *>(self);
+        instance->acyclic_num_rev = static_cast<size_t>(value);
+    }
+
+    bool exports_hpcc_js_graphviz_resources_method_graphviz_acyclic(exports_hpcc_js_graphviz_resources_borrow_graphviz_t self, root_string_t *dot, bool do_write, bool verbose)
+    {
+        auto *instance = reinterpret_cast<Graphviz *>(self);
+        const auto dotStr = to_std_string(dot);
+        return instance->acyclic(dotStr.c_str(), do_write, verbose);
+    }
+
+    void exports_hpcc_js_graphviz_resources_method_graphviz_tred_out(exports_hpcc_js_graphviz_resources_borrow_graphviz_t self, root_string_t *ret)
+    {
+        auto *instance = reinterpret_cast<Graphviz *>(self);
+        root_string_dup(ret, instance->tred_out);
+    }
+
+    void exports_hpcc_js_graphviz_resources_method_graphviz_tred_err(exports_hpcc_js_graphviz_resources_borrow_graphviz_t self, root_string_t *ret)
+    {
+        auto *instance = reinterpret_cast<Graphviz *>(self);
+        root_string_dup(ret, instance->tred_err);
+    }
+
+    void exports_hpcc_js_graphviz_resources_method_graphviz_tred(exports_hpcc_js_graphviz_resources_borrow_graphviz_t self, root_string_t *dot, bool verbose, bool print_removed_edges)
+    {
+        auto *instance = reinterpret_cast<Graphviz *>(self);
+        const auto dotStr = to_std_string(dot);
+        instance->tred(dotStr.c_str(), verbose, print_removed_edges);
+    }
+
+    void exports_hpcc_js_graphviz_resources_method_graphviz_unflatten(exports_hpcc_js_graphviz_resources_borrow_graphviz_t self, root_string_t *dot, int32_t max_minlen, bool do_fans, int32_t chain_limit, root_string_t *ret)
+    {
+        auto *instance = reinterpret_cast<Graphviz *>(self);
+        const auto dotStr = to_std_string(dot);
+        const char *result = instance->unflatten(dotStr.c_str(), max_minlen, do_fans, chain_limit);
+        root_string_dup(ret, result);
+    }
+}

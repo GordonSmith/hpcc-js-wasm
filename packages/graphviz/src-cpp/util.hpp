@@ -18,6 +18,8 @@ class TempFileBuffer
 {
 private:
     FILE *filePointer = nullptr;
+    char *buffer = nullptr;
+    size_t bufferSize = 0;
     char tempFileName[L_tmpnam];
 
 public:

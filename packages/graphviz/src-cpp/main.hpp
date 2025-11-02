@@ -9,6 +9,8 @@ public:
     Graphviz(int yInvert = 0, int nop = 0);
     ~Graphviz();
 
+    void configure(int yInvert = 0, int nop = 0);
+
     void createFile(const char *path, const char *data);
 
     StringBuffer layout_result;

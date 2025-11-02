@@ -1,5 +1,6 @@
-// @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
-import load, { reset } from "../../../build/packages/graphviz/src-cpp/graphvizlib.wasm";
+import { resources } from "../../../build/packages/graphviz/graphvizlib.component.js";
+
+const GraphvizWasm = resources.Graphviz;
 
 /**
  * Various graphic and data formats for end user, web, documents and other applications.  See [Output Formats](https://graphviz.gitlab.io/docs/outputs/) for more information.
@@ -92,36 +93,31 @@ function createFiles(graphviz: any, _options?: Options) {
  */
 export class Graphviz {
 
-    private constructor(protected _module: any) {
+    private constructor() {
     }
 
     /**
-     * Compiles and instantiates the raw wasm.
+     * Creates an instance of the Graphviz class.
      * 
-     * ::: info
-     * In general WebAssembly compilation is disallowed on the main thread if the buffer size is larger than 4KB, hence forcing `load` to be asynchronous;
-     * :::
-     * 
-     * @returns A promise to an instance of the Graphviz class.
+     * @returns An instance of the Graphviz class.
      */
-    static load(): Promise<Graphviz> {
-        return load().then((module: any) => {
-            return new Graphviz(module);
-        });
+    static async load(): Promise<Graphviz> {
+        return new Graphviz();
     }
 
     /**
-     * Unloades the compiled wasm instance.
+     * No-op for compatibility with previous API.
      */
     static unload() {
-        reset();
+        // No-op in WASI component model
     }
 
     /**
      * @returns The Graphviz c++ version
      */
     version(): string {
-        return this._module.Graphviz.prototype.version();
+        const instance = new GraphvizWasm();
+        return instance.version();
     }
 
     /**
@@ -135,7 +131,8 @@ export class Graphviz {
      */
     layout(dotSource: string, outputFormat: Format = "svg", layoutEngine: Engine = "dot", options?: Options): string {
         if (!dotSource) return "";
-        const graphViz = new this._module.Graphviz(options?.yInvert ? 1 : 0, options?.nop ? options?.nop : 0);
+        const graphViz = new GraphvizWasm();
+        graphViz.init(options?.yInvert ? 1 : 0, options?.nop ? options?.nop : 0);
         let retVal = "";
         let errorMsg = "";
         try {
@@ -147,10 +144,9 @@ export class Graphviz {
             };
             errorMsg = graphViz.lastError() || errorMsg;
         } finally {
-            this._module.destroy(graphViz);
+            // No explicit cleanup needed in WASI component model
         }
         if (!retVal && errorMsg) {
-            Graphviz.unload();
             throw new Error(errorMsg);
         }
         return retVal;
@@ -166,7 +162,8 @@ export class Graphviz {
       */
     acyclic(dotSource: string, doWrite: boolean = false, verbose: boolean = false): { acyclic: boolean, num_rev: number, outFile: string } {
         if (!dotSource) return { acyclic: false, num_rev: 0, outFile: "" };
-        const graphViz = new this._module.Graphviz();
+        const graphViz = new GraphvizWasm();
+        graphViz.init(0, 0);
         let acyclic: boolean = false;
         let num_rev: number = 0;
         let outFile: string = "";
@@ -174,17 +171,16 @@ export class Graphviz {
         try {
             try {
                 acyclic = graphViz.acyclic(dotSource, doWrite, verbose);
-                num_rev = graphViz.acyclic_num_rev;
-                outFile = graphViz.acyclic_outFile;
+                num_rev = graphViz.acyclicNumRev();
+                outFile = graphViz.acyclicOutFile();
             } catch (e: any) {
                 errorMsg = e.message;
             };
             errorMsg = graphViz.lastError() || errorMsg;
         } finally {
-            this._module.destroy(graphViz);
+            // No explicit cleanup needed in WASI component model
         }
         if (errorMsg) {
-            Graphviz.unload();
             throw new Error(errorMsg);
         }
         return { acyclic, num_rev, outFile };
@@ -200,24 +196,24 @@ export class Graphviz {
       */
     tred(dotSource: string, verbose: boolean = false, printRemovedEdges: boolean = false): { out: string, err: string } {
         if (!dotSource) return { out: "", err: "" };
-        const graphViz = new this._module.Graphviz();
+        const graphViz = new GraphvizWasm();
+        graphViz.init(0, 0);
         let out: string = "";
         let err: string = "";
         let errorMsg = "";
         try {
             try {
                 graphViz.tred(dotSource, verbose, printRemovedEdges);
-                out = graphViz.tred_out;
-                err = graphViz.tred_err;
+                out = graphViz.tredOut();
+                err = graphViz.tredErr();
             } catch (e: any) {
                 errorMsg = e.message;
             };
             errorMsg = graphViz.lastError() || errorMsg;
         } finally {
-            this._module.destroy(graphViz);
+            // No explicit cleanup needed in WASI component model
         }
         if (!out && errorMsg) {
-            Graphviz.unload();
             throw new Error(errorMsg);
         }
         return { out, err };
@@ -234,7 +230,8 @@ export class Graphviz {
      */
     unflatten(dotSource: string, maxMinlen: number = 0, do_fans: boolean = false, chainLimit: number = 0): string {
         if (!dotSource) return "";
-        const graphViz = new this._module.Graphviz();
+        const graphViz = new GraphvizWasm();
+        graphViz.init(0, 0);
         let retVal = "";
         let errorMsg = "";
         try {
@@ -245,10 +242,9 @@ export class Graphviz {
             };
             errorMsg = graphViz.lastError() || errorMsg;
         } finally {
-            this._module.destroy(graphViz);
+            // No explicit cleanup needed in WASI component model
         }
         if (!retVal && errorMsg) {
-            Graphviz.unload();
             throw new Error(errorMsg);
         }
         return retVal;

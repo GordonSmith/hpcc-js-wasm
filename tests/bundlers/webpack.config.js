@@ -36,11 +36,24 @@ export default {
         asyncWebAssembly: true,
         outputModule: true
     },
-    externals: {
+    externals: [
         // Don't bundle Node.js modules
-        'fs': 'node:fs',
-        'path': 'node:path',
-        'crypto': 'node:crypto',
-        'util': 'node:util'
-    }
+        {
+            'fs': 'node:fs',
+            'path': 'node:path',
+            'crypto': 'node:crypto',
+            'util': 'node:util',
+            'url': 'node:url',
+            'worker_threads': 'node:worker_threads',
+            'process': 'node:process'
+        },
+        // Keep preview2-shim external to avoid bundling issues with worker threads
+        function ({ request }, callback) {
+            if (request && request.includes('@bytecodealliance/preview2-shim')) {
+                return callback(null, 'module ' + request);
+            }
+            callback();
+        }
+    ],
+    externalsType: 'module'
 };

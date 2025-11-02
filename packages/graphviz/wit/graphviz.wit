@@ -1,0 +1,30 @@
+package hpcc-js:graphviz;
+
+interface resources {
+    resource graphviz {
+        constructor();
+        init: func(y-invert: s32, nop: s32);
+
+        version: func() -> string;
+        last-error: func() -> string;
+        create-file: func(file: string, data: string);
+
+        layout-result: func() -> string;
+        layout: func(dot: string, format: string, engine: string) -> string;
+
+        acyclic-out-file: func() -> string;
+        acyclic-num-rev: func() -> s32;
+        set-acyclic-num-rev: func(value: s32);
+        acyclic: func(dot: string, do-write: bool, verbose: bool) -> bool;
+
+        tred-out: func() -> string;
+        tred-err: func() -> string;
+        tred: func(dot: string, verbose: bool, print-removed-edges: bool);
+
+        unflatten: func(dot: string, max-minlen: s32, do-fans: bool, chain-limit: s32) -> string;
+    }
+}
+
+world root {
+    export resources;
+}

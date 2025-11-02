@@ -83,6 +83,6 @@ endif ()
 
 add_subdirectory(packages/base91)
 add_subdirectory(packages/expat)
-add_subdirectory(packages/graphviz/src-cpp)
+add_subdirectory(packages/graphviz)
 add_subdirectory(packages/llama)
 add_subdirectory(packages/zstd)

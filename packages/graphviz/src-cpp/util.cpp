@@ -18,12 +18,14 @@ StringBuffer &StringBuffer::operator=(const std::string &str)
 
 TempFileBuffer::TempFileBuffer()
 {
-    if (std::tmpnam(tempFileName) == nullptr)
-        throw std::runtime_error("Failed to generate a unique temporary file name.");
-
-    filePointer = std::fopen(tempFileName, "w+");
+    // For WASI, use open_memstream to create an in-memory file stream
+    filePointer = open_memstream(&buffer, &bufferSize);
     if (filePointer == nullptr)
-        throw std::runtime_error("Failed to open temporary file for writing.");
+    {
+        buffer = nullptr;
+        bufferSize = 0;
+    }
+    tempFileName[0] = '\0';
 }
 
 TempFileBuffer::~TempFileBuffer()
@@ -31,7 +33,10 @@ TempFileBuffer::~TempFileBuffer()
     if (filePointer != nullptr)
     {
         std::fclose(filePointer);
-        std::remove(tempFileName);
+        if (buffer != nullptr)
+        {
+            free(buffer);
+        }
     }
 }
 
@@ -43,15 +48,11 @@ TempFileBuffer::operator FILE *() const
 TempFileBuffer::operator std::string() const
 {
     std::string content;
-    if (filePointer != nullptr)
+    if (filePointer != nullptr && buffer != nullptr)
     {
-        std::rewind(filePointer);
-        std::fseek(filePointer, 0, SEEK_END);
-        long fileSize = std::ftell(filePointer);
-        std::rewind(filePointer);
-
-        content.resize(fileSize);
-        std::fread(&content[0], 1, fileSize, filePointer);
+        // Flush the stream to ensure all data is in the buffer
+        std::fflush(filePointer);
+        content = std::string(buffer, bufferSize);
     }
     return content;
 }

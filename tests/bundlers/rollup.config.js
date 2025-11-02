@@ -14,16 +14,19 @@ export default {
         }),
         commonjs()
     ],
-    external: [
+    external: (id) => {
         // Keep Node.js built-ins external
-        'fs',
-        'path',
-        'crypto',
-        'util',
-        'url',
-        'worker_threads',
-        // Keep problematic browser-only packages external to allow graceful runtime handling
-        '@hpcc-js/wasm-duckdb',
-        '@hpcc-js/wasm-llama'
-    ]
+        if (id.startsWith('node:') || ['fs', 'path', 'crypto', 'util', 'url', 'worker_threads', 'process'].includes(id)) {
+            return true;
+        }
+        // Keep preview2-shim external to avoid bundling issues with worker threads
+        if (id.includes('@bytecodealliance/preview2-shim')) {
+            return true;
+        }
+        // Keep WASM packages external so they can be dynamically imported properly
+        if (id.includes('@hpcc-js/wasm-')) {
+            return true;
+        }
+        return false;
+    }
 };
