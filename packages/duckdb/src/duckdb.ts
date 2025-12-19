@@ -1,7 +1,7 @@
 // @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
 import load, { reset } from "../../../build/packages/duckdb/src-cpp/duckdblib.wasm";
 import type { MainModule, DuckDB as DuckDBGlobals, Connection, PreparedStatement, MaterializedQueryResult, QueryResult, ColumnarQueryResult } from "../../../build/packages/duckdb/src-cpp/duckdblib.js";
-import { WasmLibrary } from "./wasm-library.ts";
+import { WasmLibrary } from "@hpcc-js/wasm-util";
 
 let g_duckdb: Promise<DuckDB>;
 const textEncoder = new TextEncoder();
@@ -46,7 +46,6 @@ export class DuckDBResult extends WasmLibrary<MainModule, MaterializedQueryResul
     }
 
     print(): void {
-        // eslint-disable-next-line no-console
         console.log(this.toString());
     }
 
@@ -82,7 +81,6 @@ export class DuckDBQueryResult extends WasmLibrary<MainModule, QueryResult> {
     }
 
     print(): void {
-        // eslint-disable-next-line no-console
         console.log(this.toString());
     }
 }

@@ -1,5 +1,7 @@
 // @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
 import load, { reset } from "../../../build/packages/expat/src-cpp/expatlib.wasm";
+import type { MainModule, CExpatGlobal } from "../../../build/packages/expat/src-cpp/expatlib.js";
+import { WasmLibrary } from "@hpcc-js/wasm-util";
 
 export type Attributes = { [key: string]: string };
 export interface IParser {
@@ -46,9 +48,10 @@ function parseAttrs(attrs: string): Attributes {
  * ```
  
  */
-export class Expat {
+export class Expat extends WasmLibrary<MainModule, CExpatGlobal> {
 
-    private constructor(protected _module: any) {
+    private constructor(protected _module: MainModule) {
+        super(_module, new _module.CExpatGlobal());
     }
 
     /**
@@ -61,7 +64,7 @@ export class Expat {
      * @returns A promise to an instance of the Expat class.
      */
     static load(): Promise<Expat> {
-        return load().then((module: any) => {
+        return load().then((module: MainModule) => {
             return new Expat(module);
         });
     }
@@ -78,7 +81,7 @@ export class Expat {
      * @returns The Expat c++ version
      */
     version(): string {
-        return this._module.CExpat.version();
+        return this._module.CExpatGlobal.version();
     }
 
     /**
@@ -93,17 +96,11 @@ export class Expat {
      * @returns `true`|`false` if the XML parse succeeds.
      */
     parse(xml: string, callback: IParser): boolean {
-        const parser = new this._module.CExpat();
-        parser.setCallback({
+        return this._exports.parse(xml, {
             startElement: (tag: string, attrs: string) => callback.startElement(tag, parseAttrs(attrs)),
             endElement: (tag: string) => callback.endElement(tag),
             characterData: (content: string) => callback.characterData(content)
         });
-        parser.create();
-        const retVal = parser.parse(xml);
-        parser.destroy();
-        parser.delete();
-        return retVal;
     }
 }
 

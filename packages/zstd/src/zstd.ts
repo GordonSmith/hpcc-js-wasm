@@ -1,6 +1,8 @@
 // @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
 import load, { reset } from "../../../build/packages/zstd/src-cpp/zstdlib.wasm";
-import { WasmLibrary } from "./wasm-library.ts";
+import type { MainModule } from "../../../build/packages/zstd/src-cpp/zstdlib.js";
+import { WasmLibrary } from "@hpcc-js/wasm-util";
+type ZstdExports = MainModule["zstd"];
 
 //  Ref:  http://facebook.github.io/zstd/zstd_manual.html
 //  Ref:  https://github.com/facebook/zstd
@@ -24,9 +26,9 @@ let g_zstd: Promise<Zstd>;
  * const decompressed_data = zstd.decompress(compressed_data);
  * ```
  */
-export class Zstd extends WasmLibrary {
+export class Zstd extends WasmLibrary<MainModule, ZstdExports> {
 
-    private constructor(_module: any) {
+    private constructor(_module: MainModule) {
         super(_module, _module.zstd);
     }
 
@@ -41,9 +43,7 @@ export class Zstd extends WasmLibrary {
      */
     static load(): Promise<Zstd> {
         if (!g_zstd) {
-            g_zstd = load().then((module: any) => {
-                return new Zstd(module)
-            });
+            g_zstd = (load() as Promise<MainModule>).then((module) => new Zstd(module));
         }
         return g_zstd;
     }

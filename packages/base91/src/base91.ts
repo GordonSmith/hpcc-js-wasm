@@ -1,6 +1,7 @@
 // @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
 import load, { reset } from "../../../build/packages/base91/src-cpp/base91lib.wasm";
-import { WasmLibrary } from "./wasm-library.ts";
+import type { MainModule, CBasE91 } from "../../../build/packages/base91/src-cpp/base91lib.js";
+import { WasmLibrary } from "@hpcc-js/wasm-util";
 
 //  Ref:  http://base91.sourceforge.net/#a5
 
@@ -20,9 +21,9 @@ let g_base91: Promise<Base91>;
  * const decoded_data = await base91.decode(encoded_data);
  * ```
  */
-export class Base91 extends WasmLibrary {
+export class Base91 extends WasmLibrary<MainModule, CBasE91> {
 
-    private constructor(_module: any) {
+    private constructor(_module: MainModule) {
         super(_module, new _module.CBasE91());
     }
 
@@ -37,9 +38,7 @@ export class Base91 extends WasmLibrary {
      */
     static load(): Promise<Base91> {
         if (!g_base91) {
-            g_base91 = load().then((module: any) => {
-                return new Base91(module)
-            });
+            g_base91 = (load() as Promise<MainModule>).then((module) => new Base91(module));
         }
         return g_base91;
     }

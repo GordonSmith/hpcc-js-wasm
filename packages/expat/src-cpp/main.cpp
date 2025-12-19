@@ -18,11 +18,6 @@ protected:
     emscripten::val m_callback = emscripten::val::undefined();
 
 public:
-    static std::string version()
-    {
-        return XML_ExpatVersion();
-    }
-
     CExpat()
     {
     }
@@ -52,21 +47,6 @@ public:
     bool parse(const std::string &xml)
     {
         return BaseClass::Parse(xml.c_str(), (int)xml.size(), XML_TRUE);
-    }
-
-    std::string tag() const
-    {
-        return m_tag;
-    }
-
-    std::string attrs() const
-    {
-        return m_attrs;
-    }
-
-    std::string content() const
-    {
-        return m_content;
     }
 
     virtual void startElement()
@@ -123,19 +103,31 @@ public:
     }
 };
 
+class CExpatGlobal
+{
+public:
+    static std::string version()
+    {
+        return XML_ExpatVersion();
+    }
+
+    bool parse(const std::string &xml, emscripten::val callback)
+    {
+        CExpat parser;
+        parser.setCallback(callback);
+        parser.create();
+        auto retVal = parser.parse(xml);
+        parser.destroy();
+        return retVal;
+    }
+};
+
 EMSCRIPTEN_BINDINGS(expatlib_bindings)
 {
-    emscripten::class_<CExpat>("CExpat")
+    emscripten::class_<CExpatGlobal>("CExpatGlobal")
         .constructor<>()
-        .class_function("version", &CExpat::version)
-        .function("setCallback", &CExpat::setCallback)
-        .function("create", &CExpat::create)
-        .function("destroy", &CExpat::destroy)
-        .function("parse", &CExpat::parse)
-        .function("tag", &CExpat::tag)
-        .function("attrs", &CExpat::attrs)
-        .function("content", &CExpat::content)
-        .function("startElement", &CExpat::startElement)
-        .function("endElement", &CExpat::endElement)
-        .function("characterData", &CExpat::characterData);
+        .class_function("version", &CExpatGlobal::version)
+        .function("parse", &CExpatGlobal::parse)
+
+        ;
 }
