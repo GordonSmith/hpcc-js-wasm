@@ -27,12 +27,12 @@ type WasmLibraryExportsLike = {
  * Uses the DuckDB implementation as the baseline, with compatibility fallbacks
  * for older wrappers which expose `malloc/free` on the export object.
  */
-export class WasmLibrary<TModule extends object, TExports> {
+export class WasmLibrary<TModule extends object, TExports = undefined> {
 
     protected _module: TModule & WasmLibraryModuleLike<TExports>;
     protected _exports: TExports;
 
-    protected constructor(_module: TModule, _exports: TExports) {
+    protected constructor(_module: TModule, _exports?: TExports) {
         this._module = _module as any;
         this._exports = _exports as any;
     }

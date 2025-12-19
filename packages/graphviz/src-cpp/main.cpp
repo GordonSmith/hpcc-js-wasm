@@ -6,7 +6,6 @@
 #include <gvplugin.h>
 #include <graphviz_version.h>
 
-#include <emscripten/bind.h>
 #include <emscripten.h>
 
 extern gvplugin_library_t gvplugin_dot_layout_LTX_library;
@@ -53,7 +52,7 @@ int origYInvert = Y_invert;
 extern int Nop;
 int origNop = Nop;
 
-class Graphviz
+class CGraphviz
 {
 public:
     static std::string version()
@@ -66,7 +65,7 @@ public:
         return lastErrorStr;
     }
 
-    Graphviz(int yInvert = 0, int nop = 0)
+    CGraphviz(int yInvert = 0, int nop = 0)
     {
         Y_invert = yInvert > 0 ? yInvert : origYInvert;
         Nop = nop > 0 ? nop : origNop;
@@ -76,7 +75,7 @@ public:
         agseterrf(vizErrorf);
     }
 
-    ~Graphviz() = default;
+    ~CGraphviz() = default;
 
     void createFile(const std::string &path, const std::string &data)
     {
@@ -178,26 +177,28 @@ public:
     }
 };
 
+#include <emscripten/bind.h>
+
 EMSCRIPTEN_BINDINGS(graphvizlib_bindings)
 {
     using namespace emscripten;
 
-    class_<Graphviz>("Graphviz")
+    class_<CGraphviz>("CGraphviz")
         .constructor<>()
         .constructor<int, int>()
-        .class_function("version", &Graphviz::version)
-        .class_function("lastError", &Graphviz::lastError)
-        .function("createFile", &Graphviz::createFile)
-        .property("layout_result", &Graphviz::layout_result)
-        .function("layout", &Graphviz::layout)
-        .property("acyclic_outFile", &Graphviz::acyclic_outFile)
-        .property("acyclic_num_rev", &Graphviz::acyclic_num_rev)
-        .function("acyclic", &Graphviz::acyclic)
-        .property("tred_out", &Graphviz::tred_out)
-        .property("tred_err", &Graphviz::tred_err)
-        .function("tred", &Graphviz::tred)
-        .property("unflatten_out", &Graphviz::unflatten_out)
-        .function("unflatten", &Graphviz::unflatten)
+        .class_function("version", &CGraphviz::version)
+        .class_function("lastError", &CGraphviz::lastError)
+        .function("createFile", &CGraphviz::createFile)
+        .property("layout_result", &CGraphviz::layout_result)
+        .function("layout", &CGraphviz::layout)
+        .property("acyclic_outFile", &CGraphviz::acyclic_outFile)
+        .property("acyclic_num_rev", &CGraphviz::acyclic_num_rev)
+        .function("acyclic", &CGraphviz::acyclic)
+        .property("tred_out", &CGraphviz::tred_out)
+        .property("tred_err", &CGraphviz::tred_err)
+        .function("tred", &CGraphviz::tred)
+        .property("unflatten_out", &CGraphviz::unflatten_out)
+        .function("unflatten", &CGraphviz::unflatten)
 
         ;
 }
