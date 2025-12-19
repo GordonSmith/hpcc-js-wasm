@@ -24,7 +24,6 @@ set(EM_LINK_FLAGS
 string(REPLACE ";" " " LINK_FLAGS "${EM_LINK_FLAGS}")
 
 set(SRCS
-    main.hpp
     main.cpp
     util.hpp
     util.cpp
