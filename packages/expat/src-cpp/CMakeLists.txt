@@ -9,7 +9,7 @@ set(EM_LINK_FLAGS
     ${EM_LINK_FLAGS}
     "-sEXPORT_NAME='${CMAKE_PROJECT_NAME}'"
     "-sEXPORTED_FUNCTIONS=\"['_malloc']\""
-    "-sEXPORTED_RUNTIME_METHODS=\"[UTF8ToString]\""
+    "-sEXPORTED_RUNTIME_METHODS=\"['UTF8ToString', 'HEAPU8']\""
     "-lembind"
     "--emit-tsd ${CMAKE_CURRENT_BINARY_DIR}/expatlib.d.ts"
 )
