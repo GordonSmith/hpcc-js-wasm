@@ -6,10 +6,10 @@
 #include <emscripten/val.h>
 #include <emscripten/bind.h>
 
-class CExpat : public CExpatImpl<CExpat>
+class CExpatParser : public CExpatImpl<CExpatParser>
 {
 private:
-    typedef CExpatImpl<CExpat> BaseClass;
+    typedef CExpatImpl<CExpatParser> BaseClass;
 
 protected:
     std::string m_tag;
@@ -18,7 +18,7 @@ protected:
     emscripten::val m_callback = emscripten::val::undefined();
 
 public:
-    CExpat()
+    CExpatParser()
     {
     }
 
@@ -103,7 +103,7 @@ public:
     }
 };
 
-class CExpatGlobal
+class CExpat
 {
 public:
     static std::string version()
@@ -113,7 +113,7 @@ public:
 
     bool parse(const std::string &xml, emscripten::val callback)
     {
-        CExpat parser;
+        CExpatParser parser;
         parser.setCallback(callback);
         parser.create();
         auto retVal = parser.parse(xml);
@@ -124,10 +124,10 @@ public:
 
 EMSCRIPTEN_BINDINGS(expatlib_bindings)
 {
-    emscripten::class_<CExpatGlobal>("CExpatGlobal")
+    emscripten::class_<CExpat>("CExpat")
         .constructor<>()
-        .class_function("version", &CExpatGlobal::version)
-        .function("parse", &CExpatGlobal::parse)
+        .class_function("version", &CExpat::version)
+        .function("parse", &CExpat::parse)
 
         ;
 }

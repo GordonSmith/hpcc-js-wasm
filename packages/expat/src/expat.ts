@@ -1,6 +1,6 @@
 // @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
 import load, { reset } from "../../../build/packages/expat/src-cpp/expatlib.wasm";
-import type { MainModule, CExpatGlobal } from "../../../build/packages/expat/src-cpp/expatlib.js";
+import type { MainModule, CExpat } from "../../../build/packages/expat/src-cpp/expatlib.js";
 import { WasmLibrary } from "@hpcc-js/wasm-util";
 
 export type Attributes = { [key: string]: string };
@@ -48,10 +48,10 @@ function parseAttrs(attrs: string): Attributes {
  * ```
  
  */
-export class Expat extends WasmLibrary<MainModule, CExpatGlobal> {
+export class Expat extends WasmLibrary<MainModule, CExpat> {
 
     private constructor(protected _module: MainModule) {
-        super(_module, new _module.CExpatGlobal());
+        super(_module, new _module.CExpat());
     }
 
     /**
@@ -81,7 +81,7 @@ export class Expat extends WasmLibrary<MainModule, CExpatGlobal> {
      * @returns The Expat c++ version
      */
     version(): string {
-        return this._module.CExpatGlobal.version();
+        return this._module.CExpat.version();
     }
 
     /**
