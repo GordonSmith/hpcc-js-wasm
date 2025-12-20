@@ -14,11 +14,8 @@ string(REPLACE ";" " " CPP_FLAGS "${EM_CPP_FLAGS}")
 
 set(EM_LINK_FLAGS 
     ${EM_LINK_FLAGS}
-    "-sFILESYSTEM=1"
     "-sEXPORT_NAME='${CMAKE_PROJECT_NAME}'"
-    "-sEXPORTED_FUNCTIONS=\"['_free', '_malloc']\""
-    "-sEXPORTED_RUNTIME_METHODS=\"[UTF8ToString]\""
-    "-lembind"
+    "-sFILESYSTEM=1"
     "--emit-tsd ${CMAKE_CURRENT_BINARY_DIR}/graphvizlib.d.ts"
 )
 string(REPLACE ";" " " LINK_FLAGS "${EM_LINK_FLAGS}")

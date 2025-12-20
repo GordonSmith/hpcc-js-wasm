@@ -13,12 +13,14 @@ string(REPLACE ";" " " CPP_FLAGS "${EM_CPP_FLAGS}")
 set(EM_LINK_FLAGS 
     ${EM_LINK_FLAGS}
     "-sEXPORT_NAME='${CMAKE_PROJECT_NAME}'"
+    "-sEXPORTED_FUNCTIONS=\"['_free', '_malloc']\""
+    "-sEXPORTED_RUNTIME_METHODS=\"['UTF8ToString', 'HEAPU8']\""
     "-sFILESYSTEM=1"
     "-sFORCE_FILESYSTEM=1"
     "-sWASMFS=1"
     "-sWASM_BIGINT=1"
-    "-lembind"
     "-fwasm-exceptions"
+    "-lembind"
     "--emit-tsd ${CMAKE_CURRENT_BINARY_DIR}/duckdblib.d.ts"
 )
 string(REPLACE ";" " " LINK_FLAGS "${EM_LINK_FLAGS}")

@@ -40,6 +40,9 @@ set(EM_LINK_FLAGS
     "-sALLOW_UNIMPLEMENTED_SYSCALLS=1"
     "-sINCOMING_MODULE_JS_API=\"['wasmBinary']\""
     "--no-entry"
+    "-sEXPORTED_FUNCTIONS=\"['_free', '_malloc']\""
+    "-sEXPORTED_RUNTIME_METHODS=\"['UTF8ToString', 'HEAPU8']\""
+    "-lembind"
     "--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/src-cpp/src/pre.js"
     "--post-js ${CMAKE_CURRENT_SOURCE_DIR}/src-cpp/src/post.js"
 )

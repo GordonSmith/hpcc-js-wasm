@@ -16,7 +16,6 @@ set(EM_LINK_FLAGS
     "-sFILESYSTEM=1"
     "-sFORCE_FILESYSTEM=1"
     "-sWASMFS=1"
-    "-lembind"
     "-fwasm-exceptions"
     "--emit-tsd ${CMAKE_CURRENT_BINARY_DIR}/llamalib.d.ts"
 )
