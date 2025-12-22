@@ -5,6 +5,11 @@ project(cpp)
 option(ENABLE_SANITIZERS "Enable Clang's sanitizer options" OFF)
 
 set(CMAKE_INSTALL_PREFIX "..")
+
+set(VCPKG_ROOT ${CMAKE_SOURCE_DIR}/vcpkg)
+set(CMAKE_TOOLCHAIN_FILE ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
+set(VCPKG_INSTALLED_DIR "${CMAKE_BINARY_DIR}/vcpkg_installed")
+set(VCPKG_INSTALL_OPTIONS "--x-abi-tools-use-exact-versions;--downloads-root=${CMAKE_BINARY_DIR}/vcpkg_downloads;--x-buildtrees-root=${CMAKE_BINARY_DIR}/vcpkg_buildtrees;--x-packages-root=${CMAKE_BINARY_DIR}/vcpkg_packages;--x-install-root=${CMAKE_BINARY_DIR}/vcpkg_installed")
 set(VCPKG_INCLUDE_DIR ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include)
 
 # See:  https://github.com/emscripten-core/emscripten/blob/main/src/settings.js
@@ -14,6 +19,7 @@ set(EM_CPP_FLAGS
 )
 
 set(EM_LINK_FLAGS 
+    "-flto"
     "-sASSERTIONS=0"
     "-sINVOKE_RUN=0"
     "-sALLOW_MEMORY_GROWTH=1"
@@ -32,12 +38,12 @@ set(EM_LINK_FLAGS
     "-sPOLYFILL=0"
     # "-sSTRICT=0"
     "-sIGNORE_MISSING_MAIN=0"
+    # "-sALLOW_UNIMPLEMENTED_SYSCALLS=1"
     "-sAUTO_JS_LIBRARIES=0"
     "-sAUTO_NATIVE_LIBRARIES=0"
     "-sAUTO_ARCHIVE_INDEXES=0"
     "-sDEFAULT_TO_CXX=0"
     "-sUSE_GLFW=0"
-    "-sALLOW_UNIMPLEMENTED_SYSCALLS=1"
     "-sINCOMING_MODULE_JS_API=\"['wasmBinary']\""
     "--no-entry"
     "-sEXPORTED_FUNCTIONS=\"['_free', '_malloc']\""

@@ -10,6 +10,10 @@ message("Graphviz include directories: ${Graphviz_INCLUDE_DIRS}")
 find_package(expat CONFIG REQUIRED)
 
 # See:  https://github.com/emscripten-core/emscripten/blob/main/src/settings.js
+set(EM_CPP_FLAGS 
+    ${EM_CPP_FLAGS}
+    "-fwasm-exceptions"
+)
 string(REPLACE ";" " " CPP_FLAGS "${EM_CPP_FLAGS}")
 
 set(EM_LINK_FLAGS 
