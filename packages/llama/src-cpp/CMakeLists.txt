@@ -17,6 +17,9 @@ set(EM_LINK_FLAGS
     "-sFILESYSTEM=1"
     "-sFORCE_FILESYSTEM=1"
     "-sWASMFS=1"
+    # "-sALLOW_UNIMPLEMENTED_SYSCALLS=1"
+    #  "-pthread" 
+    #  "-sPROXY_TO_PTHREAD"
 
     "-fwasm-exceptions"
     "--emit-tsd ${CMAKE_CURRENT_BINARY_DIR}/llamalib.d.ts"
@@ -33,6 +36,7 @@ add_executable(llamalib
     embedding.cpp
     log_wasm.cpp
     util.cpp
+    stubs.c
     ${Llama_DIR}/common/common.cpp
     ${Llama_DIR}/common/sampling.cpp
 )

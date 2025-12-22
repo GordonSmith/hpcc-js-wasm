@@ -22,6 +22,8 @@ set(EM_CPP_FLAGS
 
 set(EM_LINK_FLAGS 
     "-flto"
+    "--no-entry"
+    "-lembind"
 
     "-sSTRICT=1"
     # "-sIGNORE_MISSING_MAIN=0"
@@ -32,7 +34,7 @@ set(EM_LINK_FLAGS
     # "-sALLOW_UNIMPLEMENTED_SYSCALLS=0"
     # "-sINCOMING_MODULE_JS_API=\"[]\""
 
-    "-sASSERTIONS=0"
+    # "-sASSERTIONS=0"
     "-sINVOKE_RUN=0"
     "-sALLOW_MEMORY_GROWTH=1"
     # "-sWASM=1"
@@ -49,8 +51,7 @@ set(EM_LINK_FLAGS
     "-sPOLYFILL=0"
     # "-sSTRICT=0"
     # "-sAUTO_ARCHIVE_INDEXES=0"
-    "--no-entry"    
-    # "-sINCOMING_MODULE_JS_API=\"['wasmBinary']\""
+    "-sINCOMING_MODULE_JS_API=\"['wasmBinary']\""
     "-sEXPORTED_FUNCTIONS=\"['_free', '_malloc']\""
     "-sEXPORTED_RUNTIME_METHODS=\"['UTF8ToString', 'HEAPU8']\""
     "-lembind"

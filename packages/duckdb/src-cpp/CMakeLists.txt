@@ -18,7 +18,13 @@ set(EM_LINK_FLAGS
     "-sFORCE_FILESYSTEM=1"
     "-sWASMFS=1"
     "-sWASM_BIGINT=1"
-    "-sPROXY_POSIX_SOCKETS=1"
+
+    # "-lwebsocket.js" 
+    # "-sPROXY_POSIX_SOCKETS" 
+    # "-pthread" 
+    # "-sPROXY_TO_PTHREAD"
+    # "-sPROXY_POSIX_SOCKETS=1"
+    # "-sALLOW_UNIMPLEMENTED_SYSCALLS=1"
 
     "-fwasm-exceptions"
     "--emit-tsd ${CMAKE_CURRENT_BINARY_DIR}/duckdblib.d.ts"
@@ -27,6 +33,7 @@ string(REPLACE ";" " " LINK_FLAGS "${EM_LINK_FLAGS}")
 
 set(SRCS
     main.cpp
+    stubs.c
 )
 
 include_directories(
