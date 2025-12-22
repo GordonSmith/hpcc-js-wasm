@@ -24,7 +24,7 @@ This is a WebAssembly (WASM) monorepo providing JavaScript/TypeScript bindings f
 npm ci
 
 # 2. Install build dependencies (20-30 minutes - NEVER CANCEL)
-# Includes: emsdk install (~5 min), vcpkg install (~15-20 min), playwright (~5-10 min)
+# Includes: emsdk install (~5 min), vcpkg install (~15-20 min), playwright (~5-10 min), bundler test deps
 npm run install-build-deps
 
 # 3. Build C++ to WASM (30-45 minutes - NEVER CANCEL) 
@@ -57,32 +57,38 @@ npm run build-ws        # 5-10 minutes
 npm run lint           # 2-3 minutes
 ```
 
-## CMake Configuration
+## CMake / C++ (WASM) Build
 
-### **CRITICAL**: ALWAYS Use VS Code CMake Extension
+Prefer the npm scripts. They source `./emsdk/emsdk_env.sh` and use the repo's CMake preset(s):
 
-**YOU MUST use the VS Code CMake extension for ALL CMake operations.** Manual cmake commands will fail because they don't properly set up the Emscripten environment.
+```bash
+npm run build-cpp
+```
 
-**REQUIRED WORKFLOW** when modifying C++ code or vcpkg packages (patches, portfile.cmake):
+For fast iteration:
 
-1. **Remove vcpkg cache**: `rm -rf vcpkg/buildtrees/<package>`
-2. **Use VS Code Command Palette** (Ctrl/Cmd+Shift+P):
-   - **`CMake: Configure`** - Reconfigures CMake and reinstalls vcpkg packages with new patches
-   - **`CMake: Build`** - Builds the configured targets
-   - **`CMake: Clean Rebuild`** - Cleans and rebuilds everything
+```bash
+npm run build-cpp-watch
+```
 
-**WHY THIS IS REQUIRED**:
-- Sets up Emscripten SDK environment variables correctly
-- Configures vcpkg toolchain properly
-- Handles WASM-specific build flags
-- Provides IntelliSense and debugging integration
+### Manual CMake (only when needed)
 
-**DO NOT use manual cmake commands like:**
-- ❌ `cmake --preset vcpkg-emscripten-*` (will fail with "emcc compiler not found")
-- ❌ `cmake --build build --target <target>` (won't work without proper environment)
-- ❌ `ninja <target>` (missing environment and configuration)
+Manual CMake is supported, but you must source Emscripten first:
 
-**EXCEPTION**: `npm run build-cpp` scripts are pre-configured with the correct environment and are safe to use for full builds.
+```bash
+source ./emsdk/emsdk_env.sh
+cmake -S . -B ./build --preset vcpkg-emscripten-MinSizeRel
+cmake --build ./build --parallel
+```
+
+### vcpkg overlay/port changes
+
+After changing `vcpkg-overlays/` or portfiles/patches, clear the affected build tree and rebuild:
+
+```bash
+rm -rf vcpkg/buildtrees/<package>
+npm run build-cpp
+```
 
 ## Embind (C++ <-> JS Interop)
 
@@ -202,9 +208,10 @@ npm test
 ### 3. End-to-End Validation
 ```bash
 # Test the examples in the root directory
-node -e "
-const { Graphviz } = require('./packages/graphviz/dist/index.js');
-Graphviz.load().then(g => console.log(g.version()));
+node --input-type=module -e "
+import { Graphviz } from './packages/graphviz/dist/index.js';
+const g = await Graphviz.load();
+console.log(g.version());
 "
 ```
 
@@ -214,7 +221,7 @@ Graphviz.load().then(g => console.log(g.version()));
 - **Network restrictions**: Downloads may fail in restricted environments
 - **Docker alternative**: Use `npm run build-docker` if local builds fail
 - **SSL certificate issues**: May block package downloads
-- **Node.js version**: Requires Node.js 20+ for optimal compatibility
+- **Node.js version**: CI runs Node.js 22 and 24 (primary support); docs deploy currently uses Node.js 20
 
 ### Package-Specific Notes
 

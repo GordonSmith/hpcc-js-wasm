@@ -244,8 +244,8 @@ cd packages/base91  # Smallest package
 npm run build
 
 # 3. Check WASM loading
-node -e "
-const fs = require('fs');
+node --input-type=module -e "
+import fs from 'node:fs';
 const wasm = fs.readFileSync('build/packages/base91/src-cpp/base91lib.wasm');
 console.log('WASM size:', wasm.length);
 "
