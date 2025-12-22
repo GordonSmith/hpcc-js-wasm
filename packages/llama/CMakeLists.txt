@@ -33,10 +33,10 @@ include_directories(
 )
 
 add_executable(llamalib
-    embedding.cpp
-    log_wasm.cpp
-    util.cpp
-    stubs.c
+    src-cpp/embedding.cpp
+    src-cpp/log_wasm.cpp
+    src-cpp/util.cpp
+    src-cpp/stubs.c
     ${Llama_DIR}/common/common.cpp
     ${Llama_DIR}/common/sampling.cpp
 )

@@ -21,7 +21,7 @@ include_directories(
 )
 
 add_executable(base91lib
-    main.cpp
+    src-cpp/main.cpp
 )
 
 set_target_properties(base91lib PROPERTIES COMPILE_FLAGS "${CPP_FLAGS}")

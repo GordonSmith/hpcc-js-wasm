@@ -21,7 +21,7 @@ include_directories(
 )
 
 add_executable(expatlib
-    main.cpp
+    src-cpp/main.cpp
 )
 
 set_target_properties(expatlib PROPERTIES COMPILE_FLAGS "${CPP_FLAGS}")

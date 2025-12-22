@@ -21,7 +21,7 @@ include_directories(
 )
 
 add_executable(zstdlib
-    main.cpp
+    src-cpp/main.cpp
 )
 
 set_target_properties(zstdlib PROPERTIES COMPILE_FLAGS "${CPP_FLAGS}")

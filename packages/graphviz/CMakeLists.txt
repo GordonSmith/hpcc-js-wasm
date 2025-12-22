@@ -25,9 +25,9 @@ set(EM_LINK_FLAGS
 string(REPLACE ";" " " LINK_FLAGS "${EM_LINK_FLAGS}")
 
 set(SRCS
-    main.cpp
-    util.hpp
-    util.cpp
+    src-cpp/main.cpp
+    src-cpp/util.hpp
+    src-cpp/util.cpp
 )
 
 include_directories(
