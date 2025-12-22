@@ -16,10 +16,22 @@ set(VCPKG_INCLUDE_DIR ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include)
 set(EM_CPP_FLAGS 
     "-flto"
     "-msimd128"
+
+    "-sSTRICT=1"
 )
 
 set(EM_LINK_FLAGS 
     "-flto"
+
+    "-sSTRICT=1"
+    # "-sIGNORE_MISSING_MAIN=0"
+    # "-sAUTO_JS_LIBRARIES=0"
+    # "-sAUTO_NATIVE_LIBRARIES=0"
+    # "-sDEFAULT_TO_CXX=0"
+    # "-sUSE_GLFW=0"
+    # "-sALLOW_UNIMPLEMENTED_SYSCALLS=0"
+    # "-sINCOMING_MODULE_JS_API=\"[]\""
+
     "-sASSERTIONS=0"
     "-sINVOKE_RUN=0"
     "-sALLOW_MEMORY_GROWTH=1"
@@ -30,22 +42,15 @@ set(EM_LINK_FLAGS
     "-sMODULARIZE=1" 
     "-sEXPORT_ES6=1"
     # "-sIGNORE_CLOSURE_COMPILER_ERRORS=0"
-    # "-sWASM_BIGINT=1"
     # "-sSTANDALONE_WASM=0"
     # "-sBINARYEN_ASYNC_COMPILATION=1"
     # "-sDYNAMIC_EXECUTION=0"
     "-sWASM_BIGINT=0"
     "-sPOLYFILL=0"
     # "-sSTRICT=0"
-    "-sIGNORE_MISSING_MAIN=0"
-    # "-sALLOW_UNIMPLEMENTED_SYSCALLS=1"
-    "-sAUTO_JS_LIBRARIES=0"
-    "-sAUTO_NATIVE_LIBRARIES=0"
-    "-sAUTO_ARCHIVE_INDEXES=0"
-    "-sDEFAULT_TO_CXX=0"
-    "-sUSE_GLFW=0"
-    "-sINCOMING_MODULE_JS_API=\"['wasmBinary']\""
-    "--no-entry"
+    # "-sAUTO_ARCHIVE_INDEXES=0"
+    "--no-entry"    
+    # "-sINCOMING_MODULE_JS_API=\"['wasmBinary']\""
     "-sEXPORTED_FUNCTIONS=\"['_free', '_malloc']\""
     "-sEXPORTED_RUNTIME_METHODS=\"['UTF8ToString', 'HEAPU8']\""
     "-lembind"

@@ -6,6 +6,7 @@ find_package(Llama CONFIG REQUIRED)
 
 set(EM_CPP_FLAGS 
     ${EM_CPP_FLAGS}
+
     "-fwasm-exceptions"
 )
 string(REPLACE ";" " " CPP_FLAGS "${EM_CPP_FLAGS}")
@@ -16,6 +17,8 @@ set(EM_LINK_FLAGS
     "-sFILESYSTEM=1"
     "-sFORCE_FILESYSTEM=1"
     "-sWASMFS=1"
+
+    "-fwasm-exceptions"
     "--emit-tsd ${CMAKE_CURRENT_BINARY_DIR}/llamalib.d.ts"
 )
 string(REPLACE ";" " " LINK_FLAGS "${EM_LINK_FLAGS}")
