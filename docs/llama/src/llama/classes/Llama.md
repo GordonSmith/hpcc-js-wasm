@@ -4,7 +4,7 @@
 
 # Class: Llama
 
-Defined in: [llama/src/llama.ts:27](https://github.com/GordonSmith/hpcc-js-wasm/blob/10467e7b89384555d9ecd41bd4f60b5c63687e4a/packages/llama/src/llama.ts#L27)
+Defined in: [packages/llama/src/llama.ts:27](https://github.com/GordonSmith/hpcc-js-wasm/blob/7b6034eaf65cd69e4cd17d30d6a08a4d45149c2b/packages/llama/src/llama.ts#L27)
 
 The llama WASM library, provides a simplified wrapper around the llama.cpp library.
 
@@ -28,7 +28,7 @@ const embeddings = llama.embedding("Hello and Welcome!", new Uint8Array(data));
 
 > `static` **load**(): `Promise`\<`Llama`\>
 
-Defined in: [llama/src/llama.ts:41](https://github.com/GordonSmith/hpcc-js-wasm/blob/10467e7b89384555d9ecd41bd4f60b5c63687e4a/packages/llama/src/llama.ts#L41)
+Defined in: [packages/llama/src/llama.ts:53](https://github.com/GordonSmith/hpcc-js-wasm/blob/7b6034eaf65cd69e4cd17d30d6a08a4d45149c2b/packages/llama/src/llama.ts#L53)
 
 Compiles and instantiates the raw wasm.
 
@@ -48,7 +48,7 @@ A promise to an instance of the Llama class.
 
 > `static` **unload**(): `void`
 
-Defined in: [llama/src/llama.ts:50](https://github.com/GordonSmith/hpcc-js-wasm/blob/10467e7b89384555d9ecd41bd4f60b5c63687e4a/packages/llama/src/llama.ts#L50)
+Defined in: [packages/llama/src/llama.ts:62](https://github.com/GordonSmith/hpcc-js-wasm/blob/7b6034eaf65cd69e4cd17d30d6a08a4d45149c2b/packages/llama/src/llama.ts#L62)
 
 Unloades the compiled wasm instance.
 
@@ -62,7 +62,7 @@ Unloades the compiled wasm instance.
 
 > **version**(): `string`
 
-Defined in: [llama/src/llama.ts:57](https://github.com/GordonSmith/hpcc-js-wasm/blob/10467e7b89384555d9ecd41bd4f60b5c63687e4a/packages/llama/src/llama.ts#L57)
+Defined in: [packages/llama/src/llama.ts:69](https://github.com/GordonSmith/hpcc-js-wasm/blob/7b6034eaf65cd69e4cd17d30d6a08a4d45149c2b/packages/llama/src/llama.ts#L69)
 
 #### Returns
 
@@ -76,7 +76,7 @@ The Llama c++ version
 
 > **embedding**(`text`, `model`, `format`): `number`[][]
 
-Defined in: [llama/src/llama.ts:69](https://github.com/GordonSmith/hpcc-js-wasm/blob/10467e7b89384555d9ecd41bd4f60b5c63687e4a/packages/llama/src/llama.ts#L69)
+Defined in: [packages/llama/src/llama.ts:81](https://github.com/GordonSmith/hpcc-js-wasm/blob/7b6034eaf65cd69e4cd17d30d6a08a4d45149c2b/packages/llama/src/llama.ts#L81)
 
 Calculates the vector representation of the input text.
 
