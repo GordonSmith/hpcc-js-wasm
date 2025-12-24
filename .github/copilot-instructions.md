@@ -34,7 +34,7 @@ npm run build-cpp
 # 4. Build TypeScript packages (5-10 minutes)
 npm run build-ws
 
-# 5. Full build command (45+ minutes total - NEVER CANCEL)
+# 5. Full build command equivilant to build-cpp + build-ws (45+ minutes total - NEVER CANCEL)
 # Equivalent to: build-cpp && build-ws
 npm run build
 ```
@@ -48,14 +48,6 @@ From actual runs in clean environment:
 - `npx playwright install`: 10-20 minutes (browser downloads)
 - `npm run build-cpp`: 30-60 minutes (C++ compilation to WASM)
 - `npm run test`: 15-30 minutes (includes browser and node tests)
-
-### Quick Development (TypeScript Only)
-```bash
-# For TypeScript-only changes when WASM files exist
-npm ci                  # 2-3 minutes
-npm run build-ws        # 5-10 minutes
-npm run lint           # 2-3 minutes
-```
 
 ## CMake / C++ (WASM) Build
 
@@ -71,6 +63,14 @@ For fast iteration:
 npm run build-cpp-watch
 ```
 
+### Quick Development (TypeScript Only)
+```bash
+# For TypeScript-only changes when WASM files exist
+npm ci                  # 2-3 minutes
+npm run build-ws        # 5-10 minutes
+npm run lint           # 2-3 minutes
+```
+
 ### Manual CMake (only when needed)
 
 Manual CMake is supported, but you must source Emscripten first:
@@ -79,15 +79,6 @@ Manual CMake is supported, but you must source Emscripten first:
 source ./emsdk/emsdk_env.sh
 cmake -S . -B ./build --preset vcpkg-emscripten-MinSizeRel
 cmake --build ./build --parallel
-```
-
-### vcpkg overlay/port changes
-
-After changing `vcpkg-overlays/` or portfiles/patches, clear the affected build tree and rebuild:
-
-```bash
-rm -rf vcpkg/buildtrees/<package>
-npm run build-cpp
 ```
 
 ## Embind (C++ <-> JS Interop)
@@ -136,18 +127,6 @@ Reference: https://emscripten.org/docs/porting/connecting_cpp_and_javascript/emb
 ```
 ✘ [ERROR] Could not resolve "../../../build/packages/base91/src-cpp/base91lib.wasm"
 ✘ [ERROR] Could not resolve "../../../build/packages/graphviz/src-cpp/graphvizlib.wasm"
-```
-
-### DuckDB Exception
-The DuckDB package is special:
-```bash
-cd packages/duckdb
-npm run pack-duckdb    # Uses pre-built WASM from @duckdb/duckdb-wasm
-npm run build          # Can complete without C++ compilation
-```
-This works because DuckDB uses pre-compiled WASM binaries rather than building from C++ source.
-```
-ERROR: Could not resolve "../../../build/packages/graphviz/src-cpp/graphvizlib.wasm"
 ```
 
 ## Testing
@@ -225,11 +204,6 @@ console.log(g.version());
 
 ### Package-Specific Notes
 
-#### DuckDB Package
-- **Special build process**: Uses pre-built WASM from @duckdb/duckdb-wasm
-- **Can build without C++ compilation**: Run `npm run pack-duckdb` instead
-- **Build command**: Uses `pack-duckdb-eh` scripts to generate WASM files
-
 #### Other Packages (base91, expat, graphviz, llama, zstd)
 - **Require C++ compilation**: Must run `npm run build-cpp` first
 - **WASM dependencies**: TypeScript builds fail without WASM files
@@ -288,7 +262,7 @@ npm run build-docs          # Build VitePress documentation
 ### Advanced Build Options
 ```bash
 npm run build-cpp-watch     # Watch C++ files for changes
-npm run build-ts-watch      # Watch TypeScript files
+npm run build-watch      # Watch TypeScript files
 npm run build-dev           # Development builds
 ```
 

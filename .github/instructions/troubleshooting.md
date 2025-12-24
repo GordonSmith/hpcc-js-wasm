@@ -277,7 +277,7 @@ time npm run build-cpp
 time npm run build-ws
 
 # Use watch modes for development
-npm run build-ts-watch &
+npm run build-watch &
 npm run build-cpp-watch &
 ```
 
@@ -374,7 +374,7 @@ git reset --hard HEAD
 
 ### During Development
 1. **Test incrementally**: Build and test after each change
-2. **Watch for errors**: Use watch modes (`npm run build-ts-watch`)
+2. **Watch for errors**: Use watch modes (`npm run build-watch`)
 3. **Monitor memory**: Keep an eye on process memory usage
 
 ### Before Committing

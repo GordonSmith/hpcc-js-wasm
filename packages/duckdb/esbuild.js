@@ -1,5 +1,6 @@
 import { neutralTpl } from "@hpcc-js/esbuild-plugins";
-import { sfxWasm } from "@hpcc-js/esbuild-plugins/sfx-wrapper";
+import { sfxWasm } from "./src-util/sfx-wrapper.ts";
+//import { sfxWasm } from "@hpcc-js/esbuild-plugins/sfx-wrapper";
 import { replaceFunction, replaceString } from "../../utils/esbuild-plugins.js";
 
 //  config  ---

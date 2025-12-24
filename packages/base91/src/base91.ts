@@ -58,6 +58,13 @@ export class Base91 extends WasmLibrary<MainModule, CBasE91> {
     }
 
     /**
+     * Resets the internal encoder/decoder state.
+     */
+    reset(): void {
+        this._exports.reset();
+    }
+
+    /**
      * @param data Data to encode.
      * @returns string containing the Base 91 encoded data
      */
@@ -74,6 +81,37 @@ export class Base91 extends WasmLibrary<MainModule, CBasE91> {
 
         this.free_heapu8(encoded);
         this.free_heapu8(unencoded);
+        return retVal;
+    }
+
+    /**
+     * @param data Data to encode.
+     * @returns string containing the Base 91 encoded data
+     */
+    encodeChunk(data: Uint8Array): string {
+        const unencoded = this.uint8_heapu8(data);
+        const encoded = this.malloc_heapu8(unencoded.size + Math.ceil(unencoded.size / 4));
+
+        encoded.size = this._exports.encode(unencoded.ptr, unencoded.size, encoded.ptr);
+        let retVal = this.heapu8_string(encoded);
+
+        this.free_heapu8(encoded);
+        this.free_heapu8(unencoded);
+        return retVal;
+    }
+
+
+    /**
+     * @param data Data to encode.
+     * @returns string containing the Base 91 encoded data
+     */
+    encodeChunkEnd(): string {
+        const encoded = this.malloc_heapu8(2);
+
+        encoded.size = this._exports.encode_end(encoded.ptr);
+        const retVal = this.heapu8_string(encoded);
+
+        this.free_heapu8(encoded);
         return retVal;
     }
 

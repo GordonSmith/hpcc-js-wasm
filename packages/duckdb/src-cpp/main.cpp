@@ -358,61 +358,6 @@ namespace ConnectionHelper
             return new ColumnarQueryResult(std::string(e.what()));
         }
     }
-
-    void interrupt(Connection &obj)
-    {
-        obj.Interrupt();
-    }
-
-    double queryProgress(Connection &obj)
-    {
-        return obj.GetQueryProgress();
-    }
-
-    void enableProfiling(Connection &obj)
-    {
-        obj.EnableProfiling();
-    }
-
-    void disableProfiling(Connection &obj)
-    {
-        obj.DisableProfiling();
-    }
-
-    std::string profilingInformation(Connection &obj)
-    {
-        return obj.GetProfilingInformation();
-    }
-
-    void beginTransaction(Connection &obj)
-    {
-        obj.BeginTransaction();
-    }
-
-    void commit(Connection &obj)
-    {
-        obj.Commit();
-    }
-
-    void rollback(Connection &obj)
-    {
-        obj.Rollback();
-    }
-
-    void setAutoCommit(Connection &obj, bool auto_commit)
-    {
-        obj.SetAutoCommit(auto_commit);
-    }
-
-    bool isAutoCommit(Connection &obj)
-    {
-        return obj.IsAutoCommit();
-    }
-
-    bool hasActiveTransaction(Connection &obj)
-    {
-        return obj.HasActiveTransaction();
-    }
 }
 
 namespace DuckDBHelper
@@ -697,7 +642,7 @@ EMSCRIPTEN_BINDINGS(duckdblib_bindings)
         ;
 
     class_<QueryResult, base<BaseQueryResult>>("QueryResult")
-        .function("toString_", &QueryResult::ToString)
+        .function("stringify", &QueryResult::ToString)
         .function("print", &QueryResult::Print)
         .function("columnCount", &QueryResult::ColumnCount)
         .function("columnName", &QueryResult::ColumnName)
@@ -732,17 +677,17 @@ EMSCRIPTEN_BINDINGS(duckdblib_bindings)
         .function("prepare", &ConnectionHelper::prepare, return_value_policy::take_ownership())
         .function("query", &ConnectionHelper::query, return_value_policy::take_ownership())
         .function("queryColumnar", &ConnectionHelper::queryColumnar, return_value_policy::take_ownership())
-        .function("interrupt", &ConnectionHelper::interrupt)
-        .function("queryProgress", &ConnectionHelper::queryProgress)
-        .function("enableProfiling", &ConnectionHelper::enableProfiling)
-        .function("disableProfiling", &ConnectionHelper::disableProfiling)
-        .function("profilingInformation", &ConnectionHelper::profilingInformation)
-        .function("beginTransaction", &ConnectionHelper::beginTransaction)
-        .function("commit", &ConnectionHelper::commit)
-        .function("rollback", &ConnectionHelper::rollback)
-        .function("setAutoCommit", &ConnectionHelper::setAutoCommit)
-        .function("isAutoCommit", &ConnectionHelper::isAutoCommit)
-        .function("hasActiveTransaction", &ConnectionHelper::hasActiveTransaction)
+        .function("interrupt", &Connection::Interrupt)
+        .function("getQueryProgress", &Connection::GetQueryProgress)
+        // .function("enableProfiling", &Connection::EnableProfiling)
+        // .function("disableProfiling", &Connection::DisableProfiling)
+        // .function("getProfilingInformation", &Connection::GetProfilingInformation)
+        .function("beginTransaction", &Connection::BeginTransaction)
+        .function("commit", &Connection::Commit)
+        .function("rollback", &Connection::Rollback)
+        .function("setAutoCommit", &Connection::SetAutoCommit)
+        .function("isAutoCommit", &Connection::IsAutoCommit)
+        .function("hasActiveTransaction", &Connection::HasActiveTransaction)
 
         ;
 

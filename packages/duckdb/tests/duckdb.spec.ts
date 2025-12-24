@@ -9,19 +9,20 @@ describe("duckdb", function () {
         expect(v).to.be.a("string");
         expect(v).to.equal("v1.4.3");       //  Update README.md if this changes
         console.log("duckdb version: " + v);
+        console.log("number of threads: " + duckdb.numberOfThreads());
     });
 
     it("simple", async function () {
         const duckdb = await DuckDB.load();
         const con = duckdb.connect();
-        con.query("CREATE TABLE integers(i INTEGER)").dispose();
-        con.query("INSERT INTO integers VALUES (3)").dispose();
+        con.query("CREATE TABLE integers(i INTEGER)").delete();
+        con.query("INSERT INTO integers VALUES (3)").delete();
         const result = con.query("SELECT * FROM integers");
-        const resultStr = result.toString();
+        const resultStr = result.stringify();
         result.print();
         expect(resultStr).to.be.a("string");
         expect(resultStr).to.contain("3");
-        result.dispose();
+        result.delete();
         con.close();
     });
 
@@ -51,7 +52,7 @@ describe("duckdb", function () {
             throw new Error("Expected f64Column(0) to return a Float64Array");
         }
         expect(col[0]).to.equal(42);
-        result.dispose();
+        result.delete();
         con.close();
     });
 
@@ -68,23 +69,23 @@ describe("duckdb", function () {
             { a: 2, b: false, c: null }
         ]);
 
-        result.dispose();
+        result.delete();
         con.close();
     });
 
     it("prepare", async function () {
         const duckdb = await DuckDB.load();
         const conn = duckdb.connect();
-        conn.query("CREATE TABLE person (name VARCHAR, age BIGINT);").dispose();
-        conn.query("INSERT INTO person VALUES ('Alice', 37), ('Ana', 35), ('Bob', 41), ('Bea', 25);").dispose();
+        conn.query("CREATE TABLE person (name VARCHAR, age BIGINT);").delete();
+        conn.query("INSERT INTO person VALUES ('Alice', 37), ('Ana', 35), ('Bob', 41), ('Bea', 25);").delete();
         const stmt = conn.prepare("SELECT * FROM person WHERE starts_with(name, CAST(? AS VARCHAR))");
         const result = stmt.execute(["B"]);
         const resultStr = result.toString();
         expect(resultStr).to.contain("name");
         expect(resultStr).to.contain("age");
         expect(resultStr.toLowerCase()).to.not.contain("error");
-        result.dispose();
-        stmt.dispose();
+        result.delete();
+        stmt.delete();
         conn.close();
     });
 
@@ -102,8 +103,8 @@ describe("duckdb", function () {
         expect(resultStr).to.contain("b");
         expect(resultStr).to.contain("z");
         expect(resultStr).to.contain("42");
-        result.dispose();
-        stmt.dispose();
+        result.delete();
+        stmt.delete();
         conn.close();
     });
 
@@ -120,7 +121,7 @@ describe("duckdb", function () {
 
         const resultObj = c.query("SELECT * FROM rows");
         const resultArr = resultObj.toArray();
-        resultObj.dispose();
+        resultObj.delete();
         expect(resultArr.length).to.equal(data.length);
         for (let i = 0; i < resultArr.length; i++) {
             expect(resultArr[i].col2).to.equal(data[i].col2);
@@ -136,7 +137,7 @@ describe("duckdb", function () {
         // generate_series is provided by core_functions; should work without calling SQL LOAD.
         const result = c.query("SELECT * FROM generate_series(0, 3) AS t(v)");
         const rows = result.toArray();
-        result.dispose();
+        result.delete();
         expect(rows.map((r: any) => r.v)).to.deep.equal([0, 1, 2, 3]);
 
         c.close();
@@ -147,7 +148,7 @@ describe("duckdb", function () {
         const con = duckdb.connect();
         const result = con.query(`SELECT extension_name, loaded, installed FROM duckdb_extensions() WHERE extension_name IN ('json', 'parquet')`);
         const extensions = result.toArray();
-        result.dispose();
+        result.delete();
 
         expect(extensions.length).to.be.gt(0);
         const loadedExtensions = extensions.filter((ext: any) => ext.loaded);

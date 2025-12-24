@@ -42,7 +42,7 @@ export class DuckDBResult extends WasmLibrary<MainModule, MaterializedQueryResul
     }
 
     toString(): string {
-        return this._exports.toString_();
+        return this._exports.stringify();
     }
 
     print(): void {
@@ -77,7 +77,7 @@ export class DuckDBQueryResult extends WasmLibrary<MainModule, QueryResult> {
     }
 
     toString(): string {
-        return this._exports.toString_();
+        return this._exports.stringify();
     }
 
     print(): void {
@@ -219,11 +219,19 @@ export class DuckDBConnection extends WasmLibrary<MainModule, Connection> {
         super(_module, connection);
     }
 
-    prepare(sql: string): DuckDBPreparedStatement {
+    prepare(sql: string): PreparedStatement {
+        return this._exports.prepare(sql)!;
+    }
+
+    query(sql: string): MaterializedQueryResult {
+        return this._exports.query(sql)!;
+    }
+
+    prepareXXX(sql: string): DuckDBPreparedStatement {
         return new DuckDBPreparedStatement(this._module, this._exports.prepare(sql)!);
     }
 
-    query(sql: string): DuckDBResult {
+    queryXXX(sql: string): DuckDBResult {
         return new DuckDBResult(this._module, this._exports.query(sql)!);
     }
 
@@ -344,6 +352,10 @@ export class DuckDB extends WasmLibrary<MainModule, DuckDBGlobals> {
 
     connect(): DuckDBConnection {
         return new DuckDBConnection(this._module, this._exports.connect()!);
+    }
+
+    numberOfThreads(): number {
+        return Number(this._exports.numberOfThreads());
     }
 
     registerFile(path: string, content: Uint8Array): void {
