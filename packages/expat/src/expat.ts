@@ -1,7 +1,7 @@
 // @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
 import load, { reset } from "../../../build/packages/expat/expatlib.wasm";
 import type { MainModule, map_string_string } from "../../../build/packages/expat/expatlib.js";
-import { WasmLibrary } from "@hpcc-js/wasm-util";
+import { MainModuleEx } from "@hpcc-js/wasm-util";
 
 export type Attributes = { [key: string]: string };
 export interface IParser {
@@ -50,10 +50,10 @@ let g_expat: Promise<Expat>;
  * ```
  
  */
-export class Expat extends WasmLibrary<MainModule, undefined> {
+export class Expat extends MainModuleEx<MainModule> {
 
-    private constructor(protected _module: MainModule) {
-        super(_module, undefined);
+    private constructor(_module: MainModule) {
+        super(_module);
     }
 
     /**

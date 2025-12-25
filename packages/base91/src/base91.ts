@@ -1,7 +1,7 @@
 // @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
 import load, { reset } from "../../../build/packages/base91/base91lib.wasm";
 import type { MainModule, CBasE91 } from "../../../build/packages/base91/base91lib.js";
-import { WasmLibrary } from "@hpcc-js/wasm-util";
+import { MainModuleEx } from "@hpcc-js/wasm-util";
 
 //  Ref:  http://base91.sourceforge.net/#a5
 
@@ -21,10 +21,13 @@ let g_base91: Promise<Base91>;
  * const decoded_data = await base91.decode(encoded_data);
  * ```
  */
-export class Base91 extends WasmLibrary<MainModule, CBasE91> {
+export class Base91 extends MainModuleEx<MainModule> {
+
+    private _base91: CBasE91;
 
     private constructor(_module: MainModule) {
-        super(_module, new _module.CBasE91());
+        super(_module);
+        this._base91 = new this._module.CBasE91();
     }
 
     /**
@@ -54,14 +57,14 @@ export class Base91 extends WasmLibrary<MainModule, CBasE91> {
      * @returns The Base91 c++ version
      */
     version(): string {
-        return this._exports.version();
+        return this._base91.version();
     }
 
     /**
      * Resets the internal encoder/decoder state.
      */
     reset(): void {
-        this._exports.reset();
+        this._base91.reset();
     }
 
     /**
@@ -69,18 +72,18 @@ export class Base91 extends WasmLibrary<MainModule, CBasE91> {
      * @returns string containing the Base 91 encoded data
      */
     encode(data: Uint8Array): string {
-        this._exports.reset();
+        this._base91.reset();
 
-        const unencoded = this.uint8_heapu8(data);
-        const encoded = this.malloc_heapu8(unencoded.size + Math.ceil(unencoded.size / 4));
+        const unencoded = this.dataToHeap(data);
+        const encoded = this.malloc(unencoded.size + Math.ceil(unencoded.size / 4));
 
-        encoded.size = this._exports.encode(unencoded.ptr, unencoded.size, encoded.ptr);
-        let retVal = this.heapu8_string(encoded);
-        encoded.size = this._exports.encode_end(encoded.ptr);
-        retVal += this.heapu8_string(encoded);
+        encoded.size = this._base91.encode(unencoded.ptr, unencoded.size, encoded.ptr);
+        let retVal = this.heapToString(encoded);
+        encoded.size = this._base91.encode_end(encoded.ptr);
+        retVal += this.heapToString(encoded);
 
-        this.free_heapu8(encoded);
-        this.free_heapu8(unencoded);
+        this.free(encoded);
+        this.free(unencoded);
         return retVal;
     }
 
@@ -89,14 +92,13 @@ export class Base91 extends WasmLibrary<MainModule, CBasE91> {
      * @returns string containing the Base 91 encoded data
      */
     encodeChunk(data: Uint8Array): string {
-        const unencoded = this.uint8_heapu8(data);
-        const encoded = this.malloc_heapu8(unencoded.size + Math.ceil(unencoded.size / 4));
+        const unencoded = this.dataToHeap(data);
+        const encoded = this.malloc(unencoded.size + Math.ceil(unencoded.size / 4));
 
-        encoded.size = this._exports.encode(unencoded.ptr, unencoded.size, encoded.ptr);
-        let retVal = this.heapu8_string(encoded);
-
-        this.free_heapu8(encoded);
-        this.free_heapu8(unencoded);
+        encoded.size = this._base91.encode(unencoded.ptr, unencoded.size, encoded.ptr);
+        const retVal = this.heapToString(encoded);
+        this.free(encoded);
+        this.free(unencoded);
         return retVal;
     }
 
@@ -106,33 +108,32 @@ export class Base91 extends WasmLibrary<MainModule, CBasE91> {
      * @returns string containing the Base 91 encoded data
      */
     encodeChunkEnd(): string {
-        const encoded = this.malloc_heapu8(2);
+        const encoded = this.malloc(2);
 
-        encoded.size = this._exports.encode_end(encoded.ptr);
-        const retVal = this.heapu8_string(encoded);
+        encoded.size = this._base91.encode_end(encoded.ptr);
+        const retVal = this.heapToString(encoded);
 
-        this.free_heapu8(encoded);
+        this.free(encoded);
         return retVal;
     }
 
     /**
-     * 
      * @param base91Str encoded string
      * @returns origonal data
      */
     decode(base91Str: string): Uint8Array {
-        this._exports.reset();
+        this._base91.reset();
 
-        const encoded = this.string_heapu8(base91Str);
-        const unencoded = this.malloc_heapu8(encoded.size);
+        const encoded = this.stringToHeap(base91Str);
+        const unencoded = this.malloc(encoded.size);
 
-        unencoded.size = this._exports.decode(encoded.ptr, encoded.size, unencoded.ptr);
-        let retVal = this.heapu8_uint8(unencoded);
-        unencoded.size = this._exports.decode_end(unencoded.ptr);
-        retVal = new Uint8Array([...retVal, ...this.heapu8_view(unencoded)]);
+        unencoded.size = this._base91.decode(encoded.ptr, encoded.size, unencoded.ptr);
+        let retVal = this.heapView(unencoded);
+        unencoded.size = this._base91.decode_end(unencoded.ptr);
+        retVal = new Uint8Array([...retVal, ...this.heapView(unencoded)]);
 
-        this.free_heapu8(unencoded);
-        this.free_heapu8(encoded);
+        this.free(unencoded);
+        this.free(encoded);
         return retVal;
     }
 }

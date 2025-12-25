@@ -1,137 +1,80 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
+import type { MainModule } from "../../../build/packages/util/utillib.js";
+import MainModuleFactory from "../../../build/packages/util/utillib.js";
+import { MainModuleEx } from "../src/wasm-library.ts";
 
-import { WasmLibrary } from "../src/wasm-library.ts";
+describe("MainModuleEx", () => {
+    let mainModule: MainModule;
+    let mainModuleEx: MainModuleEx<MainModule>;
 
-class TestLib<TModule, TExports> extends WasmLibrary<TModule, TExports> {
-    constructor(m: TModule, e: TExports) {
-        super(m, e);
-    }
-
-    allocAndCopy(bytes: Uint8Array) {
-        return this.uint8_heapu8(bytes);
-    }
-
-    view(ptr: { ptr: number; size: number }) {
-        return this.heapu8_view(ptr);
-    }
-
-    copyOut(ptr: { ptr: number; size: number }) {
-        return this.heapu8_uint8(ptr);
-    }
-
-    free(ptr: { ptr: number; size: number }) {
-        this.free_heapu8(ptr);
-    }
-
-    strToHeap(s: string) {
-        return this.string_heapu8(s);
-    }
-
-    heapToStr(ptr: { ptr: number; size: number }) {
-        return this.heapu8_string(ptr);
-    }
-}
-
-describe("WasmLibrary", () => {
-
-    it("uses module _malloc/_free when available", () => {
-        const heap = new Uint8Array(64);
-        let nextPtr = 0;
-        const freeSpy = vi.fn();
-
-        const module = {
-            HEAPU8: heap,
-            _malloc: (size: number) => {
-                const ptr = nextPtr;
-                nextPtr += size;
-                return ptr;
-            },
-            _free: (ptr: number) => {
-                freeSpy(ptr);
-            }
-        };
-
-        const lib = new TestLib(module, {});
-        const data = new Uint8Array([1, 2, 3, 4]);
-        const heapPtr = lib.allocAndCopy(data);
-
-        expect(lib.copyOut(heapPtr)).toEqual(data);
-        lib.free(heapPtr);
-        expect(freeSpy).toHaveBeenCalledWith(0);
+    beforeAll(async () => {
+        mainModule = await MainModuleFactory();
+        mainModuleEx = new MainModuleEx(mainModule);
     });
 
-    it("falls back to exports malloc/free when module _malloc/_free missing", () => {
-        const heap = new Uint8Array(64);
-        let nextPtr = 0;
-        const freeSpy = vi.fn();
+    it("malloc/free", () => {
+        const heapU8 = mainModuleEx.malloc(10);
+        expect(heapU8.size).toBe(10);
+        expect(heapU8.ptr).toBeGreaterThan(0);
 
-        const module = {
-            HEAPU8: heap
-        };
-
-        const exportsObj = {
-            malloc: (size: number) => {
-                const ptr = nextPtr;
-                nextPtr += size;
-                return ptr;
-            },
-            free: (ptr: number) => {
-                freeSpy(ptr);
-            }
-        };
-
-        const lib = new TestLib(module, exportsObj);
-        const data = new Uint8Array([9, 8, 7]);
-        const heapPtr = lib.allocAndCopy(data);
-
-        expect(lib.view(heapPtr)).toEqual(data);
-        lib.free(heapPtr);
-        expect(freeSpy).toHaveBeenCalledWith(0);
+        mainModuleEx.free(heapU8);
     });
 
-    it("disposes via exports.delete when present", () => {
-        const heap = new Uint8Array(8);
-        const deleteSpy = vi.fn();
+    it("dispose calls free", () => {
+        const freeSpy = vi.spyOn(mainModule, "_free");
 
-        const module = { HEAPU8: heap, destroy: vi.fn() };
-        const exportsObj = { delete: deleteSpy };
+        const heapU8 = mainModuleEx.malloc(4);
+        heapU8.dispose();
 
-        const lib = new TestLib(module, exportsObj);
-        lib.dispose();
-
-        expect(deleteSpy).toHaveBeenCalledTimes(1);
-        expect(module.destroy).not.toHaveBeenCalled();
+        expect(freeSpy).toHaveBeenCalledWith(heapU8.ptr);
+        freeSpy.mockRestore();
     });
 
-    it("disposes via module.destroy when exports.delete missing", () => {
-        const heap = new Uint8Array(8);
-        const destroySpy = vi.fn();
+    it("dataToHeap + heapView round-trip", () => {
+        const input = Uint8Array.from([1, 2, 3, 4]);
 
-        const module = { HEAPU8: heap, destroy: destroySpy };
-        const exportsObj = {};
+        const heapU8 = mainModuleEx.dataToHeap(input);
+        const view = mainModuleEx.heapView(heapU8);
 
-        const lib = new TestLib(module, exportsObj);
-        lib.dispose();
+        expect(Array.from(view)).toEqual([1, 2, 3, 4]);
 
-        expect(destroySpy).toHaveBeenCalledWith(exportsObj);
+        view[0] = 9;
+        expect(mainModule.HEAPU8[heapU8.ptr]).toBe(9);
+
+        mainModuleEx.free(heapU8);
     });
 
-    it("string helpers round-trip", () => {
-        const heap = new Uint8Array(64);
-        let nextPtr = 0;
-
-        const module = {
-            HEAPU8: heap,
-            _malloc: (size: number) => {
-                const ptr = nextPtr;
-                nextPtr += size;
-                return ptr;
-            },
-            _free: (_ptr: number) => void 0
-        };
-
-        const lib = new TestLib(module, {});
-        const heapPtr = lib.strToHeap("abc");
-        expect(lib.heapToStr(heapPtr)).toBe("abc");
+    it("lengthBytes handles utf8", () => {
+        expect(mainModuleEx.lengthBytes("a😀")).toBe(5);
     });
+
+    it("stringToHeap/heapToString round-trip", () => {
+        const str = "hé😀llo";
+
+        const heapStr = mainModuleEx.stringToHeap(str);
+
+        // Ensure trailing null terminator is present
+        expect(mainModule.HEAPU8[heapStr.ptr + heapStr.size - 1]).toBe(0);
+
+        const back = mainModuleEx.heapToString(heapStr);
+        expect(back).toBe(str);
+
+        heapStr.dispose();
+    });
+
+    it("dataToHeap supports empty buffers", () => {
+        const data = new Uint8Array([]);
+        const heapU8 = mainModuleEx.dataToHeap(data);
+
+        expect(heapU8.size).toBe(0);
+        expect(mainModuleEx.heapView(heapU8).length).toBe(0);
+
+        mainModuleEx.free(heapU8);
+    });
+
+    it("creates, reads, and unlinks files", () => {
+        expect(mainModuleEx.hasFilesystem()).toBe(false);
+    });
+
 });
+

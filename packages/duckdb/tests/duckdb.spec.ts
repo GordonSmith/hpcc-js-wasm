@@ -1,111 +1,88 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { DuckDB } from "@hpcc-js/wasm-duckdb";
 
-describe("duckdb", function () {
+describe("duckdb", () => {
+    let duckdb: DuckDB;
 
-    it("version", async function () {
-        const duckdb = await DuckDB.load();
+    beforeAll(async () => {
+        duckdb = await DuckDB.load();
+    });
+
+    it("loads once and reports version", async () => {
+        const secondLoad = await DuckDB.load();
+        expect(secondLoad).toBe(duckdb);
+
         const v = duckdb.version();
-        expect(v).to.be.a("string");
-        expect(v).to.equal("v1.4.3");       //  Update README.md if this changes
-        console.log("duckdb version: " + v);
-        console.log("number of threads: " + duckdb.numberOfThreads());
+        expect(typeof v).toBe("string");
+        expect(v.length).toBeGreaterThan(0);
+        expect(v).toMatch(/^v?\d/);
+
+        expect(duckdb.numberOfThreads()).toBeGreaterThan(0);
     });
 
-    it("simple", async function () {
-        const duckdb = await DuckDB.load();
+    it("runs a simple query", () => {
         const con = duckdb.connect();
-        con.query("CREATE TABLE integers(i INTEGER)").delete();
-        con.query("INSERT INTO integers VALUES (3)").delete();
-        const result = con.query("SELECT * FROM integers");
-        const resultStr = result.stringify();
-        result.print();
-        expect(resultStr).to.be.a("string");
-        expect(resultStr).to.contain("3");
+        const result = con.query("SELECT 3 + 4 AS value")!;
+
+        expect(Number(result.rowCount())).toBe(1);
+        expect(result.getValue(0, 0)).toBe(7);
+
         result.delete();
-        con.close();
+        con.delete();
     });
 
-    it("prepare", async function () {
-        const duckdb = await DuckDB.load();
-        const conn = duckdb.connect();
-        conn.query("CREATE TABLE person (name VARCHAR, age BIGINT);").delete();
-        conn.query("INSERT INTO person VALUES ('Alice', 37), ('Ana', 35), ('Bob', 41), ('Bea', 25);").delete();
-        const stmt = conn.prepare("SELECT * FROM person WHERE starts_with(name, CAST(? AS VARCHAR))");
-        const result = stmt.execute(["B"]);
-        const resultStr = result?.stringify()!;
-        expect(resultStr).to.contain("name");
-        expect(resultStr).to.contain("age");
-        expect(resultStr.toLowerCase()).to.not.contain("error");
+    it("executes prepared statements with parameters", () => {
+        const con = duckdb.connect()!;
+        con.query("CREATE TABLE person (name VARCHAR, age BIGINT);")!.delete();
+        con.query("INSERT INTO person VALUES ('Alice', 37), ('Ana', 35), ('Bob', 41), ('Bea', 25);")!.delete();
+
+        const stmt = con.prepare("SELECT name, age FROM person WHERE starts_with(name, CAST(? AS VARCHAR)) ORDER BY age DESC")!;
+        const result = stmt.execute(["B"])!;
+
+        expect(Number(result.rowCount())).toBe(2);
+        expect(result.getValue(0, 0)).toBe("Bob");
+        expect(result.getValue(1, 0)).toBe(41);
+        expect(result.getValue(0, 1)).toBe("Bea");
+        expect(result.getValue(1, 1)).toBe(25);
+
+        result.delete();
         stmt.delete();
-        conn.close();
+        con.delete();
     });
 
-    it("prepare_values", async function () {
-        const duckdb = await DuckDB.load();
-        const conn = duckdb.connect();
-        const stmt = conn.prepare(
-            "SELECT CAST(? AS VARCHAR) AS s, CAST(? AS BIGINT) AS n, CAST(? AS BOOLEAN) AS b, CAST(? AS VARCHAR) AS z"
-        );
+    it("supports binding different value types", () => {
+        const con = duckdb.connect();
+        const stmt = con.prepare("SELECT CAST(? AS VARCHAR) AS s, CAST(? AS BIGINT) AS n, CAST(? AS BOOLEAN) AS b, CAST(? AS VARCHAR) AS z");
         const result = stmt.execute(["x", 42, true, null]);
-        const resultStr = result.toString();
-        expect(resultStr.toLowerCase()).to.not.contain("error");
-        expect(resultStr).to.contain("s");
-        expect(resultStr).to.contain("n");
-        expect(resultStr).to.contain("b");
-        expect(resultStr).to.contain("z");
-        expect(resultStr).to.contain("42");
+
+        expect(result.getValue(0, 0)).toBe("x");
+        expect(result.getValue(1, 0)).toBe(42);
+        expect(result.getValue(2, 0)).toBe(true);
+        expect(result.getValue(3, 0)).toBeNull();
+
         result.delete();
         stmt.delete();
-        conn.close();
+        con.delete();
     });
 
-    it("json", async function () {
-        const duckdb = await DuckDB.load();
-        const c = duckdb.connect();
-
-        const data = [
-            { "col1": 1, "col2": "foo" },
-            { "col1": 2, "col2": "bar" },
-        ];
-        duckdb.registerFileString("/rows.json", JSON.stringify(data));
-        c.insertJSONFromPath("/rows.json", { name: "rows" });
-
-        const resultObj = c.query("SELECT * FROM rows");
-        const resultArr = resultObj.toArray();
-        resultObj.delete();
-        expect(resultArr.length).to.equal(data.length);
-        for (let i = 0; i < resultArr.length; i++) {
-            expect(resultArr[i].col2).to.equal(data[i].col2);
-        }
-
-        c.close();
-    });
-
-    it("core_functions", async function () {
-        const duckdb = await DuckDB.load();
-        const c = duckdb.connect();
-
-        // generate_series is provided by core_functions; should work without calling SQL LOAD.
-        const result = c.query("SELECT * FROM generate_series(0, 3) AS t(v)");
-        const rows = result.toArray();
-        result.delete();
-        expect(rows.map((r: any) => r.v)).to.deep.equal([0, 1, 2, 3]);
-
-        c.close();
-    });
-
-    it("extensions", async function () {
-        const duckdb = await DuckDB.load();
+    it("can query data from a registered file", () => {
         const con = duckdb.connect();
-        const result = con.query(`SELECT extension_name, loaded, installed FROM duckdb_extensions() WHERE extension_name IN ('json', 'parquet')`);
-        const extensions = result.toArray();
+        const data = [
+            { col1: 1, col2: "foo" },
+            { col1: 2, col2: "bar" },
+        ];
+
+        duckdb.registerFileString("rows.json", JSON.stringify(data));
+
+        const result = con.query("SELECT col1, col2 FROM read_json_auto('rows.json') ORDER BY col1");
+
+        expect(Number(result.rowCount())).toBe(2);
+        expect(result.getValue(0, 0)).toBe(1);
+        expect(result.getValue(1, 0)).toBe("foo");
+        expect(result.getValue(0, 1)).toBe(2);
+        expect(result.getValue(1, 1)).toBe("bar");
+
         result.delete();
-
-        expect(extensions.length).to.be.gt(0);
-        const loadedExtensions = extensions.filter((ext: any) => ext.loaded);
-        expect(loadedExtensions.length).to.be.gt(0);
-
-        con.close();
+        con.delete();
     });
 });

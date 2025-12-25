@@ -53,7 +53,7 @@ set(EM_LINK_FLAGS
     # "-sAUTO_ARCHIVE_INDEXES=0"
     "-sINCOMING_MODULE_JS_API=\"['wasmBinary']\""
     "-sEXPORTED_FUNCTIONS=\"['_free', '_malloc']\""
-    "-sEXPORTED_RUNTIME_METHODS=\"['UTF8ToString', 'HEAPU8']\""
+    "-sEXPORTED_RUNTIME_METHODS=\"['UTF8ToString', 'lengthBytesUTF8', 'stringToUTF8', 'HEAPU8']\""
     "-lembind"
     "--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/src-cpp/src/pre.js"
     "--post-js ${CMAKE_CURRENT_SOURCE_DIR}/src-cpp/src/post.js"

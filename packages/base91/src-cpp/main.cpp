@@ -1,7 +1,6 @@
 #include <base91.hpp>
 
 #include <string>
-#include <cstdint>
 
 const char *const version = "0.6.0";
 

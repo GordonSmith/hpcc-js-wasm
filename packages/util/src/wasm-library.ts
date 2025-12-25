@@ -1,126 +1,98 @@
+import type { MainModule } from "../../../build/packages/util/utillib.js";
+
+interface RuntimeFSExports {
+    FS_createPath: (parent: any, path: any, canRead: any, canWrite: any) => void;
+    FS_createDataFile: (parent: any, name: any, fileData: any, canRead: any, canWrite: any, canOwn: any) => void;
+    FS_preloadFile: (parent: any, name: any, url: any, canRead: any, canWrite: any, dontCreateFile: any, canOwn: any, preFinish: any) => Promise<void>;
+    FS_unlink: (path: any) => any;
+    addRunDependency: (id: any) => void;
+    removeRunDependency: (id: any) => void;
+}
+
 export type PTR = number;
 
 export interface HeapU8 {
     ptr: PTR;
     size: number;
+    dispose(): void;
 }
 
-type Destroyable = {
-    delete?: () => void;
-};
+export class MainModuleEx<T extends MainModule> {
 
-type WasmLibraryModuleLike<U> = {
-    _malloc?: (size: number) => PTR;
-    _free?: (ptr: PTR) => void;
-    destroy?: (instance: U) => void;
-    HEAPU8?: Uint8Array;
-};
+    protected _module: T & RuntimeFSExports;
 
-type WasmLibraryExportsLike = {
-    malloc?: (size: number) => PTR;
-    free?: (ptr: PTR) => void;
-};
-
-/**
- * Base class to simplify moving data into and out of Wasm memory.
- *
- * Uses the DuckDB implementation as the baseline, with compatibility fallbacks
- * for older wrappers which expose `malloc/free` on the export object.
- */
-export class WasmLibrary<TModule extends object, TExports = undefined> {
-
-    protected _module: TModule & WasmLibraryModuleLike<TExports>;
-    protected _exports: TExports;
-
-    protected constructor(_module: TModule, _exports?: TExports) {
-        this._module = _module as any;
-        this._exports = _exports as any;
+    constructor(mainModule: T) {
+        this._module = mainModule as T & RuntimeFSExports;
     }
 
-    delete() {
-        const exportsAny = this._exports as any as Destroyable;
-        if (exportsAny && typeof exportsAny.delete === "function") {
-            exportsAny.delete();
-            return;
-        }
-        const moduleAny = this._module as any;
-        if (moduleAny && typeof moduleAny.destroy === "function") {
-            moduleAny.destroy(this._exports);
-        }
+    malloc(size: number): HeapU8 {
+        const ptr: PTR = this._module._malloc(size) as PTR;
+        return {
+            ptr,
+            size,
+            dispose: () => this.free({ ptr, size, dispose: () => { } })
+        };
     }
 
-    protected malloc_heapu8(size: number): HeapU8 {
-        const moduleAny = this._module as any as WasmLibraryModuleLike<TExports>;
-        const exportsAny = this._exports as any as WasmLibraryExportsLike;
-
-        const mallocFn =
-            moduleAny && typeof moduleAny._malloc === "function" ? moduleAny._malloc.bind(moduleAny)
-                : exportsAny && typeof exportsAny.malloc === "function" ? exportsAny.malloc.bind(exportsAny)
-                    : undefined;
-
-        if (!mallocFn) {
-            throw new Error("WasmLibrary: missing malloc implementation (_malloc or malloc)");
-        }
-
-        const ptr: PTR = mallocFn(size) as PTR;
-        return { ptr, size };
+    free(data: HeapU8) {
+        this._module._free(data.ptr);
     }
 
-    protected free_heapu8(data: HeapU8) {
-        const moduleAny = this._module as any as WasmLibraryModuleLike<TExports>;
-        const exportsAny = this._exports as any as WasmLibraryExportsLike;
-
-        const freeFn =
-            moduleAny && typeof moduleAny._free === "function" ? moduleAny._free.bind(moduleAny)
-                : exportsAny && typeof exportsAny.free === "function" ? exportsAny.free.bind(exportsAny)
-                    : undefined;
-
-        if (!freeFn) {
-            throw new Error("WasmLibrary: missing free implementation (_free or free)");
-        }
-
-        freeFn(data.ptr);
-    }
-
-    protected uint8_heapu8(data: Uint8Array): HeapU8 {
-        const retVal = this.malloc_heapu8(data.byteLength);
-        const heap = this.heapU8();
-        heap.set(data, retVal.ptr);
+    dataToHeap(data: Uint8Array): HeapU8 {
+        const retVal = this.malloc(data.byteLength);
+        (this._module.HEAPU8 as Uint8Array).set(data, retVal.ptr);
         return retVal;
     }
 
-    protected heapu8_view(data: HeapU8): Uint8Array {
-        const heap = this.heapU8();
-        return heap.subarray(data.ptr, data.ptr + data.size);
+    heapView(data: HeapU8): Uint8Array {
+        return (this._module.HEAPU8 as Uint8Array).subarray(data.ptr, data.ptr + data.size);
     }
 
-    protected heapu8_uint8(data: HeapU8): Uint8Array {
-        return new Uint8Array([...this.heapu8_view(data)]);
+    heapToUint8Array(data: HeapU8): Uint8Array {
+        return new Uint8Array([...this.heapView(data)]);
     }
 
-    protected string_heapu8(str: string): HeapU8 {
-        const data = Uint8Array.from(str, x => x.charCodeAt(0));
-        return this.uint8_heapu8(data);
+    lengthBytes(str: string): number {
+        return this._module.lengthBytesUTF8(str);
     }
 
-    protected string_uint8array(str: string): Uint8Array {
-        return Uint8Array.from(str, x => x.charCodeAt(0));
+    stringToHeap(str: string): HeapU8 {
+        const size = this.lengthBytes(str) + 1;
+        const ptr = this._module._malloc(size);
+        this._module.stringToUTF8(str, ptr, size);
+        return {
+            ptr,
+            size,
+            dispose: () => this.free({ ptr, size, dispose: () => { } })
+        };
     }
 
-    protected heapu8_string(data: HeapU8): string {
-        const retVal = Array.from({ length: data.size });
-        const submodule = this.heapu8_view(data);
-        submodule.forEach((c: number, i: number) => {
-            retVal[i] = String.fromCharCode(c);
-        });
-        return retVal.join("");
+    heapToString(data: HeapU8): string {
+        return this._module.UTF8ToString(data.ptr, data.size);
     }
 
-    private heapU8(): Uint8Array {
-        const moduleAny = this._module as any as WasmLibraryModuleLike<TExports>;
-        if (!moduleAny || !(moduleAny.HEAPU8 instanceof Uint8Array)) {
-            throw new Error("WasmLibrary: missing HEAPU8");
-        }
-        return moduleAny.HEAPU8;
+    hasFilesystem(): boolean {
+        const moduleAny = this._module as any;
+        return moduleAny.FS_createPath !== undefined &&
+            moduleAny.FS_createDataFile !== undefined &&
+            moduleAny.FS_preloadFile !== undefined &&
+            moduleAny.FS_unlink !== undefined;
     }
+
+    createPath(path: string, canRead = true, canWrite = true) {
+        return this._module.FS_createPath("/", path, canRead, canWrite);
+    }
+
+    createDataFile(path: string, data: Uint8Array, canRead = true, canWrite = true, canOwn = true) {
+        return this._module.FS_createDataFile("/", path, data, canRead, canWrite, canOwn);
+    }
+
+    preloadFile(path: string, data: Uint8Array, canRead = true, canWrite = true, dontCreateFile = false, canOwn = true, preFinish = false) {
+        return this._module.FS_preloadFile("/", path, data, canRead, canWrite, dontCreateFile, canOwn, preFinish);
+    }
+
+    unlink(path: string) {
+        return this._module.FS_unlink(path);
+    }
+
 }
