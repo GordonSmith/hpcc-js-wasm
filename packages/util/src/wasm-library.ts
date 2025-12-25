@@ -37,7 +37,7 @@ export class WasmLibrary<TModule extends object, TExports = undefined> {
         this._exports = _exports as any;
     }
 
-    dispose() {
+    delete() {
         const exportsAny = this._exports as any as Destroyable;
         if (exportsAny && typeof exportsAny.delete === "function") {
             exportsAny.delete();

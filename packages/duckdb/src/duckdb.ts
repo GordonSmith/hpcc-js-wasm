@@ -1,6 +1,6 @@
 // @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
 import load, { reset } from "../../../build/packages/duckdb/duckdblib.wasm";
-import type { MainModule, DuckDB as DuckDBGlobals, Connection, PreparedStatement, MaterializedQueryResult, QueryResult, ColumnarQueryResult } from "../../../build/packages/duckdb/duckdblib.js";
+import type { MainModule, DuckDB as DuckDBGlobals, Connection, PreparedStatement, MaterializedQueryResult, QueryResult, ColumnarQueryResult, ClassHandle } from "../../../build/packages/duckdb/duckdblib.js";
 import { WasmLibrary } from "@hpcc-js/wasm-util";
 
 let g_duckdb: Promise<DuckDB>;
@@ -213,10 +213,67 @@ export class DuckDBColumnarResult extends WasmLibrary<MainModule, ColumnarQueryR
     }
 }
 
-export class DuckDBConnection extends WasmLibrary<MainModule, Connection> {
+export class DuckDBConnection extends WasmLibrary<MainModule, Connection> implements Connection {
 
     constructor(_module: MainModule, connection: Connection) {
         super(_module, connection);
+    }
+
+    isAliasOf(other: ClassHandle): boolean {
+        return this._exports.isAliasOf(other);
+    }
+
+    delete(): void {
+        this._exports.delete();
+    }
+
+    deleteLater(): this {
+        this._exports.deleteLater();
+        return this;
+    }
+
+    isDeleted(): boolean {
+        return this._exports.isDeleted();
+    }
+
+    [Symbol.dispose](): void {
+        this.delete();
+    }
+
+    clone(): this {
+        return new DuckDBConnection(this._module, this._exports.clone()) as this;
+    }
+
+    interrupt(): void {
+        this._exports.interrupt();
+    }
+
+    beginTransaction(): void {
+        this._exports.beginTransaction();
+    }
+
+    commit(): void {
+        this._exports.commit();
+    }
+
+    rollback(): void {
+        this._exports.rollback();
+    }
+
+    setAutoCommit(_0: boolean): void {
+        this._exports.setAutoCommit(_0);
+    }
+
+    isAutoCommit(): boolean {
+        return this._exports.isAutoCommit();
+    }
+
+    hasActiveTransaction(): boolean {
+        return this._exports.hasActiveTransaction();
+    }
+
+    getQueryProgress(): number {
+        return this._exports.getQueryProgress();
     }
 
     prepare(sql: string): PreparedStatement {
@@ -225,14 +282,6 @@ export class DuckDBConnection extends WasmLibrary<MainModule, Connection> {
 
     query(sql: string): MaterializedQueryResult {
         return this._exports.query(sql)!;
-    }
-
-    prepareXXX(sql: string): DuckDBPreparedStatement {
-        return new DuckDBPreparedStatement(this._module, this._exports.prepare(sql)!);
-    }
-
-    queryXXX(sql: string): DuckDBResult {
-        return new DuckDBResult(this._module, this._exports.query(sql)!);
     }
 
     /**

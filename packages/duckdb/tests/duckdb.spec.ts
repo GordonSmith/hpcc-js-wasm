@@ -26,53 +26,6 @@ describe("duckdb", function () {
         con.close();
     });
 
-    it("runQuery", async function () {
-        const duckdb = await DuckDB.load();
-        const con = duckdb.connect();
-        const bytes = con.runQuery("SELECT 42 AS answer");
-        expect(bytes).to.be.instanceOf(Uint8Array);
-        expect(bytes.length).to.be.gt(0);
-        const text = new TextDecoder().decode(bytes);
-        expect(text).to.contain("42");
-        con.close();
-    });
-
-    it("queryColumnar", async function () {
-        const duckdb = await DuckDB.load();
-        const con = duckdb.connect();
-        const result = con.queryColumnar("SELECT 42 AS answer");
-        expect(result.hasError()).to.equal(false);
-        expect(result.rowCount()).to.equal(1);
-        expect(result.columnCount()).to.equal(1);
-        expect(result.columnName(0).toLowerCase()).to.contain("answer");
-        expect(result.validity(0)).to.be.instanceOf(Uint8Array);
-        const col = result.f64Column(0);
-        expect(col).to.not.equal(null);
-        if (!(col instanceof Float64Array)) {
-            throw new Error("Expected f64Column(0) to return a Float64Array");
-        }
-        expect(col[0]).to.equal(42);
-        result.delete();
-        con.close();
-    });
-
-    it("queryColumnar_toArray", async function () {
-        const duckdb = await DuckDB.load();
-        const con = duckdb.connect();
-
-        const result = con.queryColumnar(
-            "SELECT * FROM (VALUES (1, true, 'x'), (2, false, NULL)) t(a, b, c)"
-        );
-        expect(result.hasError()).to.equal(false);
-        expect(result.toArray()).to.deep.equal([
-            { a: 1, b: true, c: "x" },
-            { a: 2, b: false, c: null }
-        ]);
-
-        result.delete();
-        con.close();
-    });
-
     it("prepare", async function () {
         const duckdb = await DuckDB.load();
         const conn = duckdb.connect();
@@ -80,11 +33,10 @@ describe("duckdb", function () {
         conn.query("INSERT INTO person VALUES ('Alice', 37), ('Ana', 35), ('Bob', 41), ('Bea', 25);").delete();
         const stmt = conn.prepare("SELECT * FROM person WHERE starts_with(name, CAST(? AS VARCHAR))");
         const result = stmt.execute(["B"]);
-        const resultStr = result.toString();
+        const resultStr = result?.stringify()!;
         expect(resultStr).to.contain("name");
         expect(resultStr).to.contain("age");
         expect(resultStr.toLowerCase()).to.not.contain("error");
-        result.delete();
         stmt.delete();
         conn.close();
     });

@@ -87,6 +87,7 @@ export async function wrap(path: string) {
     path = path.replace(/\.js$/, ".xxx");
     const wasmJsPath = path.replace(/\.wasm$/, ".js");
     const CHUNK_SIZE = 64 * 1024 * 1024;
+
     let base91Wasm = '';
     base91.reset();
     for (let offset = 0; offset < wasm.length; offset += CHUNK_SIZE) {
@@ -97,9 +98,31 @@ export async function wrap(path: string) {
     base91Wasm += base91.encodeChunkEnd();
 
     console.log(`  Compressing...`);
-    const compressedWasm = zstd.compress(wasm);
+    const compressedChunks: Uint8Array[] = [];
+    zstd.reset();
+    for (let offset = 0; offset < wasm.length; offset += CHUNK_SIZE) {
+        const chunk = wasm.subarray(offset, Math.min(offset + CHUNK_SIZE, wasm.length));
+        compressedChunks.push(zstd.compressChunk(chunk));
+        console.log(`    Compressed ${Math.min(offset + CHUNK_SIZE, wasm.length)} / ${wasm.length} bytes`);
+    }
+    compressedChunks.push(zstd.compressEnd());
+    const totalLength = compressedChunks.reduce((sum, chunk) => sum + chunk.length, 0);
+    const compressedWasm = new Uint8Array(totalLength);
+    let compressionOffset = 0;
+    for (const chunk of compressedChunks) {
+        compressedWasm.set(chunk, compressionOffset);
+        compressionOffset += chunk.length;
+    }
+
     console.log(`  Encoding compressed...`);
-    const base91CompressedWasm = base91.encode(compressedWasm);
+    let base91CompressedWasm = '';
+    base91.reset();
+    for (let offset = 0; offset < compressedWasm.length; offset += CHUNK_SIZE) {
+        const chunk = compressedWasm.subarray(offset, Math.min(offset + CHUNK_SIZE, compressedWasm.length));
+        base91CompressedWasm += base91.encodeChunk(chunk);
+        console.log(`    Encoded ${Math.min(offset + CHUNK_SIZE, compressedWasm.length)} / ${compressedWasm.length} bytes (compressed)`);
+    }
+    base91CompressedWasm += base91.encodeChunkEnd();
 
     console.log(`  Creating wrapper...`);
     return tpl(wasmJsPath, base91Wasm, base91CompressedWasm);
