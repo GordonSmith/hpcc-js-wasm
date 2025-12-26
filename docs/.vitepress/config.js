@@ -6,6 +6,7 @@ export default defineConfig({
     description: 'HPCC Systems Wasm Libraries',
     base: '/hpcc-js-wasm/',
     srcExclude: ['**/tests/**'],
+    ignoreDeadLinks: true,
 
     themeConfig: {
         repo: "hpcc-systems/hpcc-js-wasm",
@@ -38,12 +39,12 @@ export default defineConfig({
             {
                 text: 'WASM API',
                 items: [
-                    { text: 'Base91', link: '/base91/src/base91/classes/Base91' },
-                    { text: 'DuckDB', link: '/duckdb/src/duckdb/classes/DuckDB' },
-                    { text: 'Expat', link: '/expat/src/expat/classes/Expat' },
-                    { text: 'Graphviz', link: '/graphviz/src/graphviz/classes/Graphviz' },
-                    { text: 'Llama', link: '/llama/src/llama/classes/Llama' },
-                    { text: 'Zstd', link: '/zstd/src/zstd/classes/Zstd' },
+                    { text: 'Base91', link: '/packages/base91/README' },
+                    { text: 'DuckDB', link: '/packages/duckdb/README' },
+                    { text: 'Expat', link: '/packages/expat/README' },
+                    { text: 'Graphviz', link: '/packages/graphviz/README' },
+                    { text: 'Llama', link: '/packages/llama/README' },
+                    { text: 'Zstd', link: '/packages/zstd/README' },
                 ]
             }
 
