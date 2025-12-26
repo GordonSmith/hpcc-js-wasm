@@ -88,7 +88,7 @@ export class Base91 extends MainModuleEx<MainModule> {
     }
 
     /**
-     * @param data Data to encode.
+     * @param data Data to encode. Call {@link encodeChunkEnd} after the final chunk.
      * @returns string containing the Base 91 encoded data
      */
     encodeChunk(data: Uint8Array): string {
@@ -134,6 +134,37 @@ export class Base91 extends MainModuleEx<MainModule> {
 
         this.free(unencoded);
         this.free(encoded);
+        return retVal;
+    }
+
+    /**
+     * Streaming decode for a chunk of data. Call {@link decodeChunkEnd} after the final chunk.
+     * @param base91Str Encoded chunk
+     * @returns decoded bytes for the chunk
+     */
+    decodeChunk(base91Str: string): Uint8Array {
+        const encoded = this.stringToHeap(base91Str);
+        const unencoded = this.malloc(encoded.size);
+
+        unencoded.size = this._base91.decode(encoded.ptr, encoded.size, unencoded.ptr);
+        const retVal = this.heapToUint8Array(unencoded);
+
+        this.free(unencoded);
+        this.free(encoded);
+        return retVal;
+    }
+
+    /**
+     * Finalizes a streaming decode started with {@link decodeChunk}.
+     * @returns remaining decoded bytes
+     */
+    decodeChunkEnd(): Uint8Array {
+        const unencoded = this.malloc(2);
+
+        unencoded.size = this._base91.decode_end(unencoded.ptr);
+        const retVal = this.heapToUint8Array(unencoded);
+
+        this.free(unencoded);
         return retVal;
     }
 }

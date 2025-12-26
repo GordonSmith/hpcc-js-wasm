@@ -33,8 +33,7 @@ set(EM_LINK_FLAGS
     # "-sUSE_GLFW=0"
     # "-sALLOW_UNIMPLEMENTED_SYSCALLS=0"
     # "-sINCOMING_MODULE_JS_API=\"[]\""
-
-    # "-sASSERTIONS=0"
+    "-sASSERTIONS=0"
     "-sINVOKE_RUN=0"
     "-sALLOW_MEMORY_GROWTH=1"
     # "-sWASM=1"
