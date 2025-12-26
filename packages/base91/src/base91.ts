@@ -159,7 +159,7 @@ export class Base91 extends MainModuleEx<MainModule> {
      * @returns remaining decoded bytes
      */
     decodeChunkEnd(): Uint8Array {
-        const unencoded = this.malloc(2);
+        const unencoded = this.malloc(1);
 
         unencoded.size = this._base91.decode_end(unencoded.ptr);
         const retVal = this.heapToUint8Array(unencoded);
