@@ -1,6 +1,7 @@
 project(duckdblib)
 
 find_package(DuckDB CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 # See:  https://github.com/emscripten-core/emscripten/blob/main/src/settings.js
 
@@ -49,4 +50,5 @@ set_target_properties(duckdblib PROPERTIES LINK_FLAGS "${LINK_FLAGS}")
 
 target_link_libraries(duckdblib
     PRIVATE $<IF:$<TARGET_EXISTS:duckdb>,duckdb,duckdb_static>
+    PRIVATE nlohmann_json::nlohmann_json
 )

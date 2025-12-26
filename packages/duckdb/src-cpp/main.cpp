@@ -7,235 +7,14 @@
 #include <emscripten/val.h>
 #include <emscripten/bind.h>
 
+#include <nlohmann/json.hpp>
+
 #include "duckdb/main/stream_query_result.hpp"
 
 // Statically initialize extensions without requiring SQL LOAD.
 #include "duckdb/main/extension/extension_loader.hpp"
 
 using namespace duckdb;
-
-class ColumnarQueryResult
-{
-public:
-    enum class Kind
-    {
-        F64 = 0,
-        BOOL = 1,
-        STRING = 2
-    };
-
-    ColumnarQueryResult() = default;
-
-    explicit ColumnarQueryResult(const std::string &error)
-    {
-        _has_error = true;
-        _error = error;
-    }
-
-    explicit ColumnarQueryResult(std::unique_ptr<MaterializedQueryResult> result)
-    {
-        if (!result)
-        {
-            return;
-        }
-
-        _column_count = (uint32_t)result->ColumnCount();
-        _row_count = (uint32_t)result->RowCount();
-
-        if (result->HasError())
-        {
-            _has_error = true;
-            // Best-effort: this includes the error message in current DuckDB builds.
-            _error = result->ToString();
-        }
-
-        _names.reserve(_column_count);
-        _kinds.resize(_column_count, Kind::STRING);
-        _types.reserve(_column_count);
-        _validity.resize(_column_count);
-        _f64.resize(_column_count);
-        _u8.resize(_column_count);
-        _str.resize(_column_count);
-
-        for (uint32_t c = 0; c < _column_count; ++c)
-        {
-            _names.push_back(result->ColumnName(c));
-            _types.push_back(std::string(""));
-            _validity[c].resize(_row_count);
-
-            // Infer a display type + storage kind from first non-null value.
-            Kind inferred = Kind::STRING;
-            std::string inferred_type;
-            for (uint32_t r = 0; r < _row_count; ++r)
-            {
-                Value v = result->GetValue(c, r);
-                if (!v.IsNull())
-                {
-                    inferred_type = v.type().ToString();
-                    switch (v.type().id())
-                    {
-                    case LogicalTypeId::BOOLEAN:
-                        inferred = Kind::BOOL;
-                        break;
-                    case LogicalTypeId::TINYINT:
-                    case LogicalTypeId::SMALLINT:
-                    case LogicalTypeId::INTEGER:
-                    case LogicalTypeId::BIGINT:
-                    case LogicalTypeId::FLOAT:
-                    case LogicalTypeId::DOUBLE:
-                        inferred = Kind::F64;
-                        break;
-                    default:
-                        inferred = Kind::STRING;
-                        break;
-                    }
-                    break;
-                }
-            }
-            _kinds[c] = inferred;
-            _types[c] = inferred_type;
-
-            switch (inferred)
-            {
-            case Kind::F64:
-                _f64[c].resize(_row_count);
-                break;
-            case Kind::BOOL:
-                _u8[c].resize(_row_count);
-                break;
-            default:
-                _str[c].resize(_row_count);
-                break;
-            }
-        }
-
-        for (uint32_t r = 0; r < _row_count; ++r)
-        {
-            for (uint32_t c = 0; c < _column_count; ++c)
-            {
-                Value v = result->GetValue(c, r);
-                if (v.IsNull())
-                {
-                    _validity[c][r] = 0;
-                    // Leave default value.
-                    continue;
-                }
-                _validity[c][r] = 1;
-
-                switch (_kinds[c])
-                {
-                case Kind::BOOL:
-                    _u8[c][r] = v.GetValue<bool>() ? 1 : 0;
-                    break;
-                case Kind::F64:
-                    switch (v.type().id())
-                    {
-                    case LogicalTypeId::FLOAT:
-                    case LogicalTypeId::DOUBLE:
-                        _f64[c][r] = v.GetValue<double>();
-                        break;
-                    case LogicalTypeId::TINYINT:
-                    case LogicalTypeId::SMALLINT:
-                    case LogicalTypeId::INTEGER:
-                    case LogicalTypeId::BIGINT:
-                        _f64[c][r] = (double)v.GetValue<int64_t>();
-                        break;
-                    default:
-                        // Fallback: if conversion isn't supported, keep a default value.
-                        _validity[c][r] = 0;
-                        break;
-                    }
-                    break;
-                default:
-                    _str[c][r] = v.ToString();
-                    break;
-                }
-            }
-        }
-    }
-
-    bool hasError() const { return _has_error; }
-    std::string error() const { return _error; }
-
-    uint32_t rowCount() const { return _row_count; }
-    uint32_t columnCount() const { return _column_count; }
-
-    std::string columnName(uint32_t column) const
-    {
-        if (column >= _names.size())
-            return std::string("");
-        return _names[column];
-    }
-
-    std::string columnType(uint32_t column) const
-    {
-        if (column >= _types.size())
-            return std::string("");
-        return _types[column];
-    }
-
-    uint32_t columnKind(uint32_t column) const
-    {
-        if (column >= _kinds.size())
-            return (uint32_t)Kind::STRING;
-        return (uint32_t)_kinds[column];
-    }
-
-    emscripten::val validity(uint32_t column)
-    {
-        if (column >= _validity.size())
-            return emscripten::val::null();
-        return emscripten::val(emscripten::typed_memory_view(_row_count, _validity[column].data()));
-    }
-
-    emscripten::val f64Column(uint32_t column)
-    {
-        if (column >= _f64.size() || _kinds[column] != Kind::F64)
-            return emscripten::val::null();
-        return emscripten::val(emscripten::typed_memory_view(_row_count, _f64[column].data()));
-    }
-
-    emscripten::val boolColumn(uint32_t column)
-    {
-        if (column >= _u8.size() || _kinds[column] != Kind::BOOL)
-            return emscripten::val::null();
-        return emscripten::val(emscripten::typed_memory_view(_row_count, _u8[column].data()));
-    }
-
-    emscripten::val stringColumn(uint32_t column)
-    {
-        if (column >= _str.size() || _kinds[column] != Kind::STRING)
-            return emscripten::val::null();
-        emscripten::val arr = emscripten::val::array();
-        for (uint32_t r = 0; r < _row_count; ++r)
-        {
-            if (_validity[column][r] == 0)
-            {
-                arr.call<void>("push", emscripten::val::null());
-            }
-            else
-            {
-                arr.call<void>("push", emscripten::val(_str[column][r]));
-            }
-        }
-        return arr;
-    }
-
-private:
-    bool _has_error = false;
-    std::string _error;
-    uint32_t _row_count = 0;
-    uint32_t _column_count = 0;
-
-    std::vector<std::string> _names;
-    std::vector<std::string> _types;
-    std::vector<Kind> _kinds;
-
-    std::vector<std::vector<uint8_t>> _validity;
-    std::vector<std::vector<double>> _f64;
-    std::vector<std::vector<uint8_t>> _u8;
-    std::vector<std::vector<std::string>> _str;
-};
 
 extern "C"
 {
@@ -333,6 +112,58 @@ namespace MaterializedQueryResultHelper
             return emscripten::val(val.ToString());
         }
     }
+
+    nlohmann::json valueToJSON(const Value &val)
+    {
+        if (val.IsNull())
+        {
+            return nullptr;
+        }
+
+        switch (val.type().id())
+        {
+        case LogicalTypeId::BOOLEAN:
+            return val.GetValue<bool>();
+        case LogicalTypeId::TINYINT:
+        case LogicalTypeId::SMALLINT:
+        case LogicalTypeId::INTEGER:
+        case LogicalTypeId::BIGINT:
+            return val.GetValue<int64_t>();
+        case LogicalTypeId::FLOAT:
+        case LogicalTypeId::DOUBLE:
+        {
+            double d = val.GetValue<double>();
+            if (std::isnan(d) || std::isinf(d))
+            {
+                return nullptr;
+            }
+            return d;
+        }
+        case LogicalTypeId::VARCHAR:
+            return val.GetValue<string>();
+        default:
+            return val.ToString();
+        }
+    }
+
+    std::string toJSON(MaterializedQueryResult &obj)
+    {
+        nlohmann::json result = nlohmann::json::array();
+        const size_t rowCount = obj.RowCount();
+        const size_t colCount = obj.ColumnCount();
+
+        for (size_t row = 0; row < rowCount; ++row)
+        {
+            nlohmann::json rowObj = nlohmann::json::object();
+            for (size_t col = 0; col < colCount; ++col)
+            {
+                Value val = obj.GetValue(col, row);
+                rowObj[obj.ColumnName(col)] = valueToJSON(val);
+            }
+            result.push_back(rowObj);
+        }
+        return result.dump();
+    }
 }
 
 namespace ConnectionHelper
@@ -346,18 +177,18 @@ namespace ConnectionHelper
         return obj.Query(query).release();
     }
 
-    ColumnarQueryResult *queryColumnar(Connection &obj, const string &query)
-    {
-        try
-        {
-            auto result = obj.Query(query);
-            return new ColumnarQueryResult(std::move(result));
-        }
-        catch (const std::exception &e)
-        {
-            return new ColumnarQueryResult(std::string(e.what()));
-        }
-    }
+    // ColumnarQueryResult *queryColumnar(Connection &obj, const string &query)
+    // {
+    //     try
+    //     {
+    //         auto result = obj.Query(query);
+    //         return new ColumnarQueryResult(std::move(result));
+    //     }
+    //     catch (const std::exception &e)
+    //     {
+    //         return new ColumnarQueryResult(std::string(e.what()));
+    //     }
+    // }
 }
 
 namespace DuckDBHelper
@@ -567,28 +398,9 @@ EMSCRIPTEN_BINDINGS(duckdblib_bindings)
 {
     using namespace emscripten;
 
-    enum_<ColumnarQueryResult::Kind>("ColumnarQueryResultKind")
-        .value("F64", ColumnarQueryResult::Kind::F64)
-        .value("BOOL", ColumnarQueryResult::Kind::BOOL)
-        .value("STRING", ColumnarQueryResult::Kind::STRING);
-
-    class_<ColumnarQueryResult>("ColumnarQueryResult")
-        .constructor<>()
-        .function("hasError", &ColumnarQueryResult::hasError)
-        .function("error", &ColumnarQueryResult::error)
-        .function("rowCount", &ColumnarQueryResult::rowCount)
-        .function("columnCount", &ColumnarQueryResult::columnCount)
-        .function("columnName", &ColumnarQueryResult::columnName)
-        .function("columnType", &ColumnarQueryResult::columnType)
-        .function("columnKind", &ColumnarQueryResult::columnKind)
-        .function("validity", &ColumnarQueryResult::validity)
-        .function("f64Column", &ColumnarQueryResult::f64Column)
-        .function("boolColumn", &ColumnarQueryResult::boolColumn)
-        .function("stringColumn", &ColumnarQueryResult::stringColumn);
-
     class_<LogicalType>("LogicalType")
         .constructor<>()
-        .function("toString", &LogicalType::ToString)
+        .function("stringify", &LogicalType::ToString)
         .function("id", &LogicalTypeHelper::id)
         .function("physicalType", &LogicalTypeHelper::physicalType)
         .function("isIntegral", &LogicalType::IsIntegral)
@@ -609,7 +421,7 @@ EMSCRIPTEN_BINDINGS(duckdblib_bindings)
         .constructor<>()
         .function("type", &Value::type)
         .function("isNull", &Value::IsNull)
-        .function("toString", &Value::ToString)
+        .function("stringify", &Value::ToString)
         .function("toSQLString", &ValueHelper::toSQLString)
         .function("copy", &ValueHelper::copy)
         .function("getBoolean", &Value::GetValue<bool>)
@@ -659,6 +471,7 @@ EMSCRIPTEN_BINDINGS(duckdblib_bindings)
         .function("rowCount", &MaterializedQueryResult::RowCount)
         .function("collection", &MaterializedQueryResult::Collection)
         .function("getValue", &MaterializedQueryResultHelper::GetValue)
+        .function("toJSON", &MaterializedQueryResultHelper::toJSON)
 
         ;
 

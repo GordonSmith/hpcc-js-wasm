@@ -1,4 +1,7 @@
-export default {
+import { resolve } from 'path';
+import { defineConfig } from 'vite'
+
+export default defineConfig({
     title: '@hpcc-js/wasm',
     description: 'HPCC Systems Wasm Libraries',
     base: '/hpcc-js-wasm/',
@@ -50,4 +53,4 @@ export default {
             copyright: 'Copyright © 2019-present hpccsystems.com'
         }
     }
-}
+});

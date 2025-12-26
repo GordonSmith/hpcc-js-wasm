@@ -28,7 +28,7 @@ features:
     link: /base91/src/base91/classes/Base91
   - title: DuckDB
     details: DuckDB - a fast in-process analytical database.
-    link: /duckdb/src/duckdb/classes/DuckDB
+    link: /packages/duckdb/README
   - title: Expat
     details: A popular stream-oriented XML parser library.
     link: /expat/src/expat/classes/Expat
