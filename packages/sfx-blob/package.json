@@ -1,0 +1,71 @@
+{
+    "name": "@hpcc-js/sfx-blob",
+    "version": "0.1.0",
+    "description": "hpcc-js - Self-Extracting Blob (AssemblyScript)",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./types/index.d.ts",
+            "default": "./dist/index.js"
+        },
+        "./compress": {
+            "types": "./types/index-compress.d.ts",
+            "default": "./dist/compress.js"
+        },
+        "./decompress": {
+            "types": "./types/index-decompress.d.ts",
+            "default": "./dist/decompress.js"
+        }
+    },
+    "main": "./dist/index.js",
+    "types": "./types/index.d.ts",
+    "files": [
+        "dist/**/*",
+        "src/**/*",
+        "assembly/**/*",
+        "types/**/*"
+    ],
+    "scripts": {
+        "clean": "rimraf coverage dist dist-test types .nyc_output build",
+        "build-asm": "run-p build-asm:*",
+        "build-asm:combined": "asc assembly/index.ts --config asconfig.json --target release",
+        "build-asm:compress": "asc assembly/index-compress.ts --config asconfig.json --target compress-release",
+        "build-asm:decompress": "asc assembly/index-decompress.ts --config asconfig.json --target decompress-release",
+        "build-asm-debug": "asc assembly/index.ts --config asconfig.json --target debug",
+        "gen-types": "tsc --project tsconfig.json --emitDeclarationOnly",
+        "gen-types-watch": "npm run gen-types -- --watch",
+        "bundle": "node esbuild.js",
+        "bundle-dev": "npm run bundle -- --development",
+        "bundle-watch": "npm run bundle-dev -- --watch",
+        "build-dev": "run-s build-asm && run-p gen-types bundle-dev",
+        "build": "run-s build-asm && run-p gen-types bundle",
+        "lint-skypack": "npx -y @skypack/package-check",
+        "lint-eslint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
+        "lint": "run-p lint-eslint",
+        "test": "vitest run",
+        "coverage": "vitest run --coverage",
+        "update": "npx -y npm-check-updates -u -t minor",
+        "update-major": "npx -y npm-check-updates -u"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "@hpcc-js/esbuild-plugins": "1.7.0",
+        "assemblyscript": "0.28.9"
+    },
+    "keywords": [
+        "sfx-blob",
+        "self-extracting",
+        "webassembly",
+        "wasm",
+        "lz4",
+        "base91",
+        "assemblyscript"
+    ],
+    "author": "hpcc-systems",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/hpcc-systems/hpcc-js-wasm.git"
+    },
+    "homepage": "https://hpcc-systems.github.io/hpcc-js-wasm/",
+    "license": "Apache-2.0"
+}

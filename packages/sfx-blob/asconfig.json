@@ -1,0 +1,42 @@
+{
+    "targets": {
+        "debug": {
+            "outFile": "build/sfxbloblib.debug.wasm",
+            "textFile": "build/sfxbloblib.debug.wat",
+            "sourceMap": true,
+            "debug": true,
+            "exportRuntime": false
+        },
+        "release": {
+            "outFile": "build/sfxbloblib.wasm",
+            "textFile": "build/sfxbloblib.wat",
+            "sourceMap": true,
+            "optimizeLevel": 3,
+            "shrinkLevel": 0,
+            "converge": false,
+            "noAssert": false,
+            "exportRuntime": false
+        },
+        "compress-release": {
+            "outFile": "build/compress.wasm",
+            "sourceMap": true,
+            "optimizeLevel": 3,
+            "shrinkLevel": 0,
+            "converge": false,
+            "noAssert": false,
+            "exportRuntime": false
+        },
+        "decompress-release": {
+            "outFile": "build/decompress.wasm",
+            "sourceMap": true,
+            "optimizeLevel": 3,
+            "shrinkLevel": 0,
+            "converge": false,
+            "noAssert": false,
+            "exportRuntime": false
+        }
+    },
+    "options": {
+        "bindings": "raw"
+    }
+}
