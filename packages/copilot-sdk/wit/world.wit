@@ -1,0 +1,31 @@
+package hpcc:copilot-sdk@1.0.0;
+
+/// WASM Component interface for the Copilot SDK.
+///
+/// This component encapsulates outbound HTTP calls to the GitHub Copilot
+/// chat completions API.  It is designed for embedding in Java and C++
+/// applications via a WASI-preview-2-capable runtime (e.g. wasmtime).
+///
+/// ## Request JSON
+/// ```json
+/// {
+///   "action": "completion",
+///   "prompt": "<user message>",
+///   "token": "<GitHub OAuth token>",
+///   "options": {
+///     "model": "gpt-4o",
+///     "systemPrompt": "...",
+///     "max_tokens": 150,
+///     "temperature": 0.7
+///   }
+/// }
+/// ```
+///
+/// ## Response JSON
+/// ```json
+/// { "type": "completion_response", "text": "..." }
+/// { "type": "error",              "message": "..." }
+/// ```
+world copilot-sdk {
+    export handle: func(request: string) -> string;
+}
