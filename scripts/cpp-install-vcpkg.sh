@@ -2,13 +2,14 @@
 
 # List of current version can be found in https://github.com/microsoft/vcpkg/releases  ---
 # UPDATE README.md
-VCPKG_BUILD_TOOLS_VERSION=2026.06.01
+VCPKG_BUILD_TOOLS_VERSION=2026.06.24
 
 if [ ! -d "./vcpkg" ] 
 then
     git clone --branch "$VCPKG_BUILD_TOOLS_VERSION" --depth 1 https://github.com/microsoft/vcpkg.git
 fi
 cd ./vcpkg
+git fetch --tags
 git checkout $VCPKG_BUILD_TOOLS_VERSION
 ./bootstrap-vcpkg.sh
 cd ..
