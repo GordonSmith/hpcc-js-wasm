@@ -9,7 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit tests for {@link Graphviz}.
  *
- * <p>The tests mirror the behaviour validated by the TypeScript test suite so
+ * <p>
+ * The tests mirror the behaviour validated by the TypeScript test suite so
  * that parity between language bindings can be confirmed.
  */
 class GraphvizTest {
@@ -33,6 +34,7 @@ class GraphvizTest {
         String v = graphviz.version();
         assertNotNull(v);
         assertFalse(v.isBlank(), "version string should not be blank");
+        assertEquals("15.1.0", v, "version should match the bundled library version"); // Update when upgrading Graphviz
     }
 
     @Test
@@ -48,7 +50,7 @@ class GraphvizTest {
         String dot = graphviz.layout("digraph { a -> b }", "dot", "dot");
         assertNotNull(dot);
         assertTrue(dot.contains("digraph") || dot.contains("->"),
-            "dot output should contain graph syntax");
+                "dot output should contain graph syntax");
     }
 
     @Test
@@ -59,6 +61,14 @@ class GraphvizTest {
     }
 
     @Test
+    void layout_emptyInput_returnsEmptyString() {
+        // mirrors the JS "blank-dot" test: graphviz.dot("", "svg") === ""
+        String result = graphviz.layout("", "svg", "dot");
+        assertNotNull(result);
+        assertTrue(result.isEmpty(), "empty DOT input should produce empty output");
+    }
+
+    @Test
     void layout_neatoEngine_producesSvg() {
         String svg = graphviz.layout("graph { a -- b -- c }", "svg", "neato");
         assertNotNull(svg);
@@ -66,34 +76,109 @@ class GraphvizTest {
     }
 
     @Test
+    void layout_circoEngine_producesSvg() {
+        String svg = graphviz.layout("graph { a -- b -- c }", "svg", "circo");
+        assertNotNull(svg);
+        assertTrue(svg.contains("<svg"), "circo layout should produce SVG");
+    }
+
+    @Test
+    void layout_fdpEngine_producesSvg() {
+        String svg = graphviz.layout("graph { a -- b -- c }", "svg", "fdp");
+        assertNotNull(svg);
+        assertTrue(svg.contains("<svg"), "fdp layout should produce SVG");
+    }
+
+    @Test
+    void layout_sfdpEngine_producesSvg() {
+        String svg = graphviz.layout("graph { a -- b -- c }", "svg", "sfdp");
+        assertNotNull(svg);
+        assertTrue(svg.contains("<svg"), "sfdp layout should produce SVG");
+    }
+
+    @Test
+    void layout_osageEngine_producesSvg() {
+        String svg = graphviz.layout("graph { a -- b -- c }", "svg", "osage");
+        assertNotNull(svg);
+        assertTrue(svg.contains("<svg"), "osage layout should produce SVG");
+    }
+
+    @Test
+    void layout_patchworkEngine_producesSvg() {
+        String svg = graphviz.layout("graph { a -- b -- c }", "svg", "patchwork");
+        assertNotNull(svg);
+        assertTrue(svg.contains("<svg"), "patchwork layout should produce SVG");
+    }
+
+    @Test
+    void layout_twopiEngine_producesSvg() {
+        String svg = graphviz.layout("graph { a -- b -- c }", "svg", "twopi");
+        assertNotNull(svg);
+        assertTrue(svg.contains("<svg"), "twopi layout should produce SVG");
+    }
+
+    @Test
     void layout_nullSrc_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class,
-            () -> graphviz.layout(null, "svg", "dot"));
+                () -> graphviz.layout(null, "svg", "dot"));
     }
 
     @Test
     void layout_nullFormat_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class,
-            () -> graphviz.layout("digraph{}", null, "dot"));
+                () -> graphviz.layout("digraph{}", null, "dot"));
     }
 
     @Test
     void layout_nullEngine_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class,
-            () -> graphviz.layout("digraph{}", "svg", null));
+                () -> graphviz.layout("digraph{}", "svg", null));
     }
 
     @Test
     void layout_invalidDot_throwsGraphvizException() {
+        // mirrors JS "bad dot / syntax error" test: error message should contain
+        // "syntax error in line"
+        GraphvizException ex = assertThrows(GraphvizException.class,
+                () -> graphviz.layout("this is not valid dot", "svg", "dot"));
+        assertTrue(ex.getMessage().contains("syntax error in line"),
+                "exception message should contain 'syntax error in line', was: " + ex.getMessage());
+    }
+
+    @Test
+    void layout_recoversAfterInvalidDot() {
+        // mirrors JS test: valid layout still works after a failed one
         assertThrows(GraphvizException.class,
-            () -> graphviz.layout("this is not valid dot", "svg", "dot"));
+                () -> graphviz.layout("this is not valid dot", "svg", "dot"));
+        String svg = graphviz.layout("digraph { Hello -> World }", "svg", "dot");
+        assertNotNull(svg);
+        assertTrue(svg.contains("<svg"), "should recover and produce SVG after an error");
+        // a second bad-dot should also throw cleanly
+        assertThrows(GraphvizException.class,
+                () -> graphviz.layout("this is not valid dot", "svg", "dot"));
+    }
+
+    @Test
+    void layout_selfLoopGraph_doesNotFail() {
+        // Regression for GH-389: repeated layout of a graph with a self-loop must not
+        // crash
+        String selfLoopDot = "digraph {\n" +
+                "  ie1 [label=\"Customers switching\"];\n" +
+                "  and1 [label=\"Change Me\"];\n" +
+                "  ie1 -> and1; and1 -> ie1;\n" +
+                "}";
+        for (int i = 0; i < 6; i++) {
+            String result = graphviz.layout(selfLoopDot, "json", "dot");
+            assertNotNull(result);
+            assertFalse(result.isBlank(), "layout " + i + " should return non-blank JSON");
+        }
     }
 
     @Test
     void closedInstance_throwsOnUse() {
         graphviz.close();
         assertThrows(IllegalStateException.class,
-            () -> graphviz.layout("digraph{}", "svg", "dot"));
+                () -> graphviz.layout("digraph{}", "svg", "dot"));
     }
 
     @Test
@@ -237,7 +322,7 @@ class GraphvizTest {
             g.addEdge("X", "Y");
             String dot = g.toDot();
             assertTrue(dot.contains("graph ") || dot.contains("--"),
-                "undirected graph DOT should use graph keyword or '--'");
+                    "undirected graph DOT should use graph keyword or '--'");
         }
     }
 

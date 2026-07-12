@@ -12,7 +12,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit tests for {@link Base91}.
  *
- * <p>The tests mirror the behaviour validated by the TypeScript test suite so
+ * <p>
+ * The tests mirror the behaviour validated by the TypeScript test suite so
  * that parity between language bindings can be confirmed.
  */
 class Base91Test {
@@ -55,6 +56,22 @@ class Base91Test {
     }
 
     @Test
+    void encode_100Bytes_roundTrips() {
+        // mirrors JS "simple_100" test
+        byte[] data = new byte[100];
+        for (int i = 0; i < data.length; i++) {
+            data[i] = (byte) (i % 256);
+        }
+
+        String encoded = base91.encode(data);
+        assertNotNull(encoded);
+        assertFalse(encoded.isEmpty(), "encoded string should not be empty");
+
+        byte[] decoded = base91.decode(encoded);
+        assertArrayEquals(data, decoded, "decoded 100-byte data should match original");
+    }
+
+    @Test
     void encode_emptyArray_returnsEmptyString() {
         String encoded = base91.encode(new byte[0]);
         // Base91 of empty input should be empty
@@ -69,7 +86,7 @@ class Base91Test {
 
     @Test
     void encode_singleByte_isReversible() {
-        byte[] data = {0x42};
+        byte[] data = { 0x42 };
         String encoded = base91.encode(data);
         byte[] decoded = base91.decode(encoded);
         assertArrayEquals(data, decoded);
@@ -86,7 +103,7 @@ class Base91Test {
         // Base64 size = ceil(1000/3)*4 = 1336 chars
         // Base91 should be shorter
         assertTrue(base91Str.length() < 1336,
-            "Base91 encoded size (" + base91Str.length() + ") should be less than Base64 (1336)");
+                "Base91 encoded size (" + base91Str.length() + ") should be less than Base64 (1336)");
     }
 
     @Test
@@ -117,7 +134,7 @@ class Base91Test {
     void closedInstance_throwsOnUse() {
         base91.close();
         assertThrows(IllegalStateException.class, () -> base91.version());
-        assertThrows(IllegalStateException.class, () -> base91.encode(new byte[]{1}));
+        assertThrows(IllegalStateException.class, () -> base91.encode(new byte[] { 1 }));
         assertThrows(IllegalStateException.class, () -> base91.decode("AA"));
     }
 
@@ -128,7 +145,7 @@ class Base91Test {
 
             byte[] data = "independent instances test".getBytes(StandardCharsets.UTF_8);
             assertEquals(base91.encode(data), second.encode(data),
-                "Both instances should produce identical encoded output");
+                    "Both instances should produce identical encoded output");
         }
     }
 
