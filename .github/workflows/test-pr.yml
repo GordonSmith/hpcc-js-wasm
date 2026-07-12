@@ -108,13 +108,16 @@ jobs:
         run: |
           npm run test
 
-      - name: Build Java WASM target
+      - name: Build Java WASM targets
         run: |
           cmake --build build --target base91lib_java
+          cmake --build build --target graphvizlib_java
 
-      - name: Test Java package
+      - name: Test Java packages
         run: |
           cd packages-java/base91
+          mvn --batch-mode test
+          cd ../graphviz
           mvn --batch-mode test
 
       - name: Test Bundler Integration

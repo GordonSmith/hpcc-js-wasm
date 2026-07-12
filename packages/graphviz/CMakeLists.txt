@@ -98,6 +98,75 @@ add_custom_command(TARGET graphvizlib POST_BUILD
 
 # set_target_properties(graphvizlib-web PROPERTIES LINK_FLAGS "${LINK_FLAGS} -s ENVIRONMENT=web")
 
+# ---------------------------------------------------------------------------
+# Java / JVM target — standalone WASI WebAssembly, no JavaScript runtime needed
+# ---------------------------------------------------------------------------
+# Uses the same EM_CPP_FLAGS as the JS target (includes -fwasm-exceptions).
+# Link flags differ: standalone-wasm replaces the Emscripten JS glue with
+# WASIp1 syscalls, making the module loadable by Endive on any JVM.
+string(REPLACE ";" " " JAVA_CPP_FLAGS "${EM_CPP_FLAGS}")
+
+set(EM_JAVA_LINK_FLAGS
+    "--standalone-wasm"
+    "--no-entry"
+    "-sEXPORTED_FUNCTIONS=['_graphviz_malloc','_graphviz_free','_graphviz_version','_graphviz_layout','_graphviz_get_result_ptr','_graphviz_last_error','_cgraph_create','_cgraph_destroy','_cgraph_to_dot','_cgraph_layout','_cgraph_add_node','_cgraph_add_edge','_cgraph_set_graph_attr','_cgraph_set_node_attr','_cgraph_set_edge_attr','_cgraph_remove_node','_cgraph_remove_edge','_cgraph_remove_subgraph','_cgraph_has_node','_cgraph_has_edge','_cgraph_has_subgraph','_cgraph_node_count','_cgraph_edge_count','_cgraph_subgraph_count','_cgraph_get_graph_attr','_cgraph_get_node_attr','_cgraph_get_edge_attr','_cgraph_node_names','_cgraph_subgraph_names','_cgraph_edges','_cgraph_out_edges','_cgraph_in_edges','_cgraph_node_edges','_cgraph_add_subgraph','_cgraph_get_subgraph','_csubgraph_add_node','_csubgraph_add_edge','_csubgraph_set_attr','_csubgraph_set_node_attr','_csubgraph_set_edge_attr','_csubgraph_remove_node','_csubgraph_remove_edge','_csubgraph_has_node','_csubgraph_has_edge','_csubgraph_node_count','_csubgraph_edge_count','_csubgraph_get_attr','_csubgraph_get_node_attr','_csubgraph_get_edge_attr','_csubgraph_node_names','_csubgraph_edges','_csubgraph_out_edges','_csubgraph_in_edges','_csubgraph_node_edges']"
+    "-sALLOW_MEMORY_GROWTH=1"
+    "-sASSERTIONS=0"
+)
+string(REPLACE ";" " " JAVA_LINK_FLAGS "${EM_JAVA_LINK_FLAGS}")
+
+add_executable(graphvizlib_java
+    src-cpp/java_bridge.cpp
+)
+
+set_target_properties(graphvizlib_java PROPERTIES
+    COMPILE_FLAGS "${JAVA_CPP_FLAGS}"
+    LINK_FLAGS    "${JAVA_LINK_FLAGS}"
+    SUFFIX        ".wasm"
+)
+
+target_include_directories(graphvizlib_java PRIVATE
+    ${Graphviz_INCLUDE_DIRS}/graphviz
+)
+
+# Re-use the library paths already resolved for the JS target.
+target_link_libraries(graphvizlib_java PRIVATE
+    ${GRAPHVIZ_common}
+    ${GRAPHVIZ_gvc}
+    ${GRAPHVIZ_gvplugin_core}
+    ${GRAPHVIZ_gvplugin_dot_layout}
+    ${GRAPHVIZ_gvplugin_neato_layout}
+    ${GRAPHVIZ_ortho}
+    ${GRAPHVIZ_cdt}
+    ${GRAPHVIZ_cgraph}
+    ${GRAPHVIZ_dotgen}
+    ${GRAPHVIZ_neatogen}
+    ${GRAPHVIZ_fdpgen}
+    ${GRAPHVIZ_sfdpgen}
+    ${GRAPHVIZ_twopigen}
+    ${GRAPHVIZ_circogen}
+    ${GRAPHVIZ_label}
+    ${GRAPHVIZ_osage}
+    ${GRAPHVIZ_patchwork}
+    ${GRAPHVIZ_pack}
+    ${GRAPHVIZ_sparse}
+    ${GRAPHVIZ_pathplan}
+    ${GRAPHVIZ_xdot}
+    ${GRAPHVIZ_util}
+    ${GRAPHVIZ_vpsc}
+    ${EXPAT_LIBRARIES}
+)
+
+# Copy the WASI WASM to the Java package resources so it is bundled in the JAR.
+add_custom_command(TARGET graphvizlib_java POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../packages-java/graphviz/src/main/resources
+    COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_BINARY_DIR}/graphvizlib_java.wasm
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../packages-java/graphviz/src/main/resources/graphvizlib.wasm
+    COMMENT "Copying WASI WASM to Java package resources"
+)
+
 # target_link_libraries(graphvizlib-web PRIVATE
 #     gvplugin_core
 #     gvplugin_dot_layout

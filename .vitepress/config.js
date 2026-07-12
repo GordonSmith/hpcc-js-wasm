@@ -56,6 +56,7 @@ export default defineConfig({
                 text: 'Java API',
                 items: [
                     { text: 'Base91', link: '/packages-java/base91/README' },
+                    { text: 'Graphviz', link: '/packages-java/graphviz/README' },
                 ]
             }
 
