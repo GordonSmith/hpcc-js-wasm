@@ -18,6 +18,8 @@ permissions:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
     steps:
       - name: Initialize Release Please
         id: release
@@ -146,3 +148,9 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
         run: |
           npm run purge-jsdelivr
+
+  publish-java:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    uses: ./.github/workflows/publish-maven.yml
+    secrets: inherit

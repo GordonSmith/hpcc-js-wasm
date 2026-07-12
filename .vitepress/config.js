@@ -51,6 +51,12 @@ export default defineConfig({
                     { text: 'Llama', link: '/packages/llama/README' },
                     { text: 'Zstd', link: '/packages/zstd/README' },
                 ]
+            },
+            {
+                text: 'Java API',
+                items: [
+                    { text: 'Base91', link: '/packages-java/base91/README' },
+                ]
             }
 
         ],

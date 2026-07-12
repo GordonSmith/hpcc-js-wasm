@@ -1,0 +1,114 @@
+name: Publish Java packages to Maven Central (publish-maven.yml)
+
+# This workflow publishes the Java wasm-base91 package to Maven Central
+# via the Sonatype Central Portal.
+#
+# Required repository secrets:
+#   MAVEN_CENTRAL_USERNAME  - Sonatype Central Portal token username
+#   MAVEN_CENTRAL_PASSWORD  - Sonatype Central Portal token password
+#   GPG_PRIVATE_KEY         - ASCII-armoured GPG private key for artifact signing
+#   GPG_PASSPHRASE          - Passphrase for the GPG private key
+
+on:
+  workflow_call:
+    # Triggered by release-please.yml after a release is created.
+    inputs:
+      release_tag:
+        description: "Git tag of the release (e.g. wasm-base91-java-1.14.2)"
+        required: false
+        type: string
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Git tag to publish (leave blank for HEAD)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  VCPKG_BINARY_SOURCES: "clear;nuget,GitHub,readwrite"
+  VCPKG_NUGET_REPOSITORY: https://github.com/hpcc-systems/hpcc-js-wasm
+
+jobs:
+  publish-maven:
+    runs-on: ubuntu-24.04
+    name: Publish wasm-base91 to Maven Central
+
+    steps:
+      - name: Checkout Sources
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag || github.sha }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          server-id: central
+          server-username: MAVEN_CENTRAL_USERNAME
+          server-password: MAVEN_CENTRAL_PASSWORD
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git cmake ninja-build wget zip \
+            gcc-multilib g++-multilib pkg-config autoconf libtool \
+            python3 python3-pip mono-complete
+
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install npm dependencies and build tools
+        run: npm ci
+
+      - name: Install Emscripten SDK
+        run: npm run install-build-deps
+
+      - name: Make nuget.exe executable
+        run: |
+          NUGET_PATH=$(./vcpkg/vcpkg fetch nuget | tail -n 1)
+          chmod +x "$NUGET_PATH"
+
+      - name: Setup vcpkg NuGet authentication
+        run: |
+          mono `./vcpkg/vcpkg fetch nuget | tail -n 1` \
+            sources add \
+            -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+            -storepasswordincleartext \
+            -name "GitHub" \
+            -username "${{ github.repository_owner }}" \
+            -password "${{ secrets.GITHUB_TOKEN }}"
+          mono `./vcpkg/vcpkg fetch nuget | tail -n 1` \
+            setapikey "${{ secrets.GITHUB_TOKEN }}" \
+            -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+
+      - name: Configure CMake build
+        run: npm run build-configure
+
+      - name: Build Java WASM target
+        run: cmake --build build --target base91lib_java
+
+      - name: Publish to Maven Central
+        env:
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE:   ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          cd packages-java/base91
+          mvn --batch-mode --no-transfer-progress deploy \
+            -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}"
