@@ -1,0 +1,67 @@
+{
+  "name": "@hpcc-js/esbuild-plugins",
+  "version": "1.13.1",
+  "description": "Various esbuild plugins",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./sfx-wrapper": {
+      "types": "./types/sfx-wrapper.d.ts",
+      "default": "./dist/sfx-wrapper.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./types/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src/**/*",
+    "types/**/*"
+  ],
+  "scripts": {
+    "clean": "rimraf ./dist ./types",
+    "build-types": "tsc --project tsconfig.json --emitDeclarationOnly",
+    "build-types-watch": "npm run build-types -- --watch",
+    "build-ts-dev": "esbuild ./src/index.ts --platform=node --format=esm --bundle --packages=external --sourcemap --outfile=./dist/index.js",
+    "build-ts": "npm run build-ts-dev -- --minify",
+    "build-ts-watch": "npm run build-ts-dev -- --watch",
+    "build-dev": "run-p build-types build-ts-dev",
+    "build-sfx-wrapper-dev": "esbuild ./src/sfx-wrapper.ts --platform=node --format=esm --bundle --sourcemap --outfile=./dist/sfx-wrapper.js",
+    "build-sfx-wrapper": "npm run build-sfx-wrapper-dev -- --minify",
+    "build": "run-p build-types build-ts build-sfx-wrapper",
+    "lint-skypack": "npx -y @skypack/package-check",
+    "lint-eslint": "eslint src/**/*.ts",
+    "lint": "run-p lint-eslint lint-skypack",
+    "update": "npx --yes npm-check-updates -u -t minor",
+    "update-major": "npx --yes npm-check-updates -u"
+  },
+  "dependencies": {
+    "esbuild": "0.28.2",
+    "esbuild-copy-static-files": "0.1.0",
+    "esbuild-plugin-inline-css": "0.0.1",
+    "esbuild-plugin-umd-wrapper": "3.0.0",
+    "fzstd": "0.1.1"
+  },
+  "devDependencies": {
+    "@hpcc-js/wasm-base91": "1.16.2",
+    "@hpcc-js/wasm-zstd": "1.16.2",
+    "@types/esbuild-copy-static-files": "0.1.4"
+  },
+  "keywords": [
+    "esbuild",
+    "plugins",
+    "WebAssembly",
+    "wasm",
+    "sfx"
+  ],
+  "author": "hpcc-systems",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hpcc-systems/hpcc-js-wasm.git"
+  },
+  "homepage": "https://hpcc-systems.github.io/hpcc-js-wasm/",
+  "license": "Apache-2.0",
+  "gitHead": "a9a326e7ef5b1fc79838c0f79e7d4ded7b8571fd"
+}

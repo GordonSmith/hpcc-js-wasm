@@ -41,6 +41,7 @@ This repository includes comprehensive instructions for AI assistants and GitHub
 - [Development Workflow](.github/instructions/workflow.md) - Step-by-step development processes
 - [Package Patterns](.github/instructions/patterns.md) - Common patterns and quick reference
 - [Troubleshooting Guide](.github/instructions/troubleshooting.md) - Debugging and problem resolution
+- [Spec-Driven Development](specs/README.md) - Specs and four-layer acceptance tests (test cases → DSL → protocol drivers → system under test)
 - Package-specific guides in `packages/*/` directories
 
 ## Packages

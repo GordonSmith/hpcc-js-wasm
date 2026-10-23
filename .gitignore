@@ -39,6 +39,7 @@ types/
 /emsdk
 
 /packages/*/.vitest/
+tests/acceptance/.vitest/
 
 __screenshots__/
 packages/*/.vitest-attachments

@@ -41,7 +41,7 @@
   "dependencies": {},
   "devDependencies": {
     "@hpcc-js/esbuild-plugins": "1.13.1",
-    "@hpcc-js/wasm-util": "1.0.0"
+    "@hpcc-js/util": "^3.8.1"
   },
   "keywords": [
     "graphviz",

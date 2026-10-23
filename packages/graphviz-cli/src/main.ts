@@ -59,5 +59,6 @@ export async function main() {
     } catch (e: any) {
         console.error(`Error:  ${e?.message}\n`);
         console.error(HELP_TEXT);
+        process.exitCode = 1;
     }
 }

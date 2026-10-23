@@ -10,6 +10,7 @@ This directory contains comprehensive instructions for AI assistants working wit
 - **[workflow.md](workflow.md)** - Step-by-step development workflows for common tasks
 - **[patterns.md](patterns.md)** - Quick reference for package patterns and usage examples
 - **[troubleshooting.md](troubleshooting.md)** - Debugging guide for common issues
+- **[spec-driven.instructions.md](spec-driven.instructions.md)** - Spec-driven development: specs → acceptance test cases → DSL → protocol drivers (auto-applied to `specs/**` and `tests/acceptance/**`; skills in [../skills](../skills))
 
 ### Package-Specific Instructions
 - **[../../packages/graphviz/.copilot-package.md](../../packages/graphviz/.copilot-package.md)** - Graphviz package specifics

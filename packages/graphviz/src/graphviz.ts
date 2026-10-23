@@ -1,5 +1,5 @@
-// @ts-expect-error importing from a wasm file is resolved via a custom esbuild plugin
-import load, { reset } from "../../../build/packages/graphviz/graphvizlib.wasm";
+import { WasmModuleResource } from "../../../build/packages/graphviz/graphvizlib.wasm";
+import { SharedPtr } from "@hpcc-js/util";
 import type { MainModule, CGraph as CGraphWasm, CSubgraph as CSubgraphWasm } from "../types/graphvizlib.js";
 import type {
     NodeDotAttr, NodeAttrs,
@@ -123,7 +123,7 @@ function createFiles(graphviz: any, _options?: Options) {
     [...options.files, ...imagesToFiles(options.images)].forEach(file => graphviz.createFile(file.path, file.data));
 }
 
-let g_graphviz: Promise<Graphviz> | undefined;
+let g_graphviz: SharedPtr<WasmModuleResource<MainModule>> | undefined;
 let g_graphvizInstance: Graphviz | undefined;
 
 /**
@@ -616,16 +616,23 @@ export class Subgraph {
     }
 
     /**
-     * Release the WASM wrapper.  The subgraph data itself is freed when the
-     * parent {@link Graph} is deleted.
+     * Release the WASM wrapper. The subgraph data itself is freed when the
+     * parent {@link Graph} is disposed.
+     */
+    dispose(): void {
+        this._sg.delete();
+    }
+
+    /**
+     * @deprecated Use {@link dispose} instead.
      */
     delete(): void {
-        this._sg.delete();
+        this.dispose();
     }
 
     /** @internal – supports the `using` keyword (explicit resource management). */
     [Symbol.dispose](): void {
-        this.delete();
+        this.dispose();
     }
 }
 
@@ -636,7 +643,7 @@ export class Subgraph {
  * {@link Graph.toDot} to serialise to a DOT string that can be passed to
  * {@link Graphviz.layout} (or any of its convenience wrappers).
  *
- * **Always call {@link Graph.delete} (or use the `using` keyword) when
+ * **Always call {@link Graph.dispose} (or use the `using` keyword) when
  * finished** to release the underlying WASM memory.
  *
  * ```ts
@@ -1228,16 +1235,22 @@ export class Graph {
     }
 
     /**
-     * Release the underlying WASM object.  Must be called when the graph is
-     * no longer needed (or use the `using` keyword with TypeScript ≥ 5.2).
+     * Release the underlying WASM object.
+     */
+    dispose(): void {
+        this._graph.delete();
+    }
+
+    /**
+     * @deprecated Use {@link dispose} instead.
      */
     delete(): void {
-        this._graph.delete();
+        this.dispose();
     }
 
     /** @internal – supports the `using` keyword (explicit resource management). */
     [Symbol.dispose](): void {
-        this.delete();
+        this.dispose();
     }
 }
 
@@ -1282,9 +1295,15 @@ export class Graph {
 export class Graphviz {
 
     private _module: MainModule;
+    private _loadReferences = 0;
 
     private constructor(_module: MainModule) {
         this._module = _module;
+    }
+
+    /** @internal */
+    static _create(module: MainModule): Graphviz {
+        return new Graphviz(module);
     }
 
     /**
@@ -1298,33 +1317,45 @@ export class Graphviz {
      */
     static load(): Promise<Graphviz> {
         if (!g_graphviz) {
-            const loading: Promise<Graphviz> = load().then((module: MainModule) => {
-                const instance = new Graphviz(module);
-                if (g_graphviz === loading) g_graphvizInstance = instance;
-                return instance;
-            });
-            g_graphviz = loading;
+            g_graphviz = SharedPtr.make(WasmModuleResource<MainModule>);
         }
-        return g_graphviz!;
+        const owner = g_graphviz;
+        const resource = owner.get();
+        if (!resource) {
+            throw new Error("Graphviz WASM resource is no longer available");
+        }
+        return resource.ready.then(module => {
+            if (g_graphviz !== owner || owner.get() !== resource) return Graphviz._create(module);
+            g_graphvizInstance ??= Graphviz._create(module);
+            ++g_graphvizInstance._loadReferences;
+            return g_graphvizInstance;
+        });
     }
 
-    /**
-     * Unloades the compiled wasm instance.
-     */
-    static unload() {
-        reset();
+    /** Disposes the compiled WASM instance, regardless of outstanding references, and allows it to be loaded again. */
+    static dispose(): void {
+        const owner = g_graphviz;
         g_graphviz = undefined;
         g_graphvizInstance = undefined;
+        owner?.dispose();
     }
 
     /**
-     * Unloads the compiled wasm instance, equivalent to {@link Graphviz.unload}.
-     * Disposing an instance that has already been unloaded is a no-op.
+     * @deprecated Use {@link Graphviz.dispose} instead.
+     */
+    static unload(): void {
+        Graphviz.dispose();
+    }
+
+    /**
+     * Releases one {@link Graphviz.load} reference. The library is unloaded, as by
+     * {@link Graphviz.dispose}, when the last reference is released, so overlapping `using`
+     * scopes do not invalidate each other. Disposing an instance that has already been
+     * unloaded is a no-op.
      */
     dispose(): void {
-        if (g_graphvizInstance === this) {
-            Graphviz.unload();
-        }
+        if (g_graphvizInstance !== this || !g_graphviz?.get() || this._loadReferences === 0) return;
+        if (--this._loadReferences === 0) Graphviz.dispose();
     }
 
     [Symbol.dispose](): void {
@@ -1364,7 +1395,7 @@ export class Graphviz {
             graphViz.delete();
         }
         if (!retVal && errorMsg) {
-            Graphviz.unload();
+            Graphviz.dispose();
             throw new Error(errorMsg);
         }
         return retVal;
@@ -1398,7 +1429,7 @@ export class Graphviz {
             graphViz.delete();
         }
         if (errorMsg) {
-            Graphviz.unload();
+            Graphviz.dispose();
             throw new Error(errorMsg);
         }
         return { acyclic, num_rev, outFile };
@@ -1431,7 +1462,7 @@ export class Graphviz {
             graphViz.delete();
         }
         if (!out && errorMsg) {
-            Graphviz.unload();
+            Graphviz.dispose();
             throw new Error(errorMsg);
         }
         return { out, err };
@@ -1462,7 +1493,7 @@ export class Graphviz {
             graphViz.delete();
         }
         if (!retVal && errorMsg) {
-            Graphviz.unload();
+            Graphviz.dispose();
             throw new Error(errorMsg);
         }
         return retVal;
@@ -1635,7 +1666,7 @@ export class Graphviz {
             graph.read(dotSource);
             return graph;
         } catch (e) {
-            graph.delete();
+            graph.dispose();
             throw e;
         }
     }

@@ -24,6 +24,7 @@
   },
   "workspaces": [
     "packages/*",
+    "tests/acceptance",
     "tests/bundlers"
   ],
   "scripts": {
@@ -76,6 +77,8 @@
     "test-browser": "vitest run --project browser",
     "test-node": "vitest run --project node",
     "test": "lerna run test",
+    "test-acceptance": "npm run test --workspace=tests/acceptance",
+    "check-specs": "node ./scripts/check-spec-coverage.mjs",
     "test-bundlers": "npm run test --workspace=tests/bundlers",
     "test-bundlers-script": "./scripts/test-bundlers.sh",
     "test-bundlers-webpack": "npm run test:webpack --workspace=tests/bundlers",

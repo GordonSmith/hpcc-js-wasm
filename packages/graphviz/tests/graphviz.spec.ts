@@ -61,6 +61,9 @@ describe("graphviz", function () {
         disposed.dispose();
         expect(await Graphviz.load()).to.equal(reloaded);
 
+        // two outstanding references: the reload above and the load in the line before
+        reloaded[Symbol.dispose]();
+        expect(reloaded.layout("digraph G { a -> b }", "svg")).to.contain("<svg");
         reloaded[Symbol.dispose]();
         expect(await Graphviz.load()).to.not.equal(reloaded);
         Graphviz.unload();

@@ -201,6 +201,21 @@ npm run test-bundlers
 
 **CRITICAL**: Tests require full build completion. Without WASM files, all tests will fail with module not found errors.
 
+## Spec-Driven Development (acceptance tests)
+
+Packages that have a `specs/<package>/` folder (currently `graphviz` and `graphviz-cli`) are
+developed spec first, using a four-layer acceptance-test model: test cases → DSL → protocol
+drivers → system under test. Conventions are in [specs/README.md](../specs/README.md) and
+[.github/instructions/spec-driven.instructions.md](instructions/spec-driven.instructions.md).
+
+- To change behaviour in these packages, first add or update a spec with a stable ID, then
+  add a failing scenario in `tests/acceptance/`, then implement. Use the `/new-spec`,
+  `/spec-to-test` and `/implement-spec` skills (`.github/skills/`).
+- `npm run check-specs`: traceability between specs and scenarios. It needs no build and
+  also runs as part of `npm run lint`.
+- `npm run test-acceptance`: runs every scenario against each driver (`node-inprocess`,
+  `node-no-globals`, `cli`, `browser`). It needs the built `dist/` and `bin/` output.
+
 ## Validation Scenarios
 
 After making changes, ALWAYS run these validation scenarios:

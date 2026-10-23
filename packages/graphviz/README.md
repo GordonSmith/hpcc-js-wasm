@@ -267,22 +267,23 @@ when finished to avoid memory leaks:
   }
   ```
 
-- **Manual `delete()`**:
+- **Manual `dispose()`**:
   ```typescript
   const graph = graphviz.createGraph("G");
   try {
     // ...
   } finally {
-    graph.delete();
+    graph.dispose();
   }
   ```
 
 Subgraph wrappers follow the same rule. The underlying subgraph _data_ is
-owned by the parent `Graph` and freed automatically when the parent is deleted;
-only the thin JS wrapper needs an explicit `delete()` / `using` block.
+owned by the parent `Graph` and freed automatically when the parent is disposed;
+only the thin JS wrapper needs an explicit `dispose()` / `using` block. The legacy
+`delete()` methods remain available as deprecated aliases.
 
-The `Graphviz` instance itself is also disposable. Leaving its scope is
-equivalent to calling `Graphviz.unload()`, so declare it before the graphs that
+The `Graphviz` instance itself is also disposable. Leaving its scope
+releases the reference taken by `Graphviz.load()`, so declare it before the graphs that
 depend on it; `using` disposes in reverse order:
 
 ```typescript
@@ -291,12 +292,15 @@ depend on it; `using` disposes in reverse order:
   using graph = graphviz.createGraph("G");
   graph.addEdge("a", "b");
   const svg = graph.layout();
-} // graph is deleted first, then Graphviz.unload() runs
+} // graph is disposed first, then Graphviz is disposed
 ```
 
-`Graphviz.load()` returns a singleton, so disposing it unloads the module for
-every caller in the current JavaScript context. Disposing an instance that has
-already been unloaded does nothing.
+`Graphviz.load()` returns a shared, reference-counted singleton: every call takes
+a reference and every `dispose()` releases one, so overlapping `using` scopes do
+not break each other. The module is unloaded when the last reference is released.
+Disposing an instance that has already been unloaded does nothing. The static
+`Graphviz.dispose()` unloads immediately regardless of outstanding references,
+and `Graphviz.unload()` is a deprecated alias for it.
 
 <!--@include: ../../docs/graphviz/src/graphviz/README.md-->
 
