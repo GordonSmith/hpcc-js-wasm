@@ -96,7 +96,7 @@
     "@types/node": "26.6.6",
     "@types/yargs": "17.0.35",
     "@typescript/native": "npm:typescript@7.0.2",
-    "@typescript-eslint/parser": "8.72.1",
+    "@typescript-eslint/parser": "8.72.2",
     "@vitest/browser-playwright": "5.1.0",
     "@vitest/coverage-istanbul": "5.1.0",
     "@vitest/coverage-v8": "5.1.0",
@@ -113,13 +113,13 @@
     "typedoc": "0.28.20",
     "typedoc-plugin-markdown": "4.14.1",
     "typescript": "npm:@typescript/typescript6@6.0.2",
-    "typescript-eslint": "8.72.1",
+    "typescript-eslint": "8.72.2",
     "vitepress": "1.6.4",
     "vitest": "5.1.0",
     "glob": "14.0.4",
     "minimatch": "11.0.5",
     "undici": "8.12.4",
-    "vite": "8.3.6"
+    "vite": "8.3.7"
   },
   "overrides": {
     "glob": "14.0.4",
@@ -128,7 +128,7 @@
       "minimatch": "10.2.6"
     },
     "undici": "8.12.4",
-    "vite": "8.3.6"
+    "vite": "8.3.7"
   },
   "c8": {
     "exclude-after-remap": []
